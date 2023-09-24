@@ -60,7 +60,7 @@ public class ControllerReadTest extends JFrame{
 
 	private abstract static class AxisPanel extends JPanel{
 		private static final long serialVersionUID = -2117191506803328790L;
-		Component axis;
+		transient Component axis;
 		float data;
 
 		public AxisPanel(Component ax){
@@ -172,8 +172,8 @@ public class ControllerReadTest extends JFrame{
 
 	private static class ControllerWindow extends JFrame {
 		private static final long serialVersionUID = 5812903945250431578L;
-		Controller ca;
-		List<AxisPanel> axisList = new ArrayList<>();
+		transient Controller ca;
+		transient List<AxisPanel> axisList = new ArrayList<>();
 		boolean disabled = false;
 
 		public ControllerWindow(JFrame frame,Controller ca){
@@ -252,7 +252,7 @@ public class ControllerReadTest extends JFrame{
 	}
 
 	static final long HEARTBEATMS =100; // 10th of a second
-	List<ControllerWindow> controllers = new ArrayList<>();
+	transient List<ControllerWindow> controllers = new ArrayList<>();
 
 	public ControllerReadTest() {
 		super("Controller Read Test. Version: " + Version.getVersion());

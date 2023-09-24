@@ -30,25 +30,42 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  */
+
 package net.java.games.input;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+import vavix.rococoa.corefoundation.CFAllocator;
+import vavix.rococoa.corefoundation.CFDictionary;
+import vavix.rococoa.kernel.KernelLib;
+import vavix.rococoa.iokit.IOKitLib;
+import vavix.rococoa.iokit.IOKitLib.IOHIDDeviceInterface;
+
+import static net.java.games.input.NativeUtil.copyEvent;
+import static net.java.games.input.NativeUtil.createMapFromCFDictionary;
+import static vavix.rococoa.iokit.IOKitLib.INSTANCE;
+import static vavix.rococoa.iokit.IOKitLib.IOHIDEventStruct;
+
+
 /** OSX HIDManager implementation
-* @author elias
-* @author gregorypierce
-* @version 1.0
-*/
+ * @author elias
+ * @author gregorypierce
+ * @version 1.0
+ */
 final class OSXHIDDevice {
+
 	private final static Logger log = Logger.getLogger(OSXHIDDevice.class.getName());
+
 	private final static int AXIS_DEFAULT_MIN_VALUE = 0;
 	private final static int AXIS_DEFAULT_MAX_VALUE = 64*1024;
-	
+
 	private final static String kIOHIDTransportKey                  = "Transport";
 	private final static String kIOHIDVendorIDKey                   = "VendorID";
 	private final static String kIOHIDVendorIDSourceKey             = "VendorIDSource";
@@ -64,7 +81,7 @@ final class OSXHIDDevice {
 	private final static String kIOHIDDeviceUsagePairsKey           = "DeviceUsagePairs";
 	private final static String kIOHIDPrimaryUsageKey               = "PrimaryUsage";
 	private final static String kIOHIDPrimaryUsagePageKey           = "PrimaryUsagePage";
-	private final static String kIOHIDMaxInputReportSizeKey     = "MaxInputReportSize";
+	private final static String kIOHIDMaxInputReportSizeKey         = "MaxInputReportSize";
 	private final static String kIOHIDMaxOutputReportSizeKey        = "MaxOutputReportSize";
 	private final static String kIOHIDMaxFeatureReportSizeKey       = "MaxFeatureReportSize";
 
@@ -96,15 +113,17 @@ final class OSXHIDDevice {
 	private final static String kIOHIDElementDuplicateIndexKey      = "DuplicateIndex";
 	private final static String kIOHIDElementParentCollectionKey    = "ParentCollection";
 
-	private final long device_address;
-	private final long device_interface_address;
+	private final Pointer device_address;
+	private final Pointer/*IOHIDDeviceInterface**/ device_interface_address;
+	private final IOHIDDeviceInterface device_interface;
 	private final Map<String,?> properties;
 
 	private boolean released;
 
-	public OSXHIDDevice(long device_address, long device_interface_address) throws IOException {
+	public OSXHIDDevice(Pointer device_address, Pointer/*IOHIDDeviceInterface**/ device_interface_address) throws IOException {
 		this.device_address = device_address;
 		this.device_interface_address = device_interface_address;
+		this.device_interface = new IOHIDDeviceInterface(device_interface_address.getPointer(0));
 		this.properties = getDeviceProperties();
 		open();
 	}
@@ -125,28 +144,29 @@ final class OSXHIDDevice {
 	}
 
 	private final OSXHIDElement createElementFromElementProperties(Map<String,?> element_properties) {
-	/*	long size = getLongFromProperties(element_properties, kIOHIDElementSizeKey);
-		// ignore elements that can't fit into the 32 bit value field of a hid event
-		if (size > 32)
-			return null;*/
-		long element_cookie = getLongFromProperties(element_properties, kIOHIDElementCookieKey);
+//		long size = getLongFromProperties(element_properties, kIOHIDElementSizeKey);
+//		// ignore elements that can't fit into the 32 bit value field of a hid event
+//		if (size > 32)
+//			return null;
+		Pointer element_cookie = new Pointer(getLongFromProperties(element_properties, kIOHIDElementCookieKey));
 		int element_type_id = getIntFromProperties(element_properties, kIOHIDElementTypeKey);
 		ElementType element_type = ElementType.map(element_type_id);
 		int min = (int)getLongFromProperties(element_properties, kIOHIDElementMinKey, AXIS_DEFAULT_MIN_VALUE);
 		int max = (int)getLongFromProperties(element_properties, kIOHIDElementMaxKey, AXIS_DEFAULT_MAX_VALUE);
-/*		long scaled_min = getLongFromProperties(element_properties, kIOHIDElementScaledMinKey, Long.MIN_VALUE);
-		long scaled_max = getLongFromProperties(element_properties, kIOHIDElementScaledMaxKey, Long.MAX_VALUE);*/
+//		long scaled_min = getLongFromProperties(element_properties, kIOHIDElementScaledMinKey, Long.MIN_VALUE);
+//		long scaled_max = getLongFromProperties(element_properties, kIOHIDElementScaledMaxKey, Long.MAX_VALUE);
 		UsagePair device_usage_pair = getUsagePair();
 		boolean default_relative = device_usage_pair != null && (device_usage_pair.getUsage() == GenericDesktopUsage.POINTER || device_usage_pair.getUsage() == GenericDesktopUsage.MOUSE);
-		
+
 		boolean is_relative = getBooleanFromProperties(element_properties, kIOHIDElementIsRelativeKey, default_relative);
-/*		boolean is_wrapping = getBooleanFromProperties(element_properties, kIOHIDElementIsWrappingKey);
-		boolean is_non_linear = getBooleanFromProperties(element_properties, kIOHIDElementIsNonLinearKey);
-		boolean has_preferred_state = getBooleanFromProperties(element_properties, kIOHIDElementHasPreferredStateKey);
-		boolean has_null_state = getBooleanFromProperties(element_properties, kIOHIDElementHasNullStateKey);*/
+//		boolean is_wrapping = getBooleanFromProperties(element_properties, kIOHIDElementIsWrappingKey);
+//		boolean is_non_linear = getBooleanFromProperties(element_properties, kIOHIDElementIsNonLinearKey);
+//		boolean has_preferred_state = getBooleanFromProperties(element_properties, kIOHIDElementHasPreferredStateKey);
+//		boolean has_null_state = getBooleanFromProperties(element_properties, kIOHIDElementHasNullStateKey);
 		int usage = getIntFromProperties(element_properties, kIOHIDElementUsageKey);
 		int usage_page = getIntFromProperties(element_properties, kIOHIDElementUsagePageKey);
 		UsagePair usage_pair = createUsagePair(usage_page, usage);
+		log.finer("element_type = 0x" + element_type + " | usage = " + usage + " | usage_page = " + usage_page);
 		if (usage_pair == null || (element_type != ElementType.INPUT_MISC && element_type != ElementType.INPUT_BUTTON && element_type != ElementType.INPUT_AXIS)) {
 			//log.info("element_type = 0x" + element_type + " | usage = " + usage + " | usage_page = " + usage_page);
 			return null;
@@ -155,13 +175,18 @@ final class OSXHIDDevice {
 		}
 	}
 
-    @SuppressWarnings("unchecked")
-    private final void addElements(List<OSXHIDElement> elements, Map<String,?> properties) {
+	@SuppressWarnings("unchecked")
+	private final void addElements(List<OSXHIDElement> elements, Map<String,?> properties) {
 		Object[] elements_properties = (Object[])properties.get(kIOHIDElementKey);
-		if (elements_properties == null)
+		if (elements_properties == null) {
+			log.finer("no elements");
 			return;
+		}
+		log.finer("elements_properties: " + elements_properties.length);
 		for (int i = 0; i < elements_properties.length; i++) {
 			Map<String,?> element_properties = (Map<String,?>)elements_properties[i];
+			log.finer("element_properties: " + element_properties);
+			if (element_properties == null) continue;
 			OSXHIDElement element = createElementFromElementProperties(element_properties);
 			if (element != null) {
 				elements.add(element);
@@ -169,13 +194,13 @@ final class OSXHIDDevice {
 			addElements(elements, element_properties);
 		}
 	}
-	
+
 	public final List<OSXHIDElement> getElements() {
 		List<OSXHIDElement> elements = new ArrayList<>();
 		addElements(elements, properties);
 		return elements;
 	}
-	
+
 	private final static long getLongFromProperties(Map<String,?> properties, String key, long default_value) {
 		Long long_obj = (Long)properties.get(key);
 		if (long_obj == null)
@@ -184,16 +209,18 @@ final class OSXHIDDevice {
 	}
 
 	private final static boolean getBooleanFromProperties(Map<String,?> properties, String key, boolean default_value) {
-		return getLongFromProperties(properties, key, default_value ? 1 : 0) != 0;
+		Object v = properties.get(key);
+		return v != null ? (boolean) v : default_value;
 	}
 
 	private final static int getIntFromProperties(Map<String,?> properties, String key) {
 		return (int)getLongFromProperties(properties, key);
 	}
 
-	private final static long getLongFromProperties(Map<String,?> properties, String key) {
-		Long long_obj = (Long)properties.get(key);
-		return long_obj.longValue();
+	private static long getLongFromProperties(Map<String,?> properties, String key) {
+		log.finer("key: " + key + ", value: " + properties.get(key));
+		Object v = properties.get(key);
+		return v != null ? (long) v : 0;
 	}
 
 	private final static UsagePair createUsagePair(int usage_page_id, int usage_id) {
@@ -211,7 +238,7 @@ final class OSXHIDDevice {
 		int usage_id = getIntFromProperties(properties, kIOHIDPrimaryUsageKey);
 		return createUsagePair(usage_page_id, usage_id);
 	}
-	
+
 	private final void dumpProperties() {
 		log.info(toString());
 		dumpMap("", properties);
@@ -225,7 +252,7 @@ final class OSXHIDDevice {
 		}
 		log.info(prefix + "}");
 	}
-	
+
 	private final static void dumpMap(String prefix, Map<String,?> map) {
 		Iterator<String> keys = map.keySet().iterator();
 		while (keys.hasNext()) {
@@ -243,51 +270,76 @@ final class OSXHIDDevice {
 			log.info(prefix + "0x" + Long.toHexString(l.longValue()));
 		} else if (obj instanceof Map)
 			dumpMap(prefix, (Map<String,?>)obj);
-		else if (obj.getClass().isArray())
+		else if (obj != null && obj.getClass().isArray())
 			dumpArray(prefix, (Object[])obj);
 		else
 			log.info(prefix + obj);
 	}
 
-	private final Map<String,?> getDeviceProperties() throws IOException {
-		return nGetDeviceProperties(device_address);
-	}
-	private final static native Map<String,?> nGetDeviceProperties(long device_address) throws IOException;
+	private Map<String,?> getDeviceProperties() throws IOException {
+		PointerByReference pProperties = new PointerByReference();
 
-	public final synchronized void release() throws IOException {
+		int result = INSTANCE.IORegistryEntryCreateCFProperties(
+				device_address,
+				pProperties,
+				CFAllocator.kCFAllocatorDefault,
+				KernelLib.kNilOptions);
+		if (result != IOKitLib.KERN_SUCCESS) {
+			throw new IOException("Failed to create properties for device " + result);
+		}
+		CFDictionary properties = new CFDictionary(pProperties.getValue());
+		@SuppressWarnings({"unchecked", "rawtypes"})
+		Map<String, ?> map = (Map) createMapFromCFDictionary(properties);
+		log.finer("IORegistryEntryCreateCFProperties: " + map);
+		return map;
+	}
+
+
+	public synchronized void release() throws IOException {
 		try {
 			close();
 		} finally {
 			released = true;
-			nReleaseDevice(device_address, device_interface_address);
+			device_interface.release.invoke(device_interface_address);
+			INSTANCE.IOObjectRelease(device_address);
 		}
 	}
-	private final static native void nReleaseDevice(long device_address, long device_interface_address);
 
-	public final synchronized void getElementValue(long element_cookie, OSXEvent event) throws IOException {
+	public synchronized void getElementValue(Pointer/*IOHIDElementCookie*/ element_cookie, OSXEvent event_return) throws IOException {
 		checkReleased();
-		nGetElementValue(device_interface_address, element_cookie, event);
+		IOHIDEventStruct.ByReference event = new IOHIDEventStruct.ByReference();
+
+		int ioReturnValue = device_interface.getElementValue.invoke(device_interface_address, element_cookie, event);
+		if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
+			throw new IOException(String.format("Device '%s' getElementValue failed: %x", getProductName(), ioReturnValue));
+		}
+		copyEvent(event, event_return);
 	}
-	private final static native void nGetElementValue(long device_interface_address, long element_cookie, OSXEvent event) throws IOException;
 
-	public final synchronized OSXHIDQueue createQueue(int queue_depth) throws IOException {
+	public synchronized OSXHIDQueue createQueue(int queue_depth) throws IOException {
 		checkReleased();
-		long queue_address = nCreateQueue(device_interface_address);
+		Pointer /* IOHIDQueueInterface** */ queue_address = device_interface.allocQueue.invoke(device_interface_address);
+		if (queue_address == Pointer.NULL) {
+			throw new IOException("Could not allocate queue");
+		}
 		return new OSXHIDQueue(queue_address, queue_depth);
 	}
-	private final static native long nCreateQueue(long device_interface_address) throws IOException;
 
-	private final void open() throws IOException {
-		nOpen(device_interface_address);
+	private void open() throws IOException {
+		int ioReturnValue = device_interface.open.invoke(device_interface_address, 0);
+		if (ioReturnValue !=  IOKitLib.kIOReturnSuccess) {
+			throw new IOException(String.format("Device '%s' open failed: %x", getProductName(), ioReturnValue));
+		}
 	}
-	private final static native void nOpen(long device_interface_address) throws IOException;
 
-	private final void close() throws IOException {
-		nClose(device_interface_address);
+	private void close() throws IOException {
+		int ioReturnValue = device_interface.close.invoke(device_interface_address);
+		if (ioReturnValue !=  IOKitLib.kIOReturnSuccess) {
+			throw new IOException(String.format("Device '%s' close failed: %x", getProductName(), ioReturnValue));
+		}
 	}
-	private final static native void nClose(long device_interface_address) throws IOException;
 
-	private final void checkReleased() throws IOException {
+	private void checkReleased() throws IOException {
 		if (released)
 			throw new IOException();
 	}

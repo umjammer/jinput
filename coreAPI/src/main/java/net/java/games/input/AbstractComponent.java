@@ -40,6 +40,9 @@ package net.java.games.input;
 
 import java.io.IOException;
 
+import static net.java.games.input.ControllerEnvironment.log;
+
+
 /**
  * Skeleton implementation of a named axis.
  */
@@ -104,7 +107,7 @@ public abstract class AbstractComponent implements Component {
 			try {
 				setPollData(poll());
 			} catch (IOException e) {
-				ControllerEnvironment.log("Failed to poll component: " + e);
+				log.fine("Failed to poll component: " + e);
 			}
 		}
         return value;

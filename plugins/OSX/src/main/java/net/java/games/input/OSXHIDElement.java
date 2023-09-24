@@ -40,6 +40,9 @@ package net.java.games.input;
 
 import java.io.IOException;
 
+import com.sun.jna.Pointer;
+
+
 /** Represents an OSX HID Element
 * @author elias
 * @author gregorypierce
@@ -48,14 +51,14 @@ import java.io.IOException;
 final class OSXHIDElement {
 	private final OSXHIDDevice device;
 	private final UsagePair usage_pair;
-	private final long element_cookie;
+	private final Pointer element_cookie;
 	private final ElementType element_type;
 	private final int min;
 	private final int max;
 	private final Component.Identifier identifier;
 	private final boolean is_relative;
 	
-	public OSXHIDElement(OSXHIDDevice device, UsagePair usage_pair, long element_cookie, ElementType element_type, int min, int max, boolean is_relative) {
+	public OSXHIDElement(OSXHIDDevice device, UsagePair usage_pair, Pointer element_cookie, ElementType element_type, int min, int max, boolean is_relative) {
 		this.device = device;
 		this.usage_pair = usage_pair;
 		this.element_cookie = element_cookie;
@@ -81,7 +84,7 @@ final class OSXHIDElement {
 		return identifier;
 	}
 
-	final long getCookie() {
+	final Pointer getCookie() {
 		return element_cookie;
 	}
 

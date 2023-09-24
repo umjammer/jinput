@@ -31,10 +31,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -50,11 +49,11 @@ public class JInputAppletResourceLoader {
 	private int percentageDone = 0;
 
 	private String getPrivilegedProperty(final String property) {
-		return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property));
+		return System.getProperty(property);
 	}
 
 	private String setPrivilegedProperty(final String property, final String value) {
-		return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.setProperty(property, value));
+		return System.setProperty(property, value);
 	}
 	
 	public void loadResources(URL codeBase) throws IOException {
@@ -95,7 +94,7 @@ public class JInputAppletResourceLoader {
 			JarEntry jarEntry = jarEntries.nextElement();
 			String entryName = jarEntry.getName();
 			if(!entryName.startsWith("META-INF")) {
-				totalUncompressedBytes+=jarEntry.getSize();
+				totalUncompressedBytes+= (int) jarEntry.getSize();
 				entriesToUse.add(jarEntry);
 				diagnosticLog.log(Level.INFO, "Got entry " + entryName + " " + jarEntry.getSize() + " big, total of " + totalUncompressedBytes);
 			}
@@ -166,7 +165,7 @@ public class JInputAppletResourceLoader {
 		OutputStream outStream = new FileOutputStream(localJarFile);
 		outStream = new BufferedOutputStream(outStream);
 		
-		URL remoteJarURL = new URL(codeBase, nativeJar);
+		URL remoteJarURL = URI.create(codeBase + nativeJar).toURL();
 		
 		diagnosticLog.log(Level.INFO, "Using remote file " + remoteJarURL);
 		

@@ -39,8 +39,6 @@
 package net.java.games.input;
 
 import java.io.File;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -72,9 +70,7 @@ import java.util.logging.Logger;
  */
 public abstract class ControllerEnvironment {
 
-    static void log(String msg) {
-		Logger.getLogger(ControllerEnvironment.class.getName()).info(msg);
-	}
+    static Logger log = Logger.getLogger(ControllerEnvironment.class.getName());
 
     /**
      * The default controller environment

@@ -37,6 +37,9 @@ import java.util.HashMap;
 
 import java.io.IOException;
 
+import static net.java.games.input.ControllerEnvironment.log;
+
+
 /**
  * An AbstractController is a skeleton implementation of a controller that
  * contains a fixed number of axes, controllers, and rumblers.
@@ -175,7 +178,7 @@ public abstract class AbstractController implements Controller {
 			setDeviceEventQueueSize(size);
 			event_queue = new EventQueue(size);
 		} catch (IOException e) {
-			ControllerEnvironment.log("Failed to create new event queue of size " + size + ": " + e);
+			log.fine("Failed to create new event queue of size " + size + ": " + e);
 		}
 	}
 
@@ -225,7 +228,7 @@ public abstract class AbstractController implements Controller {
 			}
 			return true;
 		} catch (IOException e) {
-			ControllerEnvironment.log("Failed to poll device: " + e.getMessage());
+			log.finest("Failed to poll device: " + e.getMessage());
 			return false;
 		}
 	} 

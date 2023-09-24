@@ -30,71 +30,39 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  */
+
 package net.java.games.input;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 import net.java.games.util.plugins.Plugin;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-/** OSX HIDManager implementation
-* @author elias
-* @author gregorypierce
-* @version 1.0
-*/
+
+/**
+ * OSX HIDManager implementation
+ * @author elias
+ * @author gregorypierce
+ * @version 1.0
+ */
 public final class OSXEnvironmentPlugin extends ControllerEnvironment implements Plugin {
-	
+
 	private static boolean supported = false;
-	
-	/**
-	 * Static utility method for loading native libraries.
-	 * It will try to load from either the path given by
-	 * the net.java.games.input.librarypath property
-	 * or through System.loadLibrary().
-	 * 
-	 */
-	static void loadLibrary(final String lib_name) {
-		AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-					    try {
-    						String lib_path = System.getProperty("net.java.games.input.librarypath");
-    						if (lib_path != null)
-    							System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
-    						else
-    							System.loadLibrary(lib_name);
-					    } catch (UnsatisfiedLinkError e) {
-					        e.printStackTrace();
-					        supported = false;
-					    }
-						return null;
-				});
-	}
-    
-	static String getPrivilegedProperty(final String property) {
-	       return AccessController.doPrivileged((PrivilegedAction<String>)() -> System.getProperty(property));
+
+	static {
+		String osName = System.getProperty("os.name", "").trim();
+log.fine(osName);
+		if (osName.contains("Mac")) {
+			// Could check isMacOSXEqualsOrBetterThan in here too.
+			supported = true;
 		}
-		
-
-	static String getPrivilegedProperty(final String property, final String default_value) {
-       return AccessController.doPrivileged((PrivilegedAction<String>)() -> System.getProperty(property, default_value));
 	}
-		
-    static {
-    	String osName = getPrivilegedProperty("os.name", "").trim();
-    	if(osName.equals("Mac OS X")) {
-    		// Could check isMacOSXEqualsOrBetterThan in here too.
-    		supported = true;
-    		loadLibrary("jinput-osx");
-    	}
-    }
 
-	private final static boolean isMacOSXEqualsOrBetterThan(int major_required, int minor_required) {
+	private static boolean isMacOSXEqualsOrBetterThan(int major_required, int minor_required) {
 		String os_version = System.getProperty("os.version");
 		StringTokenizer version_tokenizer = new StringTokenizer(os_version, ".");
 		int major;
@@ -105,7 +73,7 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			major = Integer.parseInt(major_str);
 			minor = Integer.parseInt(minor_str);
 		} catch (Exception e) {
-			log("Exception occurred while trying to determine OS version: " + e);
+			log.fine("Exception occurred while trying to determine OS version: " + e);
 			// Best guess, no
 			return false;
 		}
@@ -115,22 +83,25 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 	private final Controller[] controllers;
 
 	public OSXEnvironmentPlugin() {
-		if(isSupported()) {
+		if (isSupported()) {
 			this.controllers = enumerateControllers();
 		} else {
+log.fine("not supported");
 			this.controllers = new Controller[0];
 		}
 	}
 
+	@Override
 	public final Controller[] getControllers() {
 		return controllers;
 	}
 
+	@Override
 	public boolean isSupported() {
 		return supported;
 	}
 
-	private final static void addElements(OSXHIDQueue queue, List<OSXHIDElement> elements, List<OSXComponent> components, boolean map_mouse_buttons) throws IOException {
+	private static void addElements(OSXHIDQueue queue, List<OSXHIDElement> elements, List<OSXComponent> components, boolean map_mouse_buttons) throws IOException {
 		Iterator<OSXHIDElement> it = elements.iterator();
 		while (it.hasNext()) {
 			OSXHIDElement element = it.next();
@@ -161,6 +132,8 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			queue.release();
 			throw e;
 		}
+log.fine("@@@ components: " + components.size());
+log.fine("@@@ components: " + components);
 		Component[] components_array = new Component[components.size()];
 		components.toArray(components_array);
 		return new OSXKeyboard(device, queue, components_array, new Controller[]{}, new Rumbler[]{});
@@ -175,6 +148,8 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			queue.release();
 			throw e;
 		}
+log.fine("@@@ components: " + components.size());
+log.fine("@@@ components: " + components);
 		Component[] components_array = new Component[components.size()];
 		components.toArray(components_array);
 		Mouse mouse = new OSXMouse(device, queue, components_array, new Controller[]{}, new Rumbler[]{});
@@ -185,7 +160,7 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			return null;
 		}
 	}
-	
+
 	private final static AbstractController createControllerFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements, Controller.Type type) throws IOException {
 		List<OSXComponent> components = new ArrayList<>();
 		OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
@@ -195,6 +170,8 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			queue.release();
 			throw e;
 		}
+log.fine("@@@ components: " + components.size());
+log.fine("@@@ components: " + components);
 		Component[] components_array = new Component[components.size()];
 		components.toArray(components_array);
 		return new OSXAbstractController(device, queue, components_array, new Controller[]{}, new Rumbler[]{}, type);
@@ -202,22 +179,30 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 
 	private final static void createControllersFromDevice(OSXHIDDevice device, List<Controller> controllers) throws IOException {
 		UsagePair usage_pair = device.getUsagePair();
-		if (usage_pair == null)
+		if (usage_pair == null) {
+log.finer("device: '" + device.getProductName() + "' has no usage pair");
 			return;
+		}
+log.fine("-------- device: '" + device.getProductName() + "' --------");
 		List<OSXHIDElement> elements = device.getElements();
 		if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && (usage_pair.getUsage() == GenericDesktopUsage.MOUSE ||
 					usage_pair.getUsage() == GenericDesktopUsage.POINTER)) {
+log.fine("mouse device: '" + device.getProductName() + "' --------");
 			Controller mouse = createMouseFromDevice(device, elements);
 			if (mouse != null)
 				controllers.add(mouse);
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && (usage_pair.getUsage() == GenericDesktopUsage.KEYBOARD ||
 					usage_pair.getUsage() == GenericDesktopUsage.KEYPAD)) {
+log.fine("keyboard device: '" + device.getProductName() + "' --------");
 			controllers.add(createKeyboardFromDevice(device, elements));
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.JOYSTICK) {
+log.fine("joystick device: '" + device.getProductName() + "' --------");
 			controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.MULTI_AXIS_CONTROLLER) {
+log.fine("multi-axis device: '" + device.getProductName() + "' --------");
 			controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.GAME_PAD) {
+log.fine("gamepad device: '" + device.getProductName() + "' --------");
 			controllers.add(createControllerFromDevice(device, elements, Controller.Type.GAMEPAD));
 		}
 	}
@@ -239,19 +224,19 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 							createControllersFromDevice(device, controllers);
 							device_used = old_size != controllers.size();
 						} catch (IOException e) {
-							log("Failed to create controllers from device: " + device.getProductName());
+							log.log(Level.FINE, "Failed to create controllers from device: " + device.getProductName(), e);
 						}
 						if (!device_used)
 							device.release();
 					} catch (IOException e) {
-						log("Failed to enumerate device: " + e.getMessage());
+						log.log(Level.FINE, "Failed to enumerate device: ", e);
 					}
 				}
 			} finally {
 				it.close();
 			}
 		} catch (IOException e) {
-			log("Failed to enumerate devices: " + e.getMessage());
+			log.log(Level.FINE, "Failed to enumerate devices: " + e.getMessage(), e);
 			return new Controller[]{};
 		}
 		Controller[] controllers_array = new Controller[controllers.size()];

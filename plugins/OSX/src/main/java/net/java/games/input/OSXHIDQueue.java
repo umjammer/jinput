@@ -30,106 +30,146 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  */
+
 package net.java.games.input;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import com.sun.jna.Pointer;
+import vavix.rococoa.iokit.IOKitLib;
+import vavix.rococoa.iokit.IOKitLib.IOHIDEventStruct;
+import vavix.rococoa.iokit.IOKitLib.IOHIDQueueInterface;
+
+import static net.java.games.input.NativeUtil.copyEvent;
+import static vavix.rococoa.iokit.IOKitLib.kIOReturnSuccess;
+import static vavix.rococoa.iokit.IOKitLib.log;
+
 
 /**
-* @author elias
-* @version 1.0
-*/
+ * @author elias
+ * @version 1.0
+ */
 final class OSXHIDQueue {
-	private final Map<Long,OSXComponent> map = new HashMap<>();
-	private final long queue_address;
 
-	private boolean released;
-	
-	public OSXHIDQueue(long address, int queue_depth) throws IOException {
-		this.queue_address = address;
-		try {
-			createQueue(queue_depth);
-		} catch (IOException e) {
-			release();
-			throw e;
-		}
-	}
+    private final Map<Pointer, OSXComponent> map = new HashMap<>();
+    private final Pointer /* IOHIDQueueInterface** */ queue_address;
+    private final IOHIDQueueInterface queue;
 
-	public final synchronized void setQueueDepth(int queue_depth) throws IOException {
-		checkReleased();
-		stop();
-		close();
-		createQueue(queue_depth);
-	}
-	
-	private final void createQueue(int queue_depth) throws IOException {
-		open(queue_depth);
-		try {
-			start();
-		} catch (IOException e) {
-			close();
-			throw e;
-		}
-	}
+    private boolean released;
 
-	public final OSXComponent mapEvent(OSXEvent event) {
-		return map.get(event.getCookie());
-	}
+    public OSXHIDQueue(Pointer /* IOHIDQueueInterface** */  address, int queue_depth) throws IOException {
+        this.queue_address = address;
+        this.queue = new IOHIDQueueInterface(address.getPointer(0));
+        try {
+            createQueue(queue_depth);
+        } catch (IOException e) {
+            release();
+            throw e;
+        }
+    }
 
-	private final void open(int queue_depth) throws IOException {
-		nOpen(queue_address, queue_depth);
-	}
-	private final static native void nOpen(long queue_address, int queue_depth) throws IOException;
+    public final synchronized void setQueueDepth(int queue_depth) throws IOException {
+        checkReleased();
+        stop();
+        close();
+        createQueue(queue_depth);
+    }
 
-	private final void close() throws IOException {
-		nClose(queue_address);
-	}
-	private final static native void nClose(long queue_address) throws IOException;
+    private final void createQueue(int queue_depth) throws IOException {
+        open(queue_depth);
+        try {
+            start();
+        } catch (IOException e) {
+            close();
+            throw e;
+        }
+    }
 
-	private final void start() throws IOException {
-		nStart(queue_address);
-	}
-	private final static native void nStart(long queue_address) throws IOException;
+    public final OSXComponent mapEvent(OSXEvent event) {
+        return map.get(new Pointer(event.getCookie()));
+    }
 
-	private final void stop() throws IOException {
-		nStop(queue_address);
-	}
-	private final static native void nStop(long queue_address) throws IOException;
-	
-	public final synchronized void release() throws IOException {
-		if (!released) {
-			released = true;
-			try {
-				stop();
-				close();
-			} finally {
-				nReleaseQueue(queue_address);
-			}
-		}
-	}
-	private final static native void nReleaseQueue(long queue_address) throws IOException;
+    private void open(int queue_depth) throws IOException {
+        int ioReturnValue = queue.create.invoke(queue_address, 0, queue_depth);
+        if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue open failed: " + ioReturnValue);
+        }
+    }
 
-	public final void addElement(OSXHIDElement element, OSXComponent component) throws IOException {
-		nAddElement(queue_address, element.getCookie());
-		map.put(element.getCookie(), component);
-	}
-	private final static native void nAddElement(long queue_address, long cookie) throws IOException;
+    private void close() throws IOException {
+        int ioReturnValue = queue.dispose.invoke(queue_address);
+        if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue dispose failed: " + ioReturnValue);
+        }
+    }
 
-	public final void removeElement(OSXHIDElement element) throws IOException {
-		nRemoveElement(queue_address, element.getCookie());
-		map.remove(element.getCookie());
-	}
-	private final static native void nRemoveElement(long queue_address, long cookie) throws IOException;
+    private void start() throws IOException {
+        int ioReturnValue = queue.start.invoke(queue_address);
+        if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue start failed: " + ioReturnValue);
+        }
+    }
 
-	public final synchronized boolean getNextEvent(OSXEvent event) throws IOException {
-		checkReleased();
-		return nGetNextEvent(queue_address, event);
-	}
-	private final static native boolean nGetNextEvent(long queue_address, OSXEvent event) throws IOException;
+    private void stop() throws IOException {
+        int ioReturnValue = queue.stop.invoke(queue_address);
+        if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue stop failed: " + ioReturnValue);
+        }
+    }
 
-	private final void checkReleased() throws IOException {
-		if (released)
-			throw new IOException("Queue is released");
-	}
+    public synchronized void release() throws IOException {
+        if (!released) {
+            released = true;
+            try {
+                stop();
+                close();
+            } finally {
+                int ioReturnValue = queue.release.invoke(queue_address).intValue();
+                if (ioReturnValue != kIOReturnSuccess) {
+                    log.warning("Queue Release failed: " + ioReturnValue);
+                }
+            }
+        }
+    }
+
+    public void addElement(OSXHIDElement element, OSXComponent component) throws IOException {
+        int ioReturnValue = queue.addElement.invoke(queue_address, element.getCookie(), 0);
+        if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue addElement failed: " + ioReturnValue);
+        }
+        map.put(element.getCookie(), component);
+    }
+
+    private static void nAddElement(IOHIDQueueInterface queue, Pointer /* IOHIDElementCookie */ cookie) throws IOException {
+    }
+
+    public void removeElement(OSXHIDElement element) throws IOException {
+        int ioReturnValue = queue.removeElement.invoke(queue_address, element.getCookie(), 0);
+        if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue removeElement failed: " + ioReturnValue);
+        }
+        map.remove(element.getCookie());
+    }
+
+    public synchronized boolean getNextEvent(OSXEvent event) throws IOException {
+        checkReleased();
+
+        long /* AbsoluteTime */ zeroTime = 0;
+        IOHIDEventStruct.ByReference nEvent = new IOHIDEventStruct.ByReference();
+        int ioReturnValue = queue.getNextEvent.invoke(queue_address, nEvent, zeroTime, 0);
+        if (ioReturnValue == IOKitLib.kIOReturnUnderrun) {
+            return false;
+        } else if (ioReturnValue != kIOReturnSuccess) {
+            throw new IOException("Queue getNextEvent failed: " + ioReturnValue);
+        }
+        copyEvent(nEvent, event);
+        return true;
+    }
+
+    private void checkReleased() throws IOException {
+        if (released)
+            throw new IOException("Queue is released");
+    }
 }

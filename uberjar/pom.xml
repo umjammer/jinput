@@ -8,7 +8,7 @@
         <groupId>net.java.jinput</groupId>
         <artifactId>jinput-parent</artifactId>
         <version>2.0.10-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -17,6 +17,7 @@
             <artifactId>coreapi</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>windows-plugin</artifactId>
@@ -46,11 +47,13 @@
             <artifactId>windows-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>osx-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>wintab-plugin</artifactId>
@@ -61,6 +64,7 @@
             <artifactId>linux-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        -->
     </dependencies>
 
     <build>
@@ -70,7 +74,9 @@
                 <configuration>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceExcludes>
-                        <dependencySourceExclude>net.java.jinput:osx-plugin</dependencySourceExclude>
+                        <!--
+                <dependencySourceExclude>net.java.jinput:osx-plugin</dependencySourceExclude>
+-->
                         <dependencySourceExclude>net.java.jinput:linux-plugin</dependencySourceExclude>
                         <dependencySourceExclude>net.java.jinput:windows-plugin</dependencySourceExclude>
                         <dependencySourceExclude>net.java.jinput:wintab-plugin</dependencySourceExclude>
@@ -93,12 +99,14 @@
                         </goals>
                         <configuration>
                             <filters>
+                                <!--
                                 <filter>
                                     <artifact>net.java.jinput:osx-plugin:natives-osx</artifact>
                                     <excludes>
                                         <exclude>**/*</exclude>
                                     </excludes>
                                 </filter>
+                                -->
                                 <filter>
                                     <artifact>net.java.jinput:linux-plugin:natives-linux</artifact>
                                     <excludes>
@@ -133,7 +141,7 @@
                                 <filter>
                                     <artifact>net.java.jinput:osx-plugin</artifact>
                                     <includes>
-                                        <include>**/*.jnilib</include>
+                                        <include>**/*.dylib</include>
                                         <include>META-INF/**/*</include>
                                     </includes>
                                 </filter>

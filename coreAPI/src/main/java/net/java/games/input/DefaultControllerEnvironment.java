@@ -35,8 +35,6 @@ package net.java.games.input;
 import net.java.games.util.plugins.Plugins;
 
 import java.io.File;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -62,23 +60,20 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
 	 * 
 	 */
 	static void loadLibrary(final String lib_name) {
-		AccessController.doPrivileged((PrivilegedAction<String>) () -> {
 						String lib_path = System.getProperty("net.java.games.input.librarypath");
 						if (lib_path != null)
 							System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
 						else
 							System.loadLibrary(lib_name);
-						return null;
-				});
 	}
     
 	static String getPrivilegedProperty(final String property) {
-	       return AccessController.doPrivileged((PrivilegedAction<String>) () ->  System.getProperty(property));
+	       return System.getProperty(property);
 		}
 		
 
 	static String getPrivilegedProperty(final String property, final String default_value) {
-       return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, default_value));
+       return System.getProperty(property, default_value);
 	}
 		
     /**
@@ -102,7 +97,7 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
         if (controllers == null) {
             // Controller list has not been scanned.
             controllers = new ArrayList<>();
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> scanControllers());
+            scanControllers();
             //Check the properties for specified controller classes
             String pluginClasses = getPrivilegedProperty("jinput.plugins", "") + " " + getPrivilegedProperty("net.java.games.input.plugins", "");
 			if(!getPrivilegedProperty("jinput.useDefaultPlugin", "true").toLowerCase().trim().equals("false") && !getPrivilegedProperty("net.java.games.input.useDefaultPlugin", "true").toLowerCase().trim().equals("false")) {

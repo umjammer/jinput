@@ -33,8 +33,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -50,11 +48,11 @@ public class JInputAppletResourceLoader {
 	private int percentageDone = 0;
 
 	private String getPrivilegedProperty(final String property) {
-		return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property));
+		return System.getProperty(property);
 	}
 
 	private String setPrivilegedProperty(final String property, final String value) {
-		return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.setProperty(property, value));
+		return System.setProperty(property, value);
 	}
 	
 	public void loadResources(URL codeBase) throws IOException {

@@ -36,6 +36,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,7 +62,7 @@ public class ControllerEventTest extends JFrame{
 
 	private static abstract class AxisPanel extends JPanel{
 		private static final long serialVersionUID = -6200599064870672000L;
-		Component axis;
+		transient Component axis;
 		float data;
 
 		public AxisPanel(Component ax){
@@ -83,6 +85,7 @@ public class ControllerEventTest extends JFrame{
 	}
 
 	private static class DigitalAxisPanel extends AxisPanel {
+		@Serial
 		private static final long serialVersionUID = -4729666037860134626L;
 		JLabel digitalState = new JLabel("<unread>");
 
@@ -172,8 +175,8 @@ public class ControllerEventTest extends JFrame{
 
 	private static class ControllerWindow extends JFrame {
 		private static final long serialVersionUID = 8623977198558568961L;
-		Controller ca;
-		Map<Component, AxisPanel> axes_to_panels = new HashMap<>();
+		transient Controller ca;
+		transient Map<Component, AxisPanel> axes_to_panels = new HashMap<>();
 		boolean disabled = false;
 
 		public ControllerWindow(JFrame frame,Controller ca){
@@ -249,7 +252,7 @@ public class ControllerEventTest extends JFrame{
 	}
 
 	static final long HEARTBEATMS =100; // 10th of a second
-	List<ControllerWindow> controllers = new ArrayList<>();
+	transient List<ControllerWindow> controllers = new ArrayList<>();
 
 	public ControllerEventTest() {
 		super("Controller Event Test. Version: " + Version.getVersion());

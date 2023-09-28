@@ -19,7 +19,7 @@
 		<jar destfile="dist/jinput-linux-native.jar"
 			 basedir="../dist/" includes="libjinput-linux.so, libjinput-linux64.so"/>
 		<jar destfile="dist/jinput-osx-native.jar"
-			 basedir="../dist/" includes="libjinput-osx.jnilib"/>
+			 basedir="../dist/" includes="libjinput-osx.dylib"/>
 	</target>
 	
 	<target name="sign" depends="buildnatives">

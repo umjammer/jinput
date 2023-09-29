@@ -33,6 +33,7 @@
 package net.java.games.input;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -106,6 +107,7 @@ final class OSXHIDDevice {
 		this.device_address = device_address;
 		this.device_interface_address = device_interface_address;
 		this.properties = getDeviceProperties();
+log.finer("properties: " + properties);
 		open();
 	}
 
@@ -147,6 +149,7 @@ final class OSXHIDDevice {
 		int usage = getIntFromProperties(element_properties, kIOHIDElementUsageKey);
 		int usage_page = getIntFromProperties(element_properties, kIOHIDElementUsagePageKey);
 		UsagePair usage_pair = createUsagePair(usage_page, usage);
+log.finer("element_type = 0x" + element_type + " | usage = " + usage + " | usage_page = " + usage_page);
 		if (usage_pair == null || (element_type != ElementType.INPUT_MISC && element_type != ElementType.INPUT_BUTTON && element_type != ElementType.INPUT_AXIS)) {
 			//log.info("element_type = 0x" + element_type + " | usage = " + usage + " | usage_page = " + usage_page);
 			return null;
@@ -160,8 +163,10 @@ final class OSXHIDDevice {
 		Object[] elements_properties = (Object[])properties.get(kIOHIDElementKey);
 		if (elements_properties == null)
 			return;
+log.finer("elements_properties: " + elements_properties.length);
 		for (int i = 0; i < elements_properties.length; i++) {
 			Map<String,?> element_properties = (Map<String,?>)elements_properties[i];
+log.finer("element_properties: " + element_properties.toString());
 			OSXHIDElement element = createElementFromElementProperties(element_properties);
 			if (element != null) {
 				elements.add(element);

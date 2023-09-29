@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -93,7 +94,7 @@ public class JInputAppletResourceLoader {
 			JarEntry jarEntry = jarEntries.nextElement();
 			String entryName = jarEntry.getName();
 			if(!entryName.startsWith("META-INF")) {
-				totalUncompressedBytes+=jarEntry.getSize();
+				totalUncompressedBytes+= (int) jarEntry.getSize();
 				entriesToUse.add(jarEntry);
 				diagnosticLog.log(Level.INFO, "Got entry " + entryName + " " + jarEntry.getSize() + " big, total of " + totalUncompressedBytes);
 			}
@@ -164,7 +165,7 @@ public class JInputAppletResourceLoader {
 		OutputStream outStream = new FileOutputStream(localJarFile);
 		outStream = new BufferedOutputStream(outStream);
 		
-		URL remoteJarURL = new URL(codeBase, nativeJar);
+		URL remoteJarURL = URI.create(codeBase + nativeJar).toURL();
 		
 		diagnosticLog.log(Level.INFO, "Using remote file " + remoteJarURL);
 		

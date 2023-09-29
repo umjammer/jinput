@@ -74,6 +74,14 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDDeviceIterator_nReleaseIt
     IOObjectRelease(iterator);
 }
 
+static void dump(char *d, int l) {
+    int i;
+    for (i = 0; i < l; i++) {
+        printf("%02x ", d[i] & 0xff);
+        if ((i + 1) % 16 == 0) printf("\n");
+    }
+}
+
 static IOHIDDeviceInterface **createHIDDevice(JNIEnv *env, io_object_t hidDevice) {
 //    io_name_t               className;
 	IOHIDDeviceInterface **hidDeviceInterface;
@@ -86,7 +94,12 @@ static IOHIDDeviceInterface **createHIDDevice(JNIEnv *env, io_object_t hidDevice
     }
     
     printfJava(env, "Found device type [%s]\n", className);
-  */  
+  */
+//printf("\nkIOHIDDeviceUserClientTypeID\n");
+//dump(((char *)kIOHIDDeviceUserClientTypeID) + 0, 32);
+//printf("\nkIOCFPlugInInterfaceID\n");
+//dump(((char *)kIOCFPlugInInterfaceID) + 0, 32);
+
     IOReturn ioReturnValue = IOCreatePlugInInterfaceForService(hidDevice,
                                                       kIOHIDDeviceUserClientTypeID,
                                                       kIOCFPlugInInterfaceID,
@@ -94,18 +107,20 @@ static IOHIDDeviceInterface **createHIDDevice(JNIEnv *env, io_object_t hidDevice
                                                       &score);
 
 	if (ioReturnValue != kIOReturnSuccess) {
-		throwIOException(env, "Couldn't create plugin for device interface (%ld)\n", ioReturnValue);
+		throwIOException(env, "Couldn't create plugin for device interface (%08x)\n", ioReturnValue);
 		return NULL;
 	}
 	//Call a method of the intermediate plug-in to create the device 
 	//interface
 	//
+//printf("\nplugInInterface\n");
+//dump(((char *)*plugInInterface) + 0, 64);
 	HRESULT plugInResult = (*plugInInterface)->QueryInterface(plugInInterface,
 			CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID),
 			(LPVOID)&hidDeviceInterface);
 	(*plugInInterface)->Release(plugInInterface);
 	if (plugInResult != S_OK) {
-		throwIOException(env, "Couldn't create HID class device interface (%ld)\n", plugInResult);
+		throwIOException(env, "Couldn't create HID class device interface (%x)\n", plugInResult);
 		return NULL;
 	}
 	return hidDeviceInterface;

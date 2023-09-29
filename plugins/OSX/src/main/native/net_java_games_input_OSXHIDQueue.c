@@ -51,7 +51,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nOpen(JNIEnv *env, 
     IOHIDQueueInterface **queue = (IOHIDQueueInterface **)(intptr_t)address;
 	IOReturn ioReturnValue = (*queue)->create(queue, 0, queue_depth);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue open failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue open failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nStart(JNIEnv *env,
     IOHIDQueueInterface **queue = (IOHIDQueueInterface **)(intptr_t)address;
 	IOReturn ioReturnValue = (*queue)->start(queue);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue start failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue start failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -69,7 +69,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nStop(JNIEnv *env, 
     IOHIDQueueInterface **queue = (IOHIDQueueInterface **)(intptr_t)address;
     IOReturn ioReturnValue = (*queue)->stop(queue);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue stop failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue stop failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -78,7 +78,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nClose(JNIEnv *env,
     IOHIDQueueInterface **queue = (IOHIDQueueInterface **)(intptr_t)address;
     IOReturn ioReturnValue = (*queue)->dispose(queue);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue dispose failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue dispose failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -87,7 +87,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nReleaseQueue(JNIEn
     IOHIDQueueInterface **queue = (IOHIDQueueInterface **)(intptr_t)address;
     IOReturn ioReturnValue = (*queue)->Release(queue);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue Release failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue Release failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -98,7 +98,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nAddElement(JNIEnv 
 
     IOReturn ioReturnValue = (*queue)->addElement(queue, cookie, 0);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue addElement failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue addElement failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -109,7 +109,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDQueue_nRemoveElement(JNIE
 
     IOReturn ioReturnValue = (*queue)->removeElement(queue, cookie);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue removeElement failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue removeElement failed: %x\n", ioReturnValue);
         return;
     }
 }
@@ -124,7 +124,7 @@ JNIEXPORT jboolean JNICALL Java_net_java_games_input_OSXHIDQueue_nGetNextEvent(J
     if (ioReturnValue == kIOReturnUnderrun) {
 		return JNI_FALSE;
 	} else if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Queue getNextEvent failed: %d\n", ioReturnValue);
+        throwIOException(env, "Queue getNextEvent failed: %x\n", ioReturnValue);
         return JNI_FALSE;
     }
     copyEvent(env, &event, event_return);

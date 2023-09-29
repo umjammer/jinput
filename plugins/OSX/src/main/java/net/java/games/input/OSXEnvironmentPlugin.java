@@ -141,6 +141,7 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 					id = Component.Identifier.Button.MIDDLE;
 				}
 			}
+//log(element.toString());
 			OSXComponent component = new OSXComponent(id, element);
 			components.add(component);
 			queue.addElement(element, component);
@@ -190,6 +191,8 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			queue.release();
 			throw e;
 		}
+log("@@@ components: " + components.size());
+log("@@@ components: " + components);
 		Component[] components_array = new Component[components.size()];
 		components.toArray(components_array);
 		return new OSXAbstractController(device, queue, components_array, new Controller[]{}, new Rumbler[]{}, type);
@@ -199,20 +202,26 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 		UsagePair usage_pair = device.getUsagePair();
 		if (usage_pair == null)
 			return;
+log("-------- device: " + device.getProductName() + " --------");
 		List<OSXHIDElement> elements = device.getElements();
 		if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && (usage_pair.getUsage() == GenericDesktopUsage.MOUSE ||
 					usage_pair.getUsage() == GenericDesktopUsage.POINTER)) {
+log("mouse device: " + device.getProductName() + " --------");
 			Controller mouse = createMouseFromDevice(device, elements);
 			if (mouse != null)
 				controllers.add(mouse);
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && (usage_pair.getUsage() == GenericDesktopUsage.KEYBOARD ||
 					usage_pair.getUsage() == GenericDesktopUsage.KEYPAD)) {
+log("keyboard device: " + device.getProductName() + " --------");
 			controllers.add(createKeyboardFromDevice(device, elements));
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.JOYSTICK) {
+log("joystick device: " + device.getProductName() + " --------");
 			controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.MULTI_AXIS_CONTROLLER) {
+log("multi-axis device: " + device.getProductName() + " --------");
 			controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
 		} else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.GAME_PAD) {
+log("gamepad device: " + device.getProductName() + " --------");
 			controllers.add(createControllerFromDevice(device, elements, Controller.Type.GAMEPAD));
 		}
 	}
@@ -239,6 +248,7 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 						if (!device_used)
 							device.release();
 					} catch (IOException e) {
+e.printStackTrace(System.err);
 						log("Failed to enumerate device: " + e.getMessage());
 					}
 				}
@@ -249,6 +259,8 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment implements
 			log("Failed to enumerate devices: " + e.getMessage());
 			return new Controller[]{};
 		}
+log("@@@ controllers: " + controllers.size());
+log("@@@ controllers: " + controllers);
 		Controller[] controllers_array = new Controller[controllers.size()];
 		controllers.toArray(controllers_array);
 		return controllers_array;

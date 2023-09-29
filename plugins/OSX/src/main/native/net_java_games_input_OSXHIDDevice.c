@@ -76,7 +76,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDDevice_nOpen
     IOHIDDeviceInterface **hidDeviceInterface = (IOHIDDeviceInterface **)(intptr_t)lpDevice;
     IOReturn ioReturnValue = (*hidDeviceInterface)->open(hidDeviceInterface, 0);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Device open failed: %d", ioReturnValue);
+        throwIOException(env, "Device open failed: %x", ioReturnValue);
     }
 }
 
@@ -85,7 +85,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDDevice_nClose
     IOHIDDeviceInterface **hidDeviceInterface = (IOHIDDeviceInterface **)(intptr_t)lpDevice;
     IOReturn ioReturnValue = (*hidDeviceInterface)->close(hidDeviceInterface);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Device close failed: %d", ioReturnValue);
+        throwIOException(env, "Device close failed: %x", ioReturnValue);
     }
 }
 
@@ -97,7 +97,7 @@ JNIEXPORT void JNICALL Java_net_java_games_input_OSXHIDDevice_nGetElementValue
 
     IOReturn ioReturnValue = (*hidDeviceInterface)->getElementValue(hidDeviceInterface, cookie, &event);
     if (ioReturnValue != kIOReturnSuccess) {
-        throwIOException(env, "Device getElementValue failed: %d", ioReturnValue);
+        throwIOException(env, "Device getElementValue failed: %x", ioReturnValue);
         return;
     }
     copyEvent(env, &event, event_return);

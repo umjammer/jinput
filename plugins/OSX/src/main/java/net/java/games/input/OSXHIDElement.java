@@ -140,4 +140,18 @@ final class OSXHIDElement {
 		} else
 			return value;
 	}
+
+	@Override
+	public String toString() {
+		return "OSXHIDElement{" +
+				"device=" + device.getProductName() +
+				", usage_pair=" + usage_pair +
+				", element_cookie=" + element_cookie +
+				", element_type=" + element_type +
+				", min=" + min +
+				", max=" + max +
+				", identifier=" + identifier +
+				", is_relative=" + is_relative +
+				'}';
+	}
 }

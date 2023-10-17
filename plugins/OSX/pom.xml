@@ -6,7 +6,6 @@
     <groupId>net.java.jinput</groupId>
     <artifactId>plugins</artifactId>
     <version>2.0.10-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>osx-plugin</artifactId>

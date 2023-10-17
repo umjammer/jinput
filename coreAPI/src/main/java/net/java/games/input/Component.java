@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -138,7 +138,7 @@ public interface Component {
         public static class Axis extends Identifier {
 
             /**
-             * @param name
+             * @param name name of axis
              */
             protected Axis(String name) {
                 super(name);
@@ -316,7 +316,7 @@ public interface Component {
             public static final Button _1 = new Button("1");
 
             /**
-             * Thrid device button
+             * Third device button
              */
             public static final Button _2 = new Button("2");
 
@@ -403,7 +403,7 @@ public interface Component {
             public static final Button TOP2 = new Button("Top 2");
 
             /**
-             * The joystick button you play with with you little finger (Pinkie on *that* side
+             * The joystick button you play with you little finger (Pinkie on *that* side
              * of the pond :P)
              */
             public static final Button PINKIE = new Button("Pinkie");
@@ -419,7 +419,7 @@ public interface Component {
             public static final Button BASE2 = new Button("Base 2");
 
             /**
-             * Thrid joystick button on the base of the device
+             * Third joystick button on the base of the device
              */
             public static final Button BASE3 = new Button("Base 3");
 

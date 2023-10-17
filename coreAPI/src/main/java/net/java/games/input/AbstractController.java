@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -104,6 +104,7 @@ public abstract class AbstractController implements Controller {
      * The objects in the array are returned in order of assignment priority
      * (primary stick, secondary buttons, etc.).
      */
+    @Override
     public final Controller[] getControllers() {
         return children;
     }
@@ -117,6 +118,7 @@ public abstract class AbstractController implements Controller {
      * The array returned is an empty array if this controller contains no components
      * (such as a logical grouping of child controllers).
      */
+    @Override
     public final Component[] getComponents() {
         return components;
     }
@@ -125,6 +127,7 @@ public abstract class AbstractController implements Controller {
      * Returns a single component based on its identifier, or null
      * if no component with the specified type could be found.
      */
+    @Override
     public final Component getComponent(Component.Identifier id) {
         return id_to_components.get(id);
     }
@@ -133,6 +136,7 @@ public abstract class AbstractController implements Controller {
      * Returns the rumblers for sending feedback to this controller, or an
      * empty array if there are no rumblers on this controller.
      */
+    @Override
     public final Rumbler[] getRumblers() {
         return rumblers;
     }
@@ -142,6 +146,7 @@ public abstract class AbstractController implements Controller {
      *
      * @return PortType.UNKNOWN by default, can be overridden
      */
+    @Override
     public PortType getPortType() {
         return PortType.UNKNOWN;
     }
@@ -151,6 +156,7 @@ public abstract class AbstractController implements Controller {
      *
      * @return 0 by default, can be overridden
      */
+    @Override
     public int getPortNumber() {
         return 0;
     }
@@ -158,6 +164,7 @@ public abstract class AbstractController implements Controller {
     /**
      * Returns a human-readable name for this Controller.
      */
+    @Override
     public final String getName() {
         return name;
     }

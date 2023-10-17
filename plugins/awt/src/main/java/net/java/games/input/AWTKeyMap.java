@@ -35,222 +35,113 @@ import java.awt.event.KeyEvent;
  */
 final class AWTKeyMap {
 
-    public final static Component.Identifier.Key mapKeyCode(int key_code) {
-        switch (key_code) {
-        case KeyEvent.VK_0:
-            return Component.Identifier.Key._0;
-        case KeyEvent.VK_1:
-            return Component.Identifier.Key._1;
-        case KeyEvent.VK_2:
-            return Component.Identifier.Key._2;
-        case KeyEvent.VK_3:
-            return Component.Identifier.Key._3;
-        case KeyEvent.VK_4:
-            return Component.Identifier.Key._4;
-        case KeyEvent.VK_5:
-            return Component.Identifier.Key._5;
-        case KeyEvent.VK_6:
-            return Component.Identifier.Key._6;
-        case KeyEvent.VK_7:
-            return Component.Identifier.Key._7;
-        case KeyEvent.VK_8:
-            return Component.Identifier.Key._8;
-        case KeyEvent.VK_9:
-            return Component.Identifier.Key._9;
-
-        case KeyEvent.VK_Q:
-            return Component.Identifier.Key.Q;
-        case KeyEvent.VK_W:
-            return Component.Identifier.Key.W;
-        case KeyEvent.VK_E:
-            return Component.Identifier.Key.E;
-        case KeyEvent.VK_R:
-            return Component.Identifier.Key.R;
-        case KeyEvent.VK_T:
-            return Component.Identifier.Key.T;
-        case KeyEvent.VK_Y:
-            return Component.Identifier.Key.Y;
-        case KeyEvent.VK_U:
-            return Component.Identifier.Key.U;
-        case KeyEvent.VK_I:
-            return Component.Identifier.Key.I;
-        case KeyEvent.VK_O:
-            return Component.Identifier.Key.O;
-        case KeyEvent.VK_P:
-            return Component.Identifier.Key.P;
-        case KeyEvent.VK_A:
-            return Component.Identifier.Key.A;
-        case KeyEvent.VK_S:
-            return Component.Identifier.Key.S;
-        case KeyEvent.VK_D:
-            return Component.Identifier.Key.D;
-        case KeyEvent.VK_F:
-            return Component.Identifier.Key.F;
-        case KeyEvent.VK_G:
-            return Component.Identifier.Key.G;
-        case KeyEvent.VK_H:
-            return Component.Identifier.Key.H;
-        case KeyEvent.VK_J:
-            return Component.Identifier.Key.J;
-        case KeyEvent.VK_K:
-            return Component.Identifier.Key.K;
-        case KeyEvent.VK_L:
-            return Component.Identifier.Key.L;
-        case KeyEvent.VK_Z:
-            return Component.Identifier.Key.Z;
-        case KeyEvent.VK_X:
-            return Component.Identifier.Key.X;
-        case KeyEvent.VK_C:
-            return Component.Identifier.Key.C;
-        case KeyEvent.VK_V:
-            return Component.Identifier.Key.V;
-        case KeyEvent.VK_B:
-            return Component.Identifier.Key.B;
-        case KeyEvent.VK_N:
-            return Component.Identifier.Key.N;
-        case KeyEvent.VK_M:
-            return Component.Identifier.Key.M;
-
-        case KeyEvent.VK_F1:
-            return Component.Identifier.Key.F1;
-        case KeyEvent.VK_F2:
-            return Component.Identifier.Key.F2;
-        case KeyEvent.VK_F3:
-            return Component.Identifier.Key.F3;
-        case KeyEvent.VK_F4:
-            return Component.Identifier.Key.F4;
-        case KeyEvent.VK_F5:
-            return Component.Identifier.Key.F5;
-        case KeyEvent.VK_F6:
-            return Component.Identifier.Key.F6;
-        case KeyEvent.VK_F7:
-            return Component.Identifier.Key.F7;
-        case KeyEvent.VK_F8:
-            return Component.Identifier.Key.F8;
-        case KeyEvent.VK_F9:
-            return Component.Identifier.Key.F9;
-        case KeyEvent.VK_F10:
-            return Component.Identifier.Key.F10;
-        case KeyEvent.VK_F11:
-            return Component.Identifier.Key.F11;
-        case KeyEvent.VK_F12:
-            return Component.Identifier.Key.F12;
-
-        case KeyEvent.VK_ESCAPE:
-            return Component.Identifier.Key.ESCAPE;
-        case KeyEvent.VK_MINUS:
-            return Component.Identifier.Key.MINUS;
-        case KeyEvent.VK_EQUALS:
-            return Component.Identifier.Key.EQUALS;
-        case KeyEvent.VK_BACK_SPACE:
-            return Component.Identifier.Key.BACKSLASH;
-        case KeyEvent.VK_TAB:
-            return Component.Identifier.Key.TAB;
-        case KeyEvent.VK_OPEN_BRACKET:
-            return Component.Identifier.Key.LBRACKET;
-        case KeyEvent.VK_CLOSE_BRACKET:
-            return Component.Identifier.Key.RBRACKET;
-        case KeyEvent.VK_SEMICOLON:
-            return Component.Identifier.Key.SEMICOLON;
-        case KeyEvent.VK_QUOTE:
-            return Component.Identifier.Key.APOSTROPHE;
-        case KeyEvent.VK_NUMBER_SIGN:
-            return Component.Identifier.Key.GRAVE;
-        case KeyEvent.VK_BACK_SLASH:
-            return Component.Identifier.Key.BACKSLASH;
-        case KeyEvent.VK_PERIOD:
-            return Component.Identifier.Key.PERIOD;
-        case KeyEvent.VK_SLASH:
-            return Component.Identifier.Key.SLASH;
-        case KeyEvent.VK_MULTIPLY:
-            return Component.Identifier.Key.MULTIPLY;
-        case KeyEvent.VK_SPACE:
-            return Component.Identifier.Key.SPACE;
-        case KeyEvent.VK_CAPS_LOCK:
-            return Component.Identifier.Key.CAPITAL;
-        case KeyEvent.VK_NUM_LOCK:
-            return Component.Identifier.Key.NUMLOCK;
-        case KeyEvent.VK_SCROLL_LOCK:
-            return Component.Identifier.Key.SCROLL;
-        case KeyEvent.VK_NUMPAD7:
-            return Component.Identifier.Key.NUMPAD7;
-        case KeyEvent.VK_NUMPAD8:
-            return Component.Identifier.Key.NUMPAD8;
-        case KeyEvent.VK_NUMPAD9:
-            return Component.Identifier.Key.NUMPAD9;
-        case KeyEvent.VK_SUBTRACT:
-            return Component.Identifier.Key.SUBTRACT;
-        case KeyEvent.VK_NUMPAD4:
-            return Component.Identifier.Key.NUMPAD4;
-        case KeyEvent.VK_NUMPAD5:
-            return Component.Identifier.Key.NUMPAD5;
-        case KeyEvent.VK_NUMPAD6:
-            return Component.Identifier.Key.NUMPAD6;
-        case KeyEvent.VK_ADD:
-            return Component.Identifier.Key.ADD;
-        case KeyEvent.VK_NUMPAD1:
-            return Component.Identifier.Key.NUMPAD1;
-        case KeyEvent.VK_NUMPAD2:
-            return Component.Identifier.Key.NUMPAD2;
-        case KeyEvent.VK_NUMPAD3:
-            return Component.Identifier.Key.NUMPAD3;
-        case KeyEvent.VK_NUMPAD0:
-            return Component.Identifier.Key.NUMPAD0;
-        case KeyEvent.VK_DECIMAL:
-            return Component.Identifier.Key.DECIMAL;
-
-        case KeyEvent.VK_KANA:
-            return Component.Identifier.Key.KANA;
-        case KeyEvent.VK_CONVERT:
-            return Component.Identifier.Key.CONVERT;
-        case KeyEvent.VK_NONCONVERT:
-            return Component.Identifier.Key.NOCONVERT;
-
-        case KeyEvent.VK_CIRCUMFLEX:
-            return Component.Identifier.Key.CIRCUMFLEX;
-        case KeyEvent.VK_AT:
-            return Component.Identifier.Key.AT;
-        case KeyEvent.VK_COLON:
-            return Component.Identifier.Key.COLON;
-        case KeyEvent.VK_UNDERSCORE:
-            return Component.Identifier.Key.UNDERLINE;
-        case KeyEvent.VK_KANJI:
-            return Component.Identifier.Key.KANJI;
-
-        case KeyEvent.VK_STOP:
-            return Component.Identifier.Key.STOP;
-
-        case KeyEvent.VK_DIVIDE:
-            return Component.Identifier.Key.DIVIDE;
-
-        case KeyEvent.VK_PAUSE:
-            return Component.Identifier.Key.PAUSE;
-        case KeyEvent.VK_HOME:
-            return Component.Identifier.Key.HOME;
-        case KeyEvent.VK_UP:
-            return Component.Identifier.Key.UP;
-        case KeyEvent.VK_PAGE_UP:
-            return Component.Identifier.Key.PAGEUP;
-        case KeyEvent.VK_LEFT:
-            return Component.Identifier.Key.LEFT;
-        case KeyEvent.VK_RIGHT:
-            return Component.Identifier.Key.RIGHT;
-        case KeyEvent.VK_END:
-            return Component.Identifier.Key.END;
-        case KeyEvent.VK_DOWN:
-            return Component.Identifier.Key.DOWN;
-        case KeyEvent.VK_PAGE_DOWN:
-            return Component.Identifier.Key.PAGEDOWN;
-        case KeyEvent.VK_INSERT:
-            return Component.Identifier.Key.INSERT;
-        case KeyEvent.VK_DELETE:
-            return Component.Identifier.Key.DELETE;
-        default:
-            return Component.Identifier.Key.UNKNOWN;
-        }
+    public static Component.Identifier.Key mapKeyCode(int key_code) {
+        return switch (key_code) {
+            case KeyEvent.VK_0 -> Component.Identifier.Key._0;
+            case KeyEvent.VK_1 -> Component.Identifier.Key._1;
+            case KeyEvent.VK_2 -> Component.Identifier.Key._2;
+            case KeyEvent.VK_3 -> Component.Identifier.Key._3;
+            case KeyEvent.VK_4 -> Component.Identifier.Key._4;
+            case KeyEvent.VK_5 -> Component.Identifier.Key._5;
+            case KeyEvent.VK_6 -> Component.Identifier.Key._6;
+            case KeyEvent.VK_7 -> Component.Identifier.Key._7;
+            case KeyEvent.VK_8 -> Component.Identifier.Key._8;
+            case KeyEvent.VK_9 -> Component.Identifier.Key._9;
+            case KeyEvent.VK_Q -> Component.Identifier.Key.Q;
+            case KeyEvent.VK_W -> Component.Identifier.Key.W;
+            case KeyEvent.VK_E -> Component.Identifier.Key.E;
+            case KeyEvent.VK_R -> Component.Identifier.Key.R;
+            case KeyEvent.VK_T -> Component.Identifier.Key.T;
+            case KeyEvent.VK_Y -> Component.Identifier.Key.Y;
+            case KeyEvent.VK_U -> Component.Identifier.Key.U;
+            case KeyEvent.VK_I -> Component.Identifier.Key.I;
+            case KeyEvent.VK_O -> Component.Identifier.Key.O;
+            case KeyEvent.VK_P -> Component.Identifier.Key.P;
+            case KeyEvent.VK_A -> Component.Identifier.Key.A;
+            case KeyEvent.VK_S -> Component.Identifier.Key.S;
+            case KeyEvent.VK_D -> Component.Identifier.Key.D;
+            case KeyEvent.VK_F -> Component.Identifier.Key.F;
+            case KeyEvent.VK_G -> Component.Identifier.Key.G;
+            case KeyEvent.VK_H -> Component.Identifier.Key.H;
+            case KeyEvent.VK_J -> Component.Identifier.Key.J;
+            case KeyEvent.VK_K -> Component.Identifier.Key.K;
+            case KeyEvent.VK_L -> Component.Identifier.Key.L;
+            case KeyEvent.VK_Z -> Component.Identifier.Key.Z;
+            case KeyEvent.VK_X -> Component.Identifier.Key.X;
+            case KeyEvent.VK_C -> Component.Identifier.Key.C;
+            case KeyEvent.VK_V -> Component.Identifier.Key.V;
+            case KeyEvent.VK_B -> Component.Identifier.Key.B;
+            case KeyEvent.VK_N -> Component.Identifier.Key.N;
+            case KeyEvent.VK_M -> Component.Identifier.Key.M;
+            case KeyEvent.VK_F1 -> Component.Identifier.Key.F1;
+            case KeyEvent.VK_F2 -> Component.Identifier.Key.F2;
+            case KeyEvent.VK_F3 -> Component.Identifier.Key.F3;
+            case KeyEvent.VK_F4 -> Component.Identifier.Key.F4;
+            case KeyEvent.VK_F5 -> Component.Identifier.Key.F5;
+            case KeyEvent.VK_F6 -> Component.Identifier.Key.F6;
+            case KeyEvent.VK_F7 -> Component.Identifier.Key.F7;
+            case KeyEvent.VK_F8 -> Component.Identifier.Key.F8;
+            case KeyEvent.VK_F9 -> Component.Identifier.Key.F9;
+            case KeyEvent.VK_F10 -> Component.Identifier.Key.F10;
+            case KeyEvent.VK_F11 -> Component.Identifier.Key.F11;
+            case KeyEvent.VK_F12 -> Component.Identifier.Key.F12;
+            case KeyEvent.VK_ESCAPE -> Component.Identifier.Key.ESCAPE;
+            case KeyEvent.VK_MINUS -> Component.Identifier.Key.MINUS;
+            case KeyEvent.VK_EQUALS -> Component.Identifier.Key.EQUALS;
+            case KeyEvent.VK_BACK_SPACE -> Component.Identifier.Key.BACKSLASH;
+            case KeyEvent.VK_TAB -> Component.Identifier.Key.TAB;
+            case KeyEvent.VK_OPEN_BRACKET -> Component.Identifier.Key.LBRACKET;
+            case KeyEvent.VK_CLOSE_BRACKET -> Component.Identifier.Key.RBRACKET;
+            case KeyEvent.VK_SEMICOLON -> Component.Identifier.Key.SEMICOLON;
+            case KeyEvent.VK_QUOTE -> Component.Identifier.Key.APOSTROPHE;
+            case KeyEvent.VK_NUMBER_SIGN -> Component.Identifier.Key.GRAVE;
+            case KeyEvent.VK_BACK_SLASH -> Component.Identifier.Key.BACKSLASH;
+            case KeyEvent.VK_PERIOD -> Component.Identifier.Key.PERIOD;
+            case KeyEvent.VK_SLASH -> Component.Identifier.Key.SLASH;
+            case KeyEvent.VK_MULTIPLY -> Component.Identifier.Key.MULTIPLY;
+            case KeyEvent.VK_SPACE -> Component.Identifier.Key.SPACE;
+            case KeyEvent.VK_CAPS_LOCK -> Component.Identifier.Key.CAPITAL;
+            case KeyEvent.VK_NUM_LOCK -> Component.Identifier.Key.NUMLOCK;
+            case KeyEvent.VK_SCROLL_LOCK -> Component.Identifier.Key.SCROLL;
+            case KeyEvent.VK_NUMPAD7 -> Component.Identifier.Key.NUMPAD7;
+            case KeyEvent.VK_NUMPAD8 -> Component.Identifier.Key.NUMPAD8;
+            case KeyEvent.VK_NUMPAD9 -> Component.Identifier.Key.NUMPAD9;
+            case KeyEvent.VK_SUBTRACT -> Component.Identifier.Key.SUBTRACT;
+            case KeyEvent.VK_NUMPAD4 -> Component.Identifier.Key.NUMPAD4;
+            case KeyEvent.VK_NUMPAD5 -> Component.Identifier.Key.NUMPAD5;
+            case KeyEvent.VK_NUMPAD6 -> Component.Identifier.Key.NUMPAD6;
+            case KeyEvent.VK_ADD -> Component.Identifier.Key.ADD;
+            case KeyEvent.VK_NUMPAD1 -> Component.Identifier.Key.NUMPAD1;
+            case KeyEvent.VK_NUMPAD2 -> Component.Identifier.Key.NUMPAD2;
+            case KeyEvent.VK_NUMPAD3 -> Component.Identifier.Key.NUMPAD3;
+            case KeyEvent.VK_NUMPAD0 -> Component.Identifier.Key.NUMPAD0;
+            case KeyEvent.VK_DECIMAL -> Component.Identifier.Key.DECIMAL;
+            case KeyEvent.VK_KANA -> Component.Identifier.Key.KANA;
+            case KeyEvent.VK_CONVERT -> Component.Identifier.Key.CONVERT;
+            case KeyEvent.VK_NONCONVERT -> Component.Identifier.Key.NOCONVERT;
+            case KeyEvent.VK_CIRCUMFLEX -> Component.Identifier.Key.CIRCUMFLEX;
+            case KeyEvent.VK_AT -> Component.Identifier.Key.AT;
+            case KeyEvent.VK_COLON -> Component.Identifier.Key.COLON;
+            case KeyEvent.VK_UNDERSCORE -> Component.Identifier.Key.UNDERLINE;
+            case KeyEvent.VK_KANJI -> Component.Identifier.Key.KANJI;
+            case KeyEvent.VK_STOP -> Component.Identifier.Key.STOP;
+            case KeyEvent.VK_DIVIDE -> Component.Identifier.Key.DIVIDE;
+            case KeyEvent.VK_PAUSE -> Component.Identifier.Key.PAUSE;
+            case KeyEvent.VK_HOME -> Component.Identifier.Key.HOME;
+            case KeyEvent.VK_UP -> Component.Identifier.Key.UP;
+            case KeyEvent.VK_PAGE_UP -> Component.Identifier.Key.PAGEUP;
+            case KeyEvent.VK_LEFT -> Component.Identifier.Key.LEFT;
+            case KeyEvent.VK_RIGHT -> Component.Identifier.Key.RIGHT;
+            case KeyEvent.VK_END -> Component.Identifier.Key.END;
+            case KeyEvent.VK_DOWN -> Component.Identifier.Key.DOWN;
+            case KeyEvent.VK_PAGE_DOWN -> Component.Identifier.Key.PAGEDOWN;
+            case KeyEvent.VK_INSERT -> Component.Identifier.Key.INSERT;
+            case KeyEvent.VK_DELETE -> Component.Identifier.Key.DELETE;
+            default -> Component.Identifier.Key.UNKNOWN;
+        };
     }
 
-    public final static Component.Identifier.Key map(KeyEvent event) {
+    public static Component.Identifier.Key map(KeyEvent event) {
         int key_code = event.getKeyCode();
         int key_location = event.getKeyLocation();
         switch (key_code) {
@@ -269,12 +160,12 @@ final class AWTKeyMap {
                 return Component.Identifier.Key.RALT;
             else
                 return Component.Identifier.Key.LALT;
-            //this is 1.5 only
-/*			case KeyEvent.VK_WINDOWS:
-				if (key_location == KeyEvent.KEY_LOCATION_RIGHT)
-					return Component.Identifier.Key.RWIN;
-				else
-					return Component.Identifier.Key.LWIN;*/
+//        //this is 1.5 only
+//        case KeyEvent.VK_WINDOWS:
+//            if (key_location == KeyEvent.KEY_LOCATION_RIGHT)
+//                return Component.Identifier.Key.RWIN;
+//            else
+//                return Component.Identifier.Key.LWIN;
         case KeyEvent.VK_ENTER:
             if (key_location == KeyEvent.KEY_LOCATION_NUMPAD)
                 return Component.Identifier.Key.NUMPADENTER;

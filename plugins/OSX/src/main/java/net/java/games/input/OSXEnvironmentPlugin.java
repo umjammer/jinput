@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -35,7 +35,6 @@ package net.java.games.input;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -104,9 +103,7 @@ log.fine(osName);
     }
 
     private static void addElements(OSXHIDQueue queue, List<OSXHIDElement> elements, List<OSXComponent> components, boolean map_mouse_buttons) throws IOException {
-        Iterator<OSXHIDElement> it = elements.iterator();
-        while (it.hasNext()) {
-            OSXHIDElement element = it.next();
+        for (OSXHIDElement element : elements) {
             Component.Identifier id = element.getIdentifier();
             if (id == null)
                 continue;
@@ -125,7 +122,7 @@ log.fine(osName);
         }
     }
 
-    private final static Keyboard createKeyboardFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
+    private static Keyboard createKeyboardFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
         List<OSXComponent> components = new ArrayList<>();
         OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
         try {
@@ -141,7 +138,7 @@ log.fine("@@@ components: " + components);
         return new OSXKeyboard(device, queue, components_array, new Controller[] {}, new Rumbler[] {});
     }
 
-    private final static Mouse createMouseFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
+    private static Mouse createMouseFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
         List<OSXComponent> components = new ArrayList<>();
         OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
         try {
@@ -163,7 +160,7 @@ log.fine("@@@ components: " + components);
         }
     }
 
-    private final static AbstractController createControllerFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements, Controller.Type type) throws IOException {
+    private static AbstractController createControllerFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements, Controller.Type type) throws IOException {
         List<OSXComponent> components = new ArrayList<>();
         OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
         try {
@@ -179,7 +176,7 @@ log.fine("@@@ components: " + components);
         return new OSXAbstractController(device, queue, components_array, new Controller[] {}, new Rumbler[] {}, type);
     }
 
-    private final static void createControllersFromDevice(OSXHIDDevice device, List<Controller> controllers) throws IOException {
+    private static void createControllersFromDevice(OSXHIDDevice device, List<Controller> controllers) throws IOException {
         UsagePair usage_pair = device.getUsagePair();
         if (usage_pair == null) {
 log.finer("device: '" + device.getProductName() + "' has no usage pair");
@@ -209,7 +206,7 @@ log.fine("gamepad device: '" + device.getProductName() + "' --------");
         }
     }
 
-    private final static Controller[] enumerateControllers() {
+    private static Controller[] enumerateControllers() {
         List<Controller> controllers = new ArrayList<>();
         try {
             OSXHIDDeviceIterator it = new OSXHIDDeviceIterator();

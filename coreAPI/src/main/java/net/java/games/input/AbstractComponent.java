@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -67,6 +67,7 @@ public abstract class AbstractComponent implements Component {
     /**
      * Returns the type or identifier of the axis.
      */
+    @Override
     public Identifier getIdentifier() {
         return id;
     }
@@ -76,6 +77,7 @@ public abstract class AbstractComponent implements Component {
      *
      * @return false by default, can be overridden
      */
+    @Override
     public boolean isAnalog() {
         return false;
     }
@@ -88,6 +90,7 @@ public abstract class AbstractComponent implements Component {
      *
      * @return 0.0f by default, can be overridden
      */
+    @Override
     public float getDeadZone() {
         return 0.0f;
     }
@@ -100,6 +103,7 @@ public abstract class AbstractComponent implements Component {
      *
      * @return The data from the last time the control has been polled.
      */
+    @Override
     public final float getPollData() {
         if (!has_polled && !isRelative()) {
             has_polled = true;
@@ -131,6 +135,7 @@ public abstract class AbstractComponent implements Component {
     /**
      * Returns a human-readable name for this axis.
      */
+    @Override
     public String getName() {
         return name;
     }

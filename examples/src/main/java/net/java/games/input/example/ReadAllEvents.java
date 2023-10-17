@@ -26,12 +26,12 @@ public class ReadAllEvents {
                 System.exit(0);
             }
 
-            for (int i = 0; i < controllers.length; i++) {
+            for (Controller controller : controllers) {
                 /* Remember to poll each one */
-                controllers[i].poll();
+                controller.poll();
 
                 /* Get the controllers event queue */
-                EventQueue queue = controllers[i].getEventQueue();
+                EventQueue queue = controller.getEventQueue();
 
                 /* Create an event object for the underlying plugin to populate */
                 Event event = new Event();
@@ -49,7 +49,7 @@ public class ReadAllEvents {
                      * across controllers this way. We can not use it to tell
                      * exactly *when* an event happened just the order.
                      */
-                    StringBuffer buffer = new StringBuffer(controllers[i]
+                    StringBuffer buffer = new StringBuffer(controller
                             .getName());
                     buffer.append(" at ");
                     buffer.append(event.getNanos()).append(", ");
@@ -70,7 +70,7 @@ public class ReadAllEvents {
                             buffer.append("Off");
                         }
                     }
-                    System.out.println(buffer.toString());
+                    System.out.println(buffer);
                 }
             }
 
@@ -80,9 +80,7 @@ public class ReadAllEvents {
              */
             try {
                 Thread.sleep(20);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (InterruptedException ignore) {
             }
         }
     }

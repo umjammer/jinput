@@ -38,10 +38,12 @@ public class AWTEnvironmentPlugin extends ControllerEnvironment {
         this.controllers = new Controller[] {new AWTKeyboard(), new AWTMouse()};
     }
 
+    @Override
     public Controller[] getControllers() {
         return controllers;
     }
 
+    @Override
     public boolean isSupported() {
         return true;
     }

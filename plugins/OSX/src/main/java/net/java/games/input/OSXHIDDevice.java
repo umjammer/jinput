@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -35,7 +35,6 @@ package net.java.games.input;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -145,7 +144,7 @@ final class OSXHIDDevice {
         return (String) properties.get(kIOHIDProductKey);
     }
 
-    private final OSXHIDElement createElementFromElementProperties(Map<String, ?> element_properties) {
+    private OSXHIDElement createElementFromElementProperties(Map<String, ?> element_properties) {
 //		long size = getLongFromProperties(element_properties, kIOHIDElementSizeKey);
 //		// ignore elements that can't fit into the 32 bit value field of a hid event
 //		if (size > 32)
@@ -178,15 +177,15 @@ final class OSXHIDDevice {
     }
 
     @SuppressWarnings("unchecked")
-    private final void addElements(List<OSXHIDElement> elements, Map<String, ?> properties) {
+    private void addElements(List<OSXHIDElement> elements, Map<String, ?> properties) {
         Object[] elements_properties = (Object[]) properties.get(kIOHIDElementKey);
         if (elements_properties == null) {
             log.finer("no elements");
             return;
         }
         log.finer("elements_properties: " + elements_properties.length);
-        for (int i = 0; i < elements_properties.length; i++) {
-            Map<String, ?> element_properties = (Map<String, ?>) elements_properties[i];
+        for (Object elementsProperty : elements_properties) {
+            Map<String, ?> element_properties = (Map<String, ?>) elementsProperty;
             log.finer("element_properties: " + element_properties);
             if (element_properties == null) continue;
             OSXHIDElement element = createElementFromElementProperties(element_properties);
@@ -203,19 +202,19 @@ final class OSXHIDDevice {
         return elements;
     }
 
-    private final static long getLongFromProperties(Map<String, ?> properties, String key, long default_value) {
+    private static long getLongFromProperties(Map<String, ?> properties, String key, long default_value) {
         Long long_obj = (Long) properties.get(key);
         if (long_obj == null)
             return default_value;
-        return long_obj.longValue();
+        return long_obj;
     }
 
-    private final static boolean getBooleanFromProperties(Map<String, ?> properties, String key, boolean default_value) {
+    private static boolean getBooleanFromProperties(Map<String, ?> properties, String key, boolean default_value) {
         Object v = properties.get(key);
         return v != null ? (boolean) v : default_value;
     }
 
-    private final static int getIntFromProperties(Map<String, ?> properties, String key) {
+    private static int getIntFromProperties(Map<String, ?> properties, String key) {
         return (int) getLongFromProperties(properties, key);
     }
 
@@ -225,7 +224,7 @@ final class OSXHIDDevice {
         return v != null ? (long) v : 0;
     }
 
-    private final static UsagePair createUsagePair(int usage_page_id, int usage_id) {
+    private static UsagePair createUsagePair(int usage_page_id, int usage_id) {
         UsagePage usage_page = UsagePage.map(usage_page_id);
         if (usage_page != null) {
             Usage usage = usage_page.mapUsage(usage_id);
@@ -241,24 +240,22 @@ final class OSXHIDDevice {
         return createUsagePair(usage_page_id, usage_id);
     }
 
-    private final void dumpProperties() {
+    private void dumpProperties() {
         log.info(toString());
         dumpMap("", properties);
     }
 
-    private final static void dumpArray(String prefix, Object[] array) {
+    private static void dumpArray(String prefix, Object[] array) {
         log.info(prefix + "{");
-        for (int i = 0; i < array.length; i++) {
-            dumpObject(prefix + "\t", array[i]);
+        for (Object o : array) {
+            dumpObject(prefix + "\t", o);
             log.info(prefix + ",");
         }
         log.info(prefix + "}");
     }
 
-    private final static void dumpMap(String prefix, Map<String, ?> map) {
-        Iterator<String> keys = map.keySet().iterator();
-        while (keys.hasNext()) {
-            Object key = keys.next();
+    private static void dumpMap(String prefix, Map<String, ?> map) {
+        for (Object key : map.keySet()) {
             Object value = map.get(key);
             dumpObject(prefix, key);
             dumpObject(prefix + "\t", value);
@@ -266,10 +263,9 @@ final class OSXHIDDevice {
     }
 
     @SuppressWarnings("unchecked")
-    private final static void dumpObject(String prefix, Object obj) {
-        if (obj instanceof Long) {
-            Long l = (Long) obj;
-            log.info(prefix + "0x" + Long.toHexString(l.longValue()));
+    private static void dumpObject(String prefix, Object obj) {
+        if (obj instanceof Long l) {
+            log.info(prefix + "0x" + Long.toHexString(l));
         } else if (obj instanceof Map)
             dumpMap(prefix, (Map<String, ?>) obj);
         else if (obj != null && obj.getClass().isArray())

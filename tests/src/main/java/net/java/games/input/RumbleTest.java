@@ -33,43 +33,43 @@ public class RumbleTest {
         ControllerEnvironment ca = ControllerEnvironment.getDefaultEnvironment();
         System.out.println("JInput version: " + Version.getVersion());
         Controller[] controllers = ca.getControllers();
-        for (int i = 0; i < controllers.length; i++) {
-            System.out.println("Scanning " + controllers[i].getName());
-            Rumbler[] rumblers = controllers[i].getRumblers();
+        for (Controller controller : controllers) {
+            System.out.println("Scanning " + controller.getName());
+            Rumbler[] rumblers = controller.getRumblers();
             System.out.println("Found " + rumblers.length + " rumblers");
-            for (int j = 0; j < rumblers.length; j++) {
-                System.out.println("Rumbler " + rumblers[j].getAxisName() + " on axis " + rumblers[j].getAxisIdentifier());
+            for (Rumbler rumbler : rumblers) {
+                System.out.println("Rumbler " + rumbler.getAxisName() + " on axis " + rumbler.getAxisIdentifier());
                 System.out.println("Rumbling with intensity: " + 0.5f);
-                rumblers[j].rumble(0.5f);
+                rumbler.rumble(0.5f);
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
                 System.out.println("Rumbling with intensity: " + 1.0f);
-                rumblers[j].rumble(1f);
+                rumbler.rumble(1f);
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
                 System.out.println("Fading rumble to -1");
                 for (float k = 1.0f; k > -1.0f; ) {
                     long startTime = System.currentTimeMillis();
-                    rumblers[j].rumble(k);
+                    rumbler.rumble(k);
                     try {
                         Thread.sleep(1);
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                     k -= ((float) (System.currentTimeMillis() - startTime)) / 1000f;
                 }
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
                 System.out.println("Rumbling with intensity: " + 0.0f);
-                rumblers[j].rumble(0f);
+                rumbler.rumble(0f);
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
         }

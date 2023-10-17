@@ -51,12 +51,12 @@ final class AWTMouse extends Mouse implements AWTEventListener {
 
     private int event_state = EVENT_X;
 
-    protected AWTMouse() {
+    AWTMouse() {
         super("AWTMouse", createComponents(), new Controller[] {}, new Rumbler[] {});
         Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_WHEEL_EVENT_MASK);
     }
 
-    private final static Component[] createComponents() {
+    private static Component[] createComponents() {
         return new Component[] {new Axis(Component.Identifier.Axis.X),
                 new Axis(Component.Identifier.Axis.Y),
                 new Axis(Component.Identifier.Axis.Z),
@@ -65,34 +65,28 @@ final class AWTMouse extends Mouse implements AWTEventListener {
                 new Button(Component.Identifier.Button.RIGHT)};
     }
 
-    private final void processButtons(int button_enum, float value) {
+    private void processButtons(int button_enum, float value) {
         Button button = getButton(button_enum);
         if (button != null)
             button.setValue(value);
     }
 
-    private final Button getButton(int button_enum) {
-        switch (button_enum) {
-        case MouseEvent.BUTTON1:
-            return (Button) getLeft();
-        case MouseEvent.BUTTON2:
-            return (Button) getMiddle();
-        case MouseEvent.BUTTON3:
-            return (Button) getRight();
-        case MouseEvent.NOBUTTON:
-        default:
-            // Unknown button
-            return null;
-        }
+    private Button getButton(int button_enum) {
+        return switch (button_enum) {
+            case MouseEvent.BUTTON1 -> (Button) getLeft();
+            case MouseEvent.BUTTON2 -> (Button) getMiddle();
+            case MouseEvent.BUTTON3 -> (Button) getRight();
+            default ->
+                // Unknown button
+                    null;
+        };
     }
 
-    private final void processEvent(AWTEvent event) throws IOException {
-        if (event instanceof MouseWheelEvent) {
-            MouseWheelEvent mwe = (MouseWheelEvent) event;
+    private void processEvent(AWTEvent event) throws IOException {
+        if (event instanceof MouseWheelEvent mwe) {
             Axis wheel = (Axis) getWheel();
             wheel.setValue(wheel.poll() + mwe.getWheelRotation());
-        } else if (event instanceof MouseEvent) {
-            MouseEvent me = (MouseEvent) event;
+        } else if (event instanceof MouseEvent me) {
             Axis x = (Axis) getX();
             Axis y = (Axis) getY();
             x.setValue(me.getX());
@@ -114,8 +108,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
     public final synchronized void pollDevice() throws IOException {
         Axis wheel = (Axis) getWheel();
         wheel.setValue(0);
-        for (int i = 0; i < awt_events.size(); i++) {
-            AWTEvent event = awt_events.get(i);
+        for (AWTEvent event : awt_events) {
             processEvent(event);
             processed_awt_events.add(event);
         }
@@ -128,13 +121,11 @@ final class AWTMouse extends Mouse implements AWTEventListener {
             if (processed_awt_events.isEmpty())
                 return false;
             AWTEvent awt_event = processed_awt_events.get(0);
-            if (awt_event instanceof MouseWheelEvent) {
-                MouseWheelEvent awt_wheel_event = (MouseWheelEvent) awt_event;
+            if (awt_event instanceof MouseWheelEvent awt_wheel_event) {
                 long nanos = awt_wheel_event.getWhen() * 1000000L;
                 event.set(getWheel(), awt_wheel_event.getWheelRotation(), nanos);
                 processed_awt_events.remove(0);
-            } else if (awt_event instanceof MouseEvent) {
-                MouseEvent mouse_event = (MouseEvent) awt_event;
+            } else if (awt_event instanceof MouseEvent mouse_event) {
                 long nanos = mouse_event.getWhen() * 1000000L;
                 switch (event_state) {
                 case EVENT_X:
@@ -169,6 +160,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
         }
     }
 
+    @Override
     public final synchronized void eventDispatched(AWTEvent event) {
         awt_events.add(event);
     }
@@ -181,18 +173,21 @@ final class AWTMouse extends Mouse implements AWTEventListener {
             super(axis_id.getName(), axis_id);
         }
 
+        @Override
         public final boolean isRelative() {
             return false;
         }
 
+        @Override
         public final boolean isAnalog() {
             return true;
         }
 
-        protected final void setValue(float value) {
+        private void setValue(float value) {
             this.value = value;
         }
 
+        @Override
         protected final float poll() throws IOException {
             return value;
         }
@@ -206,18 +201,21 @@ final class AWTMouse extends Mouse implements AWTEventListener {
             super(button_id.getName(), button_id);
         }
 
-        protected final void setValue(float value) {
+        private void setValue(float value) {
             this.value = value;
         }
 
+        @Override
         protected final float poll() throws IOException {
             return value;
         }
 
+        @Override
         public final boolean isAnalog() {
             return false;
         }
 
+        @Override
         public final boolean isRelative() {
             return false;
         }

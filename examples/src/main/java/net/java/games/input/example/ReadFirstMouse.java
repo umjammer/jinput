@@ -45,7 +45,7 @@ public class ReadFirstMouse {
 
             /* Get all the axis and buttons */
             Component[] components = firstMouse.getComponents();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             /* For each component, get it's name, and it's current value */
             for (int i = 0; i < components.length; i++) {
@@ -65,7 +65,7 @@ public class ReadFirstMouse {
                     }
                 }
             }
-            System.out.println(buffer.toString());
+            System.out.println(buffer);
 
             /*
              * Sleep for 20 millis, this is just so the example doesn't thrash
@@ -73,9 +73,7 @@ public class ReadFirstMouse {
              */
             try {
                 Thread.sleep(20);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (InterruptedException ignore) {
             }
         }
     }

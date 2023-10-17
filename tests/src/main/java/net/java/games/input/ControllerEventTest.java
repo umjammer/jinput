@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -37,11 +37,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,10 +54,14 @@ import javax.swing.WindowConstants;
 
 public class ControllerEventTest extends JFrame {
 
+    private static final Logger log = Logger.getLogger(ControllerEventTest.class.getName());
+    
+    @Serial
     private static final long serialVersionUID = -8266185848160199092L;
 
     private static abstract class AxisPanel extends JPanel {
 
+        @Serial
         private static final long serialVersionUID = -6200599064870672000L;
         transient Component axis;
         float data;
@@ -80,6 +87,7 @@ public class ControllerEventTest extends JFrame {
 
     private static class DigitalAxisPanel extends AxisPanel {
 
+        @Serial
         private static final long serialVersionUID = -4729666037860134626L;
         JLabel digitalState = new JLabel("<unread>");
 
@@ -88,6 +96,7 @@ public class ControllerEventTest extends JFrame {
             add(digitalState, BorderLayout.CENTER);
         }
 
+        @Override
         protected void renderData() {
             if (data == 0.0f) {
                 digitalState.setBackground(getBackground());
@@ -95,7 +104,7 @@ public class ControllerEventTest extends JFrame {
             } else if (data == 1.0f) {
                 digitalState.setBackground(Color.green);
                 digitalState.setText("ON");
-            } else { // shoudl never happen
+            } else { // should never happen
                 digitalState.setBackground(Color.red);
                 digitalState.setText("ERR:" + data);
             }
@@ -105,6 +114,7 @@ public class ControllerEventTest extends JFrame {
 
     private static class DigitalHatPanel extends AxisPanel {
 
+        @Serial
         private static final long serialVersionUID = -6582605379682496832L;
         JLabel digitalState = new JLabel("<unread>");
 
@@ -113,6 +123,7 @@ public class ControllerEventTest extends JFrame {
             add(digitalState, BorderLayout.CENTER);
         }
 
+        @Override
         protected void renderData() {
             if (data == Component.POV.OFF) {
                 digitalState.setBackground(getBackground());
@@ -141,7 +152,7 @@ public class ControllerEventTest extends JFrame {
             } else if (data == Component.POV.UP_LEFT) {
                 digitalState.setBackground(Color.green);
                 digitalState.setText("UP+LEFT");
-            } else { // shoudl never happen
+            } else { // should never happen
                 digitalState.setBackground(Color.red);
                 digitalState.setText("ERR:" + data);
             }
@@ -151,6 +162,7 @@ public class ControllerEventTest extends JFrame {
 
     private static class AnalogAxisPanel extends AxisPanel {
 
+        @Serial
         private static final long serialVersionUID = 7536173405896285590L;
         JLabel analogState = new JLabel("<unread>");
 
@@ -159,11 +171,12 @@ public class ControllerEventTest extends JFrame {
             add(analogState, BorderLayout.CENTER);
         }
 
+        @Override
         protected void renderData() {
             String extra = "";
             if (getAxis().getDeadZone() >= Math.abs(data))
                 extra = " (DEADZONE)";
-            analogState.setText("" + data + extra);
+            analogState.setText(data + extra);
             analogState.repaint();
         }
     }
@@ -171,6 +184,7 @@ public class ControllerEventTest extends JFrame {
 
     private static class ControllerWindow extends JFrame {
 
+        @Serial
         private static final long serialVersionUID = 8623977198558568961L;
         transient Controller ca;
         transient Map<Component, AxisPanel> axes_to_panels = new HashMap<>();
@@ -188,8 +202,8 @@ public class ControllerEventTest extends JFrame {
                 int width = (int) Math.ceil(Math.sqrt(components.length));
                 JPanel p = new JPanel();
                 p.setLayout(new GridLayout(width, 0));
-                for (int j = 0; j < components.length; j++) {
-                    addAxis(p, components[j]);
+                for (Component component : components) {
+                    addAxis(p, component);
                 }
                 c.add(new JScrollPane(p), BorderLayout.CENTER);
             }
@@ -255,8 +269,8 @@ public class ControllerEventTest extends JFrame {
         super("Controller Event Test. Version: " + Version.getVersion());
         ControllerEnvironment ce = ControllerEnvironment.getDefaultEnvironment();
         Controller[] ca = ce.getControllers();
-        for (int i = 0; i < ca.length; i++) {
-            makeController(ca[i]);
+        for (Controller controller : ca) {
+            makeController(controller);
         }
 
         new Thread(() -> {
@@ -266,13 +280,13 @@ public class ControllerEventTest extends JFrame {
                         try {
                             i.next().poll();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            log.log(Level.FINER, e.getMessage(), e);
                         }
                     }
                     Thread.sleep(HEARTBEATMS);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.log(Level.FINER, e.getMessage(), e);
             }
         }).start();
         pack();
@@ -286,8 +300,8 @@ public class ControllerEventTest extends JFrame {
         if (subControllers.length == 0) {
             createControllerWindow(c);
         } else {
-            for (int i = 0; i < subControllers.length; i++) {
-                makeController(subControllers[i]);
+            for (Controller subController : subControllers) {
+                makeController(subController);
             }
         }
     }

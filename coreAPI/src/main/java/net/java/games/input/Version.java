@@ -77,8 +77,8 @@ public final class Version {
     }
 
     /**
-     * Returns the verison string and build number of
-     * this implementation.  See the class descritpion
+     * Returns the version string and build number of
+     * this implementation.  See the class description
      * for the version string format.
      *
      * @return The version string of this implementation.

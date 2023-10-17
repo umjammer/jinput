@@ -69,7 +69,7 @@ JNIEXPORT jstring JNICALL Java_net_java_games_input_LinuxJoystickDevice_nGetName
 #define BUFFER_SIZE 1024
 	int fd = (int)fd_address;
 	char device_name[BUFFER_SIZE];
-	
+
 	if (ioctl(fd, JSIOCGNAME(BUFFER_SIZE), device_name) == -1) {
 		throwIOException(env, "Failed to get device name (%d)\n", errno);
 		return NULL;
@@ -115,7 +115,7 @@ JNIEXPORT jbyteArray JNICALL Java_net_java_games_input_LinuxJoystickDevice_nGetA
 		throwIOException(env, "Failed to get axis map (%d)\n", errno);
 		return NULL;
 	}
-	
+
 	jbyteArray axis_map_array = (*env)->NewByteArray(env, (ABS_MAX + 1));
 	if (axis_map_array == NULL)
 		return NULL;
@@ -130,7 +130,7 @@ JNIEXPORT jcharArray JNICALL Java_net_java_games_input_LinuxJoystickDevice_nGetB
 		throwIOException(env, "Failed to get button map (%d)\n", errno);
 		return NULL;
 	}
-	
+
 	jcharArray button_map_array = (*env)->NewCharArray(env, (KEY_MAX - BTN_MISC + 1));
 	if (button_map_array == NULL)
 		return NULL;

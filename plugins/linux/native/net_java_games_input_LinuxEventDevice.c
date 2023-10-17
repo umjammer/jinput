@@ -71,7 +71,7 @@ JNIEXPORT jstring JNICALL Java_net_java_games_input_LinuxEventDevice_nGetName(JN
 #define BUFFER_SIZE 1024
 	int fd = (int)fd_address;
 	char device_name[BUFFER_SIZE];
-	
+
 	if (ioctl(fd, EVIOCGNAME(BUFFER_SIZE), device_name) == -1) {
 		throwIOException(env, "Failed to get device name (%d)\n", errno);
 		return NULL;

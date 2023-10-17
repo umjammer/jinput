@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,12 +28,9 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
-package net.java.games.input;
+ */
 
-import java.util.List;
-import java.util.ArrayList;
+package net.java.games.input;
 
 /**
  * A Mouse is a type of controller consisting of two child controllers,
@@ -47,6 +38,7 @@ import java.util.ArrayList;
  * trackballs, and fingersticks.
  */
 public abstract class Mouse extends AbstractController {
+
     protected Mouse(String name, Component[] components, Controller[] children, Rumbler[] rumblers) {
         super(name, components, children, rumblers);
     }
@@ -54,6 +46,7 @@ public abstract class Mouse extends AbstractController {
     /**
      * Returns the type of the Controller.
      */
+    @Override
     public Type getType() {
         return Type.MOUSE;
     }
@@ -182,5 +175,4 @@ public abstract class Mouse extends AbstractController {
 	public Component getButton4() {
 		return getComponent(Component.Identifier.Button._4);
 	}
-
-} // class Mouse
+}

@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,8 +28,8 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
+
 package net.java.games.input;
 
 /**
@@ -47,21 +41,19 @@ public interface Rumbler {
     /**
      * Rumble with the specified intensity.
      */
-    public abstract void rumble(float intensity);
-    
+    void rumble(float intensity);
+
     /**
      * Get the string name of the axis the rumbler is attached to
      *
      * @return The axis name
      */
-    public String getAxisName();
-    
+    String getAxisName();
+
     /**
      * Get the axis identifier the rumbler is attached to
      *
      * @return The axis identifier
      */
-    public Component.Identifier getAxisIdentifier();
-    
-    
-} // interface Rumbler
+    Component.Identifier getAxisIdentifier();
+}

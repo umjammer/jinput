@@ -39,8 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-
-import net.java.games.util.plugins.Plugin;
+import java.util.logging.Logger;
 
 
 /**
@@ -49,7 +48,9 @@ import net.java.games.util.plugins.Plugin;
  * @author gregorypierce
  * @version 1.0
  */
-public final class OSXEnvironmentPlugin extends ControllerEnvironment implements Plugin {
+public final class OSXEnvironmentPlugin extends ControllerEnvironment {
+
+	private static final Logger log = Logger.getLogger(OSXEnvironmentPlugin.class.getName());
 
 	private static boolean supported = false;
 

@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -63,7 +64,6 @@ import vavix.rococoa.corefoundation.CFString;
 import vavix.rococoa.corefoundation.CFType;
 import vavix.rococoa.iokit.IOKitLib;
 
-import static net.java.games.input.ControllerEnvironment.log;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberCFIndexType;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberCharType;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberDoubleType;
@@ -87,6 +87,8 @@ import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberShortType
  * @version 0.00 2023-09-22 nsano initial version <br>
  */
 public abstract class NativeUtil {
+
+    private static final Logger log = Logger.getLogger(NativeUtil.class.getName());
 
     static {
 log.finer("CFDictionary: " + CFLib.INSTANCE.CFDictionaryGetTypeID());

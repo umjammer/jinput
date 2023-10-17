@@ -110,7 +110,8 @@ final class AWTMouse extends Mouse implements AWTEventListener {
 		}
 	}
 
-	public final synchronized void pollDevice() throws IOException {
+	@Override
+    public final synchronized void pollDevice() throws IOException {
 		Axis wheel = (Axis)getWheel();
 		wheel.setValue(0);
 		for (int i = 0; i < awt_events.size(); i++) {
@@ -121,6 +122,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
 		awt_events.clear();
 	}
 
+	@Override
 	protected final synchronized boolean getNextDeviceEvent(Event event) throws IOException {
 		while (true) {
 			if (processed_awt_events.isEmpty())

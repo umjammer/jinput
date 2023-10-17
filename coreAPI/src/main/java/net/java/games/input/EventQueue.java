@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,62 +28,64 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
+
 package net.java.games.input;
 
 /**
- * A FIFO queue for input events. 
+ * A FIFO queue for input events.
  */
 public final class EventQueue {
-	private final Event[] queue;
-	
-	private int head;
-	private int tail;
 
-	/**
-	 * This is an internal method and should not be called by applications using the API
-	 */
-	public EventQueue(int size) {
-		queue = new Event[size + 1];
-		for (int i = 0; i < queue.length; i++)
-			queue[i] = new Event();
-	}
+    private final Event[] queue;
 
-	/**
-	 * This is an internal method and should not be called by applications using the API
-	 */
-	final synchronized void add(Event event) {
-		queue[tail].set(event);
-		tail = increase(tail);
-	}
+    private int head;
+    private int tail;
 
-	/**
-	 * Check if the queue is full
-	 * @return true if the queue is full
-	 */
-	final synchronized boolean isFull() {
-		return increase(tail) == head;
-	}
+    /**
+     * This is an internal method and should not be called by applications using the API
+     */
+    public EventQueue(int size) {
+        queue = new Event[size + 1];
+        for (int i = 0; i < queue.length; i++)
+            queue[i] = new Event();
+    }
 
-	/**
-	 * This is an internal method and should not be called by applications using the API
-	 */
-	private final int increase(int x) {
-		return (x + 1)%queue.length;
-	}
+    /**
+     * This is an internal method and should not be called by applications using the API
+     */
+    synchronized void add(Event event) {
+        queue[tail].set(event);
+        tail = increase(tail);
+    }
 
-	/**
-	 * Populates the provided event with the details of the event on the head of the queue.
-	 * 
-	 * @param event The event to populate
-	 * @return false if there were no events left on the queue, otherwise true.
-	 */
-	public final synchronized boolean getNextEvent(Event event) {
-		if (head == tail)
-			return false;
-		event.set(queue[head]);
-		head = increase(head);
-		return true;
-	}
+    /**
+     * Check if the queue is full
+     *
+     * @return true if the queue is full
+     */
+    synchronized boolean isFull() {
+        return increase(tail) == head;
+    }
+
+    /**
+     * This is an internal method and should not be called by applications using the API
+     */
+    private int increase(int x) {
+        return (x + 1) % queue.length;
+    }
+
+    /**
+     * Populates the provided event with the details of the event on the head of the queue.
+     *
+     * @param event The event to populate
+     * @return false if there were no events left on the queue, otherwise true.
+     */
+    public synchronized boolean getNextEvent(Event event) {
+        if (head == tail)
+            return false;
+        event.set(queue[head]);
+        head = increase(head);
+        return true;
+    }
 }

@@ -41,6 +41,7 @@ package net.java.games.input;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -49,7 +50,6 @@ import vavix.rococoa.corefoundation.CFLib;
 import vavix.rococoa.iokit.IOKitLib;
 import vavix.rococoa.iokit.IOKitLib.IOCFPlugInInterface;
 
-import static net.java.games.input.ControllerEnvironment.log;
 import static vavix.rococoa.iokit.IOKitLib.INSTANCE;
 import static vavix.rococoa.iokit.IOKitLib.IO_OBJECT_NULL;
 import static vavix.rococoa.iokit.IOKitLib.MACH_PORT_NULL;
@@ -67,6 +67,8 @@ import static vavix.rococoa.iokit.IOKitLib.kIOReturnSuccess;
  * @version 1.0
  */
 final class OSXHIDDeviceIterator {
+
+	private static final Logger log = Logger.getLogger(OSXHIDDeviceIterator.class.getName());
 
 	private final Pointer iterator_address;
 

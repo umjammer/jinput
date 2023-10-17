@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,19 +28,20 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
+
 package net.java.games.input;
 
 import java.io.IOException;
-
-import static net.java.games.input.ControllerEnvironment.log;
+import java.util.logging.Logger;
 
 
 /**
  * Skeleton implementation of a named axis.
  */
 public abstract class AbstractComponent implements Component {
+
+    private static final Logger log = Logger.getLogger(AbstractComponent.class.getName());
 
     /**
      * Human-readable name for this Axis
@@ -144,5 +139,4 @@ public abstract class AbstractComponent implements Component {
     }
 
 	protected abstract float poll() throws IOException;
-    
-} // AbstractAxis
+}

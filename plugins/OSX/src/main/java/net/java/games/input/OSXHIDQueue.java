@@ -162,7 +162,7 @@ final class OSXHIDQueue {
         if (ioReturnValue == IOKitLib.kIOReturnUnderrun) {
             return false;
         } else if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException("Queue getNextEvent failed: " + ioReturnValue);
+            throw new IOException(String.format("Queue getNextEvent failed: %x", ioReturnValue));
         }
         copyEvent(nEvent, event);
         return true;

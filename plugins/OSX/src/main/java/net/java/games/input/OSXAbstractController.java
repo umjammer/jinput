@@ -56,14 +56,17 @@ final class OSXAbstractController extends AbstractController {
 		this.port = device.getPortType();
 	}
 
-	protected final boolean getNextDeviceEvent(Event event) throws IOException {
+	@Override
+    protected final boolean getNextDeviceEvent(Event event) throws IOException {
 		return OSXControllers.getNextDeviceEvent(event, queue);
 	}
 
+	@Override
 	protected final void setDeviceEventQueueSize(int size) throws IOException {
 		queue.setQueueDepth(size);
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}

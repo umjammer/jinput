@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,30 +28,31 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
+
 package net.java.games.input;
 
 public final class Event {
+
     private Component component;
     private float value;
 	private long nanos;
 
-    public final void set(Event other) {
+    public void set(Event other) {
 		this.set(other.getComponent(), other.getValue(), other.getNanos());
     }
 
-    public final void set(Component component, float value, long nanos) {
+    public void set(Component component, float value, long nanos) {
 		this.component = component;
 		this.value = value;
 		this.nanos = nanos;
     }
 
-	public final Component getComponent() {
+	public Component getComponent() {
 		return component;
 	}
 
-	public final float getValue() {
+	public float getValue() {
 		return value;
 	}
 
@@ -66,11 +61,11 @@ public final class Event {
 	 * The time is relative and therefore can only be used
 	 * to compare with other event times.
 	 */
-	public final long getNanos() {
+	public long getNanos() {
 		return nanos;
 	}
 
-	public final String toString() {
+	public String toString() {
 		return "Event: component = " + component + " | value = " + value;
 	}
 }

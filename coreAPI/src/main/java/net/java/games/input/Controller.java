@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,8 +28,8 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
+
 package net.java.games.input;
 
 /**
@@ -46,19 +40,19 @@ package net.java.games.input;
  * controllers.
  */
 public interface Controller {
-    
+
     /**
      * Returns the controllers connected to make up this controller, or
      * an empty array if this controller contains no child controllers.
      * The objects in the array are returned in order of assignment priority
      * (primary stick, secondary buttons, etc.).
      */
-    public abstract Controller[] getControllers();
+    Controller[] getControllers();
 
     /**
      * Returns the type of the Controller.
      */
-    public abstract Type getType();
+    Type getType();
 
     /**
      * Returns the components on this controller, in order of assignment priority.
@@ -69,195 +63,156 @@ public interface Controller {
      * The array returned is an empty array if this controller contains no components
      * (such as a logical grouping of child controllers).
      */
-    public abstract Component[] getComponents();
+    Component[] getComponents();
 
     /**
      * Returns a single axis based on its type, or null
      * if no axis with the specified type could be found.
      */
-    public abstract Component getComponent(Component.Identifier id);
+    Component getComponent(Component.Identifier id);
 
     /**
      * Returns the rumblers for sending feedback to this controller, or an
      * empty array if there are no rumblers on this controller.
      */
-    public abstract Rumbler[] getRumblers();
+    Rumbler[] getRumblers();
 
     /**
      * Polls axes for data.  Returns false if the controller is no longer valid.
      * Polling reflects the current state of the device when polled.
      */
-    public abstract boolean poll();
+    boolean poll();
 
     /**
      * Initialized the controller event queue to a new size. Existing events
-	 * in the queue are lost.
+     * in the queue are lost.
      */
-	public abstract void setEventQueueSize(int size);
+    void setEventQueueSize(int size);
 
-	/**
-	 * Get the device event queue
-	 */
-	public abstract EventQueue getEventQueue();
+    /**
+     * Get the device event queue
+     */
+    EventQueue getEventQueue();
 
     /**
      * Returns the port type for this Controller.
      */
-    public abstract PortType getPortType();
+    PortType getPortType();
 
     /**
      * Returns the zero-based port number for this Controller.
      */
-    public abstract int getPortNumber();
+    int getPortNumber();
 
     /**
      * Returns a human-readable name for this Controller.
      */
-    public abstract String getName();
-    
+    String getName();
+
     /**
      * Types of controller objects.
      */
-    public static class Type {
-        
+    enum Type {
+
         /**
-         * Name of controller type
-         */
-        private final String name;
-        
-        /**
-         * Protected constructor
-         */
-        protected Type(String name) {
-            this.name = name;
-        }
-        
-        /**
-         * Returns a non-localized string description of this controller type.
-         */
-        public String toString() {
-            return name;
-        }
-        
-         /**
          * Unkown controller type.
          */
-        public static final Type UNKNOWN = new Type("Unknown");
-        
+        UNKNOWN,
+
         /**
          * Mouse controller.
          */
-        public static final Type MOUSE = new Type("Mouse");
+        MOUSE,
 
         /**
          * A keyboard controller
          */
-        public static final Type KEYBOARD = new Type("Keyboard");
-        
+        KEYBOARD,
+
         /**
          * Fingerstick controller; note that this may be sometimes treated as a
          * type of mouse or stick.
          */
-        public static final Type FINGERSTICK = new Type("Fingerstick");
+        FINGERSTICK,
 
         /**
          * Gamepad controller.
          */
-        public static final Type GAMEPAD = new Type("Gamepad");
+        GAMEPAD,
 
         /**
          * Headtracker controller.
          */
-        public static final Type HEADTRACKER = new Type("Headtracker");
+        HEADTRACKER,
 
         /**
          * Rudder controller.
          */
-        public static final Type RUDDER = new Type("Rudder");
+        RUDDER,
 
         /**
          * Stick controller, such as a joystick or flightstick.
          */
-        public static final Type STICK = new Type("Stick");
+        STICK,
 
         /**
          * A trackball controller; note that this may sometimes be treated as a
          * type of mouse.
          */
-        public static final Type TRACKBALL = new Type("Trackball");
+        TRACKBALL,
 
         /**
          * A trackpad, such as a tablet, touchpad, or glidepad;
          * note that this may sometimes be treated as a type of mouse.
          */
-        public static final Type TRACKPAD = new Type("Trackpad");
+        TRACKPAD,
 
         /**
          * A wheel controller, such as a steering wheel (note
          * that a mouse wheel is considered part of a mouse, not a
          * wheel controller).
          */
-        public static final Type WHEEL = new Type("Wheel");
-    } // class Controller.Type
-    
+        WHEEL,
+    }
+
     /**
      * Common controller port types.
      */
-    public static final class PortType {
-        
-        /**
-         * Name of port type
-         */
-        private final String name;
-        
-        /**
-         * Protected constructor
-         */
-        protected PortType(String name) {
-            this.name = name;
-        }
-        
-        /**
-         * Returns a non-localized string description of this port type.
-         */
-        public String toString() {
-            return name;
-        }
-        
+    enum PortType {
+
         /**
          * Unknown port type
          */
-        public static final PortType UNKNOWN = new PortType("Unknown");
+        UNKNOWN,
 
         /**
          * USB port
          */
-        public static final PortType USB = new PortType("USB port");
+        USB,
 
         /**
          * Standard game port
          */
-        public static final PortType GAME = new PortType("Game port");
+        GAME,
 
         /**
          * Network port
          */
-        public static final PortType NETWORK = new PortType("Network port");
+        NETWORK,
 
         /**
          * Serial port
          */
-        public static final PortType SERIAL = new PortType("Serial port");
-        
+        SERIAL,
+
         /**
-         * i8042
+         * i8042 (PS/2)
          */
-        public static final PortType I8042 = new PortType("i8042 (PS/2)");
-        
+        I8042,
+
         /**
          * Parallel port
          */
-        public static final PortType PARALLEL = new PortType("Parallel port");
-        
-    } // class Controller.PortType
-} // interface Controller
+        PARALLEL
+    }
+}

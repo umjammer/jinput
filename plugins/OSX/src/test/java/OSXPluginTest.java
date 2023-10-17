@@ -6,6 +6,7 @@
 
 import java.util.Arrays;
 
+import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.OSXEnvironmentPlugin;
 import org.junit.jupiter.api.Test;
 import vavi.util.Debug;
@@ -24,5 +25,10 @@ public class OSXPluginTest {
         OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
 Debug.println("getControllers: " + plugin.getControllers().length);
         Arrays.stream(plugin.getControllers()).forEach(System.err::println);
+    }
+
+    @Test
+    void test2() throws Exception {
+        Arrays.stream(ControllerEnvironment.getDefaultEnvironment().getControllers()).forEach(System.err::println);
     }
 }

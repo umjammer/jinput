@@ -90,6 +90,7 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
 		processed_events_index = 0;
 	}
 	
+	@Override
 	protected final void setDeviceEventQueueSize(int size) throws IOException {
 		resizeEventQueue(size);
 	}
@@ -99,7 +100,8 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
 			awt_events.add((KeyEvent)event);
 	}
 
-	public final synchronized void pollDevice() throws IOException {
+	@Override
+    public final synchronized void pollDevice() throws IOException {
 		for (int i = 0; i < awt_events.size(); i++) {
 			processEvent(awt_events.get(i));
         }
@@ -132,6 +134,7 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
 			processed_events[processed_events_index++].set(key, value, nanos);
 	}
 
+	@Override
 	protected final synchronized boolean getNextDeviceEvent(Event event) throws IOException {
 		if (processed_events_index == 0)
 			return false;

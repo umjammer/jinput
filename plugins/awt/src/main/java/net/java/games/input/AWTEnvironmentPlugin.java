@@ -27,13 +27,12 @@ package net.java.games.input;
 
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
-import net.java.games.util.plugins.Plugin;
 
 /**
  * @author Jeremy
  * @author elias
  */
-public class AWTEnvironmentPlugin extends ControllerEnvironment implements Plugin {
+public class AWTEnvironmentPlugin extends ControllerEnvironment {
 	
 	private final Controller[] controllers;
 

@@ -6,6 +6,8 @@
 
 import com.sun.jna.ptr.IntByReference;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import vavi.util.Debug;
 import vavix.rococoa.corefoundation.CFAllocator;
 import vavix.rococoa.corefoundation.CFLib;
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-09-23 nsano initial version <br>
  */
+@EnabledOnOs(OS.MAC)
 public class RococoaTest {
 
     @Test

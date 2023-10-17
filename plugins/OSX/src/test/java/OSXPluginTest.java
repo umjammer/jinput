@@ -9,6 +9,8 @@ import java.util.Arrays;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.OSXEnvironmentPlugin;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import vavi.util.Debug;
 
 
@@ -18,6 +20,7 @@ import vavi.util.Debug;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-09-23 nsano initial version <br>
  */
+@EnabledOnOs(OS.MAC)
 public class OSXPluginTest {
 
     @Test

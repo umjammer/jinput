@@ -20,7 +20,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.ptr.ByReference;
 import com.sun.jna.ptr.NativeLongByReference;
-import com.sun.jna.ptr.PointerByReference;
 
 
 /**
@@ -57,6 +56,7 @@ public interface CFLib extends Library {
 
     /** Releases a Core Foundation object. */
     void CFRelease(CFType cf);
+
     void CFRelease(Pointer cf);
 
     void CFRetain(Pointer cf);
@@ -72,6 +72,7 @@ public interface CFLib extends Library {
     NativeLong CFArrayGetTypeID();
 
     interface CFArrayApplierFunction extends Callback {
+
         void invoke(CFType value, Pointer context);
     }
 
@@ -92,6 +93,7 @@ public interface CFLib extends Library {
 //#region CFString
 
     interface CFComparisonResult {
+
         int kCFCompareLessThan = -1;
         int kCFCompareEqualTo = 0;
         int kCFCompareGreaterThan = 1;
@@ -137,6 +139,7 @@ public interface CFLib extends Library {
 //#region CFNumber
 
     interface CFNumberType {
+
         /**
          * Fixed-width types<br>
          * Fixed-width types<br>
@@ -236,6 +239,7 @@ public interface CFLib extends Library {
 //#region CFDictionary
 
     interface CFComparatorFunction extends Callback {
+
         /**
          * @see CFComparisonResult
          */
@@ -243,54 +247,67 @@ public interface CFLib extends Library {
     }
 
     interface CFAllocatorRetainCallBack extends Callback {
+
         Pointer invoke(Pointer info);
     }
 
     interface CFAllocatorReleaseCallBack extends Callback {
+
         void invoke(Pointer info);
     }
 
     interface CFAllocatorCopyDescriptionCallBack extends Callback {
+
         CFString invoke(Pointer info);
     }
 
     interface CFAllocatorAllocateCallBack extends Callback {
+
         Pointer invoke(NativeLong allocSize, NativeLong hint, Pointer info);
     }
 
     interface CFAllocatorReallocateCallBack extends Callback {
+
         Pointer invoke(Pointer ptr, NativeLong newsize, NativeLong hint, Pointer info);
     }
 
     interface CFAllocatorDeallocateCallBack extends Callback {
+
         void invoke(Pointer ptr, Pointer info);
     }
 
     interface CFAllocatorPreferredSizeCallBack extends Callback {
+
         NativeLong invoke(NativeLong size, NativeLong hint, Pointer info);
     }
 
     interface CFDictionaryRetainCallBack extends Callback {
+
         Pointer invoke(CFAllocator allocator, CFType value);
     }
 
     interface CFDictionaryReleaseCallBack extends Callback {
+
         void invoke(CFAllocator allocator, CFType value);
     }
 
     interface CFDictionaryCopyDescriptionCallBack extends Callback {
+
         CFString invoke(CFType value);
     }
 
     interface CFDictionaryEqualCallBack extends Callback {
+
         boolean invoke(CFType value1, CFType value2);
     }
 
     interface CFDictionaryHashCallBack extends Callback {
+
         NativeLong invoke(CFType value);
     }
 
     interface CFDictionaryApplierFunction extends Callback {
+
         void invoke(CFString key, CFType value, Pointer/*Structure.ByReference*/ context);
     }
 
@@ -353,9 +370,11 @@ public interface CFLib extends Library {
         }
 
         public static class ByReference extends CFDictionaryKeyCallBacks implements Structure.ByReference {
+
         }
 
         public static class ByValue extends CFDictionaryKeyCallBacks implements Structure.ByValue {
+
         }
 
         @Override
@@ -419,9 +438,11 @@ public interface CFLib extends Library {
         }
 
         public static class ByReference extends CFDictionaryValueCallBacks implements Structure.ByReference {
+
         }
 
         public static class ByValue extends CFDictionaryValueCallBacks implements Structure.ByValue {
+
         }
 
         @Override
@@ -507,6 +528,7 @@ public interface CFLib extends Library {
 //#region CFLogging
 
     interface CFLogLevel {
+
         int kCFLogLevelEmergency = 0;
         int kCFLogLevelAlert = 1;
         int kCFLogLevelCritical = 2;
@@ -557,22 +579,27 @@ public interface CFLib extends Library {
     class CFRunLoopSourceContext extends Structure {
 
         public interface CFRunLoopEqualCallBack extends Callback {
+
             boolean invoke(Pointer info1, Pointer info2);
         }
 
         public interface CFRunLoopHashCallBack extends Callback {
+
             long /*CFHashCode*/ invoke(Pointer info);
         }
 
         public interface CFRunLoopScheduleCallBack extends Callback {
+
             void invoke(Pointer info, CFRunLoop rl, CFString mode);
         }
 
         public interface CFRunLoopCancelCallBack extends Callback {
+
             void invoke(Pointer info, CFRunLoop rl, CFString mode);
         }
 
         public interface CFRunLoopPerformCallBack extends Callback {
+
             void invoke(Pointer info);
         }
 
@@ -608,9 +635,11 @@ public interface CFLib extends Library {
         }
 
         public static class ByReference extends CFRunLoopSourceContext implements Structure.ByReference {
+
         }
 
         public static class ByValue extends CFRunLoopSourceContext implements Structure.ByValue {
+
         }
 
         @Override
@@ -702,9 +731,11 @@ public interface CFLib extends Library {
         }
 
         public static class ByReference extends CFAllocatorContext implements Structure.ByReference {
+
         }
 
         public static class ByValue extends CFAllocatorContext implements Structure.ByValue {
+
         }
 
         @Override
@@ -739,9 +770,11 @@ public interface CFLib extends Library {
         public byte byte15;
 
         public static class ByReference extends CFUUIDBytes implements Structure.ByReference {
+
         }
 
         public static class ByValue extends CFUUIDBytes implements Structure.ByValue {
+
         }
 
         @Override
@@ -770,7 +803,7 @@ public interface CFLib extends Library {
 
     /**
      * @param uuidStr A string containing a UUID. The standard format for UUIDs represented
-     *               in ASCII is a string punctuated by hyphens, for example 68753A44-4D6F-1226-9C60-0050E4C00067.
+     *                in ASCII is a string punctuated by hyphens, for example 68753A44-4D6F-1226-9C60-0050E4C00067.
      */
     Pointer /*CFUUIDRef*/ CFUUIDCreateFromString(CFAllocator alloc, CFString uuidStr);
 

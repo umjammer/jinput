@@ -27,6 +27,7 @@ import com.sun.jna.Pointer;
 
 /**
  * Brought to you by:
+ *
  * @author semaphore
  * @version May 27, 2010 11:59:06 AM
  */
@@ -50,7 +51,7 @@ public class CFString extends CFType {
 
     public String getString() {
         int lengthInChars = CFLib.INSTANCE.CFStringGetLength(this).intValue();
-        NativeLong potentialLengthInBytes = new NativeLong(3 * lengthInChars + 1); // UTF8 fully escaped 16 bit chars, plus nul
+        NativeLong potentialLengthInBytes = new NativeLong(3L * lengthInChars + 1); // UTF8 fully escaped 16 bit chars, plus nul
 
         ByteBuffer buffer = ByteBuffer.allocate(potentialLengthInBytes.intValue());
         boolean ok = CFLib.INSTANCE.CFStringGetCString(this, buffer, potentialLengthInBytes, CFLib.kCFStringEncodingUTF8);

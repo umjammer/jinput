@@ -14,7 +14,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -23,9 +23,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -63,7 +64,6 @@ import vavix.rococoa.corefoundation.CFString;
 import vavix.rococoa.corefoundation.CFType;
 import vavix.rococoa.iokit.IOKitLib;
 
-import static net.java.games.input.ControllerEnvironment.log;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberCFIndexType;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberCharType;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberDoubleType;
@@ -87,6 +87,8 @@ import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberShortType
  * @version 0.00 2023-09-22 nsano initial version <br>
  */
 public abstract class NativeUtil {
+
+    private static final Logger log = Logger.getLogger(NativeUtil.class.getName());
 
     static {
 log.finer("CFDictionary: " + CFLib.INSTANCE.CFDictionaryGetTypeID());
@@ -117,9 +119,11 @@ log.finer("CFBoolean: " + CFLib.INSTANCE.CFBooleanGetTypeID());
         }
 
         public static class ByReference extends dict_context_t implements Structure.ByReference {
+
         }
 
         public static class ByValue extends dict_context_t implements Structure.ByValue {
+
         }
 
         @Override
@@ -148,9 +152,11 @@ log.finer("CFBoolean: " + CFLib.INSTANCE.CFBooleanGetTypeID());
         }
 
         public static class ByReference extends array_context_t implements Structure.ByReference {
+
         }
 
         public static class ByValue extends array_context_t implements Structure.ByValue {
+
         }
 
         @Override
@@ -199,8 +205,7 @@ log.warning("CFNumberGetValue: " + result + ", " + cfnumber);
         return switch (number_type) {
             case kCFNumberSInt8Type, kCFNumberSInt16Type, kCFNumberSInt32Type, kCFNumberSInt64Type,
                     kCFNumberCharType, kCFNumberShortType, kCFNumberIntType, kCFNumberLongType,
-                    kCFNumberLongLongType, kCFNumberCFIndexType ->
-                    createLongObjectFromCFNumber(cfnumber);
+                    kCFNumberLongLongType, kCFNumberCFIndexType -> createLongObjectFromCFNumber(cfnumber);
             case kCFNumberFloat32Type, kCFNumberFloat64Type, kCFNumberFloatType, kCFNumberDoubleType ->
                     createDoubleObjectFromCFNumber(cfnumber);
             default -> {
@@ -227,7 +232,7 @@ log.finer("array(" + array_context.arrayID + "): [" + array_context.index + "] =
         NativeLong size = CFLib.INSTANCE.CFArrayGetCount(cfarray);
         CFRange.ByValue range = new CFRange.ByValue();
         range.location = CFIndex.of(0);
-        range.length =  CFIndex.of(size);
+        range.length = CFIndex.of(size);
         Object[] array = new Object[size.intValue()];
         array_context_t.ByReference array_context = new array_context_t.ByReference();
         array_context.arrayID = arrayID++;
@@ -276,7 +281,7 @@ log.finer(dict_context.getPointer().dump(0, dict_context.size()));
         Object jvalue = createObjectFromCFObject(value);
 log.finer("map(" + dict_context.mapID + "): put: " + jkey + ", " + jvalue);
         if (jkey == null || jvalue == null) {
-log.warning("map: " + dict_context.mapID + ":: put: " + jkey + ", " + jvalue + "(" + (value != null ? value.getType() : "??") + ")");
+            log.warning("map: " + dict_context.mapID + ":: put: " + jkey + ", " + jvalue + "(" + (value != null ? value.getType() : "??") + ")");
             return;
         }
         Map<Object, Object> map = maps.get(dict_context.mapID);

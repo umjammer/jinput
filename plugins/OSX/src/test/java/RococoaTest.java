@@ -24,7 +24,7 @@ public class RococoaTest {
 
     @Test
     void test1() {
-Debug.println(CFLib.kCFRunLoopDefaultMode.getString());
+        Debug.println(CFLib.kCFRunLoopDefaultMode.getString());
         assertEquals("kCFRunLoopDefaultMode", CFLib.kCFRunLoopDefaultMode.getString());
     }
 
@@ -33,7 +33,7 @@ Debug.println(CFLib.kCFRunLoopDefaultMode.getString());
         IntByReference ip = new IntByReference(127);
         CFNumber cfn = CFLib.INSTANCE.CFNumberCreate(CFAllocator.kCFAllocatorDefault, CFLib.CFNumberType.kCFNumberIntType, ip);
 
-Debug.println(cfn);
+        Debug.println(cfn);
         assertEquals(127, cfn.getInt());
     }
 }

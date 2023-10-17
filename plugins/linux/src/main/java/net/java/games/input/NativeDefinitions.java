@@ -5,6 +5,7 @@ package net.java.games.input;
  * This file is generated from /usr/src/linux-headers-3.2.0-38-generic/include/linux/input.h please do not edit
  */
 class NativeDefinitions {
+
     public static final int EV_VERSION = 0x010001;
     public static final int EV_SYN = 0x00;
     public static final int EV_KEY = 0x01;
@@ -19,7 +20,7 @@ class NativeDefinitions {
     public static final int EV_PWR = 0x16;
     public static final int EV_FF_STATUS = 0x17;
     public static final int EV_MAX = 0x1f;
-    public static final int EV_CNT = (EV_MAX+1);
+    public static final int EV_CNT = (EV_MAX + 1);
     public static final int KEY_RESERVED = 0;
     public static final int KEY_ESC = 1;
     public static final int KEY_1 = 2;
@@ -526,7 +527,7 @@ class NativeDefinitions {
     public static final int BTN_TRIGGER_HAPPY40 = 0x2e7;
     public static final int KEY_MIN_INTERESTING = KEY_MUTE;
     public static final int KEY_MAX = 0x2ff;
-    public static final int KEY_CNT = (KEY_MAX+1);
+    public static final int KEY_CNT = (KEY_MAX + 1);
     public static final int REL_X = 0x00;
     public static final int REL_Y = 0x01;
     public static final int REL_Z = 0x02;
@@ -538,7 +539,7 @@ class NativeDefinitions {
     public static final int REL_WHEEL = 0x08;
     public static final int REL_MISC = 0x09;
     public static final int REL_MAX = 0x0f;
-    public static final int REL_CNT = (REL_MAX+1);
+    public static final int REL_CNT = (REL_MAX + 1);
     public static final int ABS_X = 0x00;
     public static final int ABS_Y = 0x01;
     public static final int ABS_Z = 0x02;
@@ -581,7 +582,7 @@ class NativeDefinitions {
     public static final int ABS_MT_FIRST = ABS_MT_TOUCH_MAJOR;
     public static final int ABS_MT_LAST = ABS_MT_DISTANCE;
     public static final int ABS_MAX = 0x3f;
-    public static final int ABS_CNT = (ABS_MAX+1);
+    public static final int ABS_CNT = (ABS_MAX + 1);
     public static final int BUS_PCI = 0x01;
     public static final int BUS_ISAPNP = 0x02;
     public static final int BUS_USB = 0x03;
@@ -625,7 +626,7 @@ class NativeDefinitions {
     public static final int FF_GAIN = 0x60;
     public static final int FF_AUTOCENTER = 0x61;
     public static final int FF_MAX = 0x7f;
-    public static final int FF_CNT = (FF_MAX+1);
+    public static final int FF_CNT = (FF_MAX + 1);
     public static final int USAGE_MOUSE = 0x00;
     public static final int USAGE_JOYSTICK = 0x01;
     public static final int USAGE_GAMEPAD = 0x02;

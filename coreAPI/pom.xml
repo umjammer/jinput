@@ -2,24 +2,16 @@
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>net.java.jinput</groupId>
+    <artifactId>jinput-parent</artifactId>
+    <version>2.0.11v</version>
+  </parent>
+
   <artifactId>coreapi</artifactId>
 
   <name>JInput - core API</name>
   <packaging>jar</packaging>
-
-  <parent>
-    <groupId>net.java.jinput</groupId>
-    <artifactId>jinput-parent</artifactId>
-    <version>2.0.10-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-
-  <dependencies>
-    <dependency>
-      <groupId>net.java.jutils</groupId>
-      <artifactId>jutils</artifactId>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>

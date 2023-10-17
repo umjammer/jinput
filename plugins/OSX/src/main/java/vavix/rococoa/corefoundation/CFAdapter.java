@@ -21,8 +21,10 @@ package vavix.rococoa.corefoundation;
 
 /**
  * Brought to you by:
+ *
  * @author semaphore
  * @version May 27, 2010 1:59:05 PM
  */
 public abstract class CFAdapter {
+
 }

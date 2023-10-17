@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -8,7 +8,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -17,9 +17,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -28,182 +28,81 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
  */
+
 package net.java.games.input;
 
-import net.java.games.util.plugins.Plugins;
-
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.Collections;
+import java.util.ServiceLoader;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * The default controller environment.
  *
- * @version %I% %G%
  * @author Michael Martak
+ * @version %I% %G%
  */
 class DefaultControllerEnvironment extends ControllerEnvironment {
-	static String libPath;
-	
-	private static Logger log = Logger.getLogger(DefaultControllerEnvironment.class.getName());
-	
-	/**
-	 * Static utility method for loading native libraries.
-	 * It will try to load from either the path given by
-	 * the net.java.games.input.librarypath property
-	 * or through System.loadLibrary().
-	 * 
-	 */
-	static void loadLibrary(final String lib_name) {
-						String lib_path = System.getProperty("net.java.games.input.librarypath");
-						if (lib_path != null)
-							System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
-						else
-							System.loadLibrary(lib_name);
-	}
-    
-	static String getPrivilegedProperty(final String property) {
-	       return System.getProperty(property);
-		}
-		
 
-	static String getPrivilegedProperty(final String property, final String default_value) {
-       return System.getProperty(property, default_value);
-	}
-		
+    private static Logger log = Logger.getLogger(DefaultControllerEnvironment.class.getName());
+
     /**
      * List of all controllers in this environment
      */
     private ArrayList<Controller> controllers;
-    
-	private Collection<String> loadedPluginNames = new ArrayList<>();
 
     /**
      * Public no-arg constructor.
      */
     public DefaultControllerEnvironment() {
     }
-    
+
     /**
      * Returns a list of all controllers available to this environment,
      * or an empty array if there are no controllers in this environment.
      */
+    @Override
     public Controller[] getControllers() {
         if (controllers == null) {
             // Controller list has not been scanned.
             controllers = new ArrayList<>();
             scanControllers();
-            //Check the properties for specified controller classes
-            String pluginClasses = getPrivilegedProperty("jinput.plugins", "") + " " + getPrivilegedProperty("net.java.games.input.plugins", "");
-			if(!getPrivilegedProperty("jinput.useDefaultPlugin", "true").toLowerCase().trim().equals("false") && !getPrivilegedProperty("net.java.games.input.useDefaultPlugin", "true").toLowerCase().trim().equals("false")) {
-				String osName = getPrivilegedProperty("os.name", "").trim();
-				if(osName.equals("Linux")) {
-					pluginClasses = pluginClasses + " net.java.games.input.LinuxEnvironmentPlugin";
-				} else if(osName.equals("Mac OS X")) {
-					pluginClasses = pluginClasses + " net.java.games.input.OSXEnvironmentPlugin";
-				} else  if(osName.equals("Windows XP") || osName.equals("Windows Vista") || osName.equals("Windows 7") || osName.equals("Windows 8") || osName.equals("Windows 8.1") || osName.equals("Windows 10")) {
-					pluginClasses = pluginClasses + " net.java.games.input.DirectAndRawInputEnvironmentPlugin";
-				} else if(osName.equals("Windows 98") || osName.equals("Windows 2000")) {
-					pluginClasses = pluginClasses + " net.java.games.input.DirectInputEnvironmentPlugin";
-				} else if (osName.startsWith("Windows")) {
-					log.warning("Found unknown Windows version: " + osName);
-					log.warning("Attempting to use default windows plug-in.");
-					pluginClasses = pluginClasses + " net.java.games.input.DirectAndRawInputEnvironmentPlugin";
-				} else {
-					log.warning("Trying to use default plugin, OS name " + osName +" not recognised");
-				}
-			}
+        }
 
-			StringTokenizer pluginClassTok = new StringTokenizer(pluginClasses, " \t\n\r\f,;:");
-			while(pluginClassTok.hasMoreTokens()) {
-				String className = pluginClassTok.nextToken();					
-				try {
-					if(!loadedPluginNames.contains(className)) {
-						log.fine("Loading: " + className);
-						Class<?> ceClass = Class.forName(className);
-						ControllerEnvironment ce = (ControllerEnvironment) ceClass.getDeclaredConstructor().newInstance();
-						if(ce.isSupported()) {
-							addControllers(ce.getControllers());
-							loadedPluginNames.add(ce.getClass().getName());
-						} else {
-							log.fine(ceClass.getName() + " is not supported");
-						}
-					}
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
-			}
-        }
-        Controller[] ret = new Controller[controllers.size()];
-        Iterator<Controller> it = controllers.iterator();
-        int i = 0;
-        while (it.hasNext()) {
-            ret[i] = it.next();
-            i++;
-        }
-        return ret;
+        return controllers.toArray(Controller[]::new);
     }
-    
-    /* This is jeff's new plugin code using Jeff's Plugin manager */
-    private Void scanControllers() {
-        String pluginPathName = getPrivilegedProperty("jinput.controllerPluginPath");
-        if(pluginPathName == null) {
-            pluginPathName = "controller";
-        }
-        
-        scanControllersAt(getPrivilegedProperty("java.home") +
-            File.separator + "lib"+File.separator + pluginPathName);
-        scanControllersAt(getPrivilegedProperty("user.dir")+
-            File.separator + pluginPathName);
 
-        return null;
-    }
-    
-    private void scanControllersAt(String path) {
-        File file = new File(path);
-        if (!file.exists()) {
-            return;
-        }
+    private void scanControllers() {
         try {
-            Plugins plugins = new Plugins(file);
-            @SuppressWarnings("unchecked")
-            Class<ControllerEnvironment>[] envClasses = plugins.getExtends(ControllerEnvironment.class);
-            for(int i=0;i<envClasses.length;i++){
+            for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
                 try {
-					log.fine("ControllerEnvironment "+
-                            envClasses[i].getName()
-                            +" loaded by "+envClasses[i].getClassLoader());
-                    ControllerEnvironment ce = envClasses[i].getDeclaredConstructor().newInstance();
-					if(ce.isSupported()) {
-	                    addControllers(ce.getControllers());
-						loadedPluginNames.add(ce.getClass().getName());
-					} else {
-						log.fine(envClasses[i].getName() + " is not supported");
-					}
+log.fine("@@@ ControllerEnvironment " + ce.getClass().getName());
+                    if (ce.isSupported()) {
+                        addControllers(ce.getControllers());
+                    } else {
+                        log.fine(ce.getClass().getName() + " is not supported");
+                    }
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    log.log(Level.FINE, e.getMessage(), e);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.log(Level.FINE, e.getMessage(), e);
         }
     }
-        
+
     /**
      * Add the array of controllers to our list of controllers.
      */
     private void addControllers(Controller[] c) {
-        for (int i = 0; i < c.length; i++) {
-            controllers.add(c[i]);
-        }
+        Collections.addAll(controllers, c);
     }
 
-	public boolean isSupported() {
-		return true;
-	}
+    @Override
+    public boolean isSupported() {
+        return true;
+    }
 }

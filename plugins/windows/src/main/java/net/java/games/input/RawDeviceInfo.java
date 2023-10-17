@@ -14,7 +14,7 @@
  *
  * - Redistribution in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materails provided with the distribution.
+ *   and/or other materials provided with the distribution.
  *
  * Neither the name Sun Microsystems, Inc. or the names of the contributors
  * may be used to endorse or promote products derived from this software
@@ -23,9 +23,9 @@
  * This software is provided "AS IS," without a warranty of any kind.
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
- * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
+ * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS 
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -36,32 +36,37 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 
-/** Java wrapper of RID_DEVICE_INFO
+
+/**
+ * Java wrapper of RID_DEVICE_INFO
+ *
  * @author elias
  * @version 1.0
  */
 abstract class RawDeviceInfo {
-	public abstract Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException;
 
-	public abstract int getUsage();
+    public abstract Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException;
 
-	public abstract int getUsagePage();
+    public abstract int getUsage();
 
-	public abstract long getHandle();
+    public abstract int getUsagePage();
 
-	public final boolean equals(Object other) {
-		if (!(other instanceof RawDeviceInfo))
-			return false;
-		RawDeviceInfo other_info = (RawDeviceInfo)other;
-		return other_info.getUsage() == getUsage() &&
-			other_info.getUsagePage() == getUsagePage();
-	}
+    public abstract long getHandle();
 
-	public final int hashCode() {
-		return getUsage() ^ getUsagePage();
-	}
+    public final boolean equals(Object other) {
+        if (!(other instanceof RawDeviceInfo))
+            return false;
+        RawDeviceInfo other_info = (RawDeviceInfo) other;
+        return other_info.getUsage() == getUsage() &&
+                other_info.getUsagePage() == getUsagePage();
+    }
+
+    public final int hashCode() {
+        return getUsage() ^ getUsagePage();
+    }
 }

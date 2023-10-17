@@ -15,7 +15,7 @@ this is jna-nized version. [original](https://github.com/jinput/jinput)
 
 ## References
 
- * https://github.com/code-orchestra/code-orchestra-core/tree/b2bbf8362be2e2173864c294c635badb2e27ecc6/core/actionScript/source/com/semaphore/jna/cf
+* https://github.com/code-orchestra/code-orchestra-core/tree/b2bbf8362be2e2173864c294c635badb2e27ecc6/core/actionScript/source/com/semaphore/jna/cf
 
 ## License
 
@@ -23,6 +23,6 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
 
 ## TODO
 
- * use proper ServiceLoader instead of proprietary plugin system (backport from vavi-awt-joystick)
- * descriptor to components
-   * how can we know descriptor length?
+* use proper ServiceLoader instead of proprietary plugin system (backport from vavi-awt-joystick)
+* descriptor to components
+    * how can we know descriptor length?

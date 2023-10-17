@@ -1,31 +1,33 @@
 /**
  * Copyright (C) 2003 Jeremy Booth (jeremy@newdawnsoftware.com)
- *
- * Redistribution and use in source and binary forms, with or without 
+ * <p>
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this 
- * list of conditions and the following disclaimer. Redistributions in binary 
- * form must reproduce the above copyright notice, this list of conditions and 
+ * <p>
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer. Redistributions in binary
+ * form must reproduce the above copyright notice, this list of conditions and
  * the following disclaimer in the documentation and/or other materials provided
- * with the distribution. 
+ * with the distribution.
  * The name of the author may not be used to endorse or promote products derived
- * from this software without specific prior written permission. 
- *
+ * from this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
- * EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
+
 package net.java.games.input;
 
 import java.util.logging.Logger;
+
 
 /**
  * Mapping utility class between native type ints and string names or
@@ -33,24 +35,25 @@ import java.util.logging.Logger;
  * @author Jeremy Booth (jeremy@newdawnsoftware.com)
  */
 class LinuxNativeTypesMap {
+
     private static LinuxNativeTypesMap INSTANCE = new LinuxNativeTypesMap();
     private static Logger log = Logger.getLogger(LinuxNativeTypesMap.class.getName());
-    
+
     private final Component.Identifier relAxesIDs[];
     private final Component.Identifier absAxesIDs[];
     private final Component.Identifier buttonIDs[];
-    
+
     /** create an empty, uninitialsed map
-     */    
+     */
     private LinuxNativeTypesMap() {
         buttonIDs = new Component.Identifier[NativeDefinitions.KEY_MAX];
         relAxesIDs = new Component.Identifier[NativeDefinitions.REL_MAX];
         absAxesIDs = new Component.Identifier[NativeDefinitions.ABS_MAX];
-		reInit();
+        reInit();
     }
-    
+
     /** Do the work.
-     */    
+     */
     private void reInit() {
         buttonIDs[NativeDefinitions.KEY_ESC] = Component.Identifier.Key.ESCAPE;
         buttonIDs[NativeDefinitions.KEY_1] = Component.Identifier.Key._1;
@@ -259,7 +262,7 @@ class LinuxNativeTypesMap {
         buttonIDs[NativeDefinitions.KEY_UNKNOWN] = Component.Identifier.Key.UNLABELED;
         /*buttonIDs[NativeDefinitions.KEY_BRIGHTNESSDOWN] = "Brightness Down";
         buttonIDs[NativeDefinitions.KEY_BRIGHTNESSUP] = "Brightness Up";*/
-        
+
         //Misc keys
         buttonIDs[NativeDefinitions.BTN_0] = Component.Identifier.Button._0;
         buttonIDs[NativeDefinitions.BTN_1] = Component.Identifier.Button._1;
@@ -271,7 +274,7 @@ class LinuxNativeTypesMap {
         buttonIDs[NativeDefinitions.BTN_7] = Component.Identifier.Button._7;
         buttonIDs[NativeDefinitions.BTN_8] = Component.Identifier.Button._8;
         buttonIDs[NativeDefinitions.BTN_9] = Component.Identifier.Button._9;
-        
+
         // Mouse
         buttonIDs[NativeDefinitions.BTN_LEFT] = Component.Identifier.Button.LEFT;
         buttonIDs[NativeDefinitions.BTN_RIGHT] = Component.Identifier.Button.RIGHT;
@@ -280,7 +283,7 @@ class LinuxNativeTypesMap {
         buttonIDs[NativeDefinitions.BTN_EXTRA] = Component.Identifier.Button.EXTRA;
         buttonIDs[NativeDefinitions.BTN_FORWARD] = Component.Identifier.Button.FORWARD;
         buttonIDs[NativeDefinitions.BTN_BACK] = Component.Identifier.Button.BACK;
-        
+
         // Joystick
         buttonIDs[NativeDefinitions.BTN_TRIGGER] = Component.Identifier.Button.TRIGGER;
         buttonIDs[NativeDefinitions.BTN_THUMB] = Component.Identifier.Button.THUMB;
@@ -295,7 +298,7 @@ class LinuxNativeTypesMap {
         buttonIDs[NativeDefinitions.BTN_BASE5] = Component.Identifier.Button.BASE5;
         buttonIDs[NativeDefinitions.BTN_BASE6] = Component.Identifier.Button.BASE6;
         buttonIDs[NativeDefinitions.BTN_DEAD] = Component.Identifier.Button.DEAD;
-        
+
         // Gamepad
         buttonIDs[NativeDefinitions.BTN_A] = Component.Identifier.Button.A;
         buttonIDs[NativeDefinitions.BTN_B] = Component.Identifier.Button.B;
@@ -366,7 +369,7 @@ class LinuxNativeTypesMap {
         buttonIDs[NativeDefinitions.BTN_TOUCH] = Component.Identifier.Button.TOUCH;
         buttonIDs[NativeDefinitions.BTN_STYLUS] = Component.Identifier.Button.STYLUS;
         buttonIDs[NativeDefinitions.BTN_STYLUS2] = Component.Identifier.Button.STYLUS2;
-        
+
         relAxesIDs[NativeDefinitions.REL_X] = Component.Identifier.Axis.X;
         relAxesIDs[NativeDefinitions.REL_Y] = Component.Identifier.Axis.Y;
         relAxesIDs[NativeDefinitions.REL_Z] = Component.Identifier.Axis.Z;
@@ -375,7 +378,7 @@ class LinuxNativeTypesMap {
         relAxesIDs[NativeDefinitions.REL_HWHEEL] = Component.Identifier.Axis.SLIDER;
         relAxesIDs[NativeDefinitions.REL_DIAL] = Component.Identifier.Axis.SLIDER;
         relAxesIDs[NativeDefinitions.REL_MISC] = Component.Identifier.Axis.SLIDER;
-        
+
         absAxesIDs[NativeDefinitions.ABS_X] = Component.Identifier.Axis.X;
         absAxesIDs[NativeDefinitions.ABS_Y] = Component.Identifier.Axis.Y;
         absAxesIDs[NativeDefinitions.ABS_Z] = Component.Identifier.Axis.Z;
@@ -404,443 +407,443 @@ class LinuxNativeTypesMap {
         absAxesIDs[NativeDefinitions.ABS_MISC] = null;
     }
 
-	public final static Controller.Type guessButtonTrait(int button_code) {
-		switch (button_code) {
-			case NativeDefinitions.BTN_TRIGGER : 
-			case NativeDefinitions.BTN_THUMB : 
-			case NativeDefinitions.BTN_THUMB2 : 
-			case NativeDefinitions.BTN_TOP : 
-			case NativeDefinitions.BTN_TOP2 : 
-			case NativeDefinitions.BTN_PINKIE : 
-			case NativeDefinitions.BTN_BASE : 
-			case NativeDefinitions.BTN_BASE2 : 
-			case NativeDefinitions.BTN_BASE3 : 
-			case NativeDefinitions.BTN_BASE4 : 
-			case NativeDefinitions.BTN_BASE5 : 
-			case NativeDefinitions.BTN_BASE6 : 
-			case NativeDefinitions.BTN_DEAD : 
-				return Controller.Type.STICK;
-			case NativeDefinitions.BTN_A : 
-			case NativeDefinitions.BTN_B : 
-			case NativeDefinitions.BTN_C : 
-			case NativeDefinitions.BTN_X : 
-			case NativeDefinitions.BTN_Y : 
-			case NativeDefinitions.BTN_Z : 
-			case NativeDefinitions.BTN_TL : 
-			case NativeDefinitions.BTN_TR : 
-			case NativeDefinitions.BTN_TL2 : 
-			case NativeDefinitions.BTN_TR2 : 
-			case NativeDefinitions.BTN_SELECT :
-            case NativeDefinitions.BTN_START :
-			case NativeDefinitions.BTN_MODE :
-			case NativeDefinitions.BTN_THUMBL : 
-			case NativeDefinitions.BTN_THUMBR :
-				return Controller.Type.GAMEPAD;
-			case NativeDefinitions.BTN_0 : 
-			case NativeDefinitions.BTN_1 : 
-			case NativeDefinitions.BTN_2 : 
-			case NativeDefinitions.BTN_3 : 
-			case NativeDefinitions.BTN_4 : 
-			case NativeDefinitions.BTN_5 : 
-			case NativeDefinitions.BTN_6 : 
-			case NativeDefinitions.BTN_7 : 
-			case NativeDefinitions.BTN_8 : 
-			case NativeDefinitions.BTN_9 : 
-				return Controller.Type.UNKNOWN;
-			case NativeDefinitions.BTN_LEFT : 
-			case NativeDefinitions.BTN_RIGHT : 
-			case NativeDefinitions.BTN_MIDDLE : 
-			case NativeDefinitions.BTN_SIDE : 
-			case NativeDefinitions.BTN_EXTRA : 
-				return Controller.Type.MOUSE;
-				//				case NativeDefinitions.KEY_RESERVED:
-			case NativeDefinitions.KEY_ESC:
-			case NativeDefinitions.KEY_1:
-			case NativeDefinitions.KEY_2:
-			case NativeDefinitions.KEY_3:
-			case NativeDefinitions.KEY_4:
-			case NativeDefinitions.KEY_5:
-			case NativeDefinitions.KEY_6:
-			case NativeDefinitions.KEY_7:
-			case NativeDefinitions.KEY_8:
-			case NativeDefinitions.KEY_9:
-			case NativeDefinitions.KEY_0:
-			case NativeDefinitions.KEY_MINUS:
-			case NativeDefinitions.KEY_EQUAL:
-			case NativeDefinitions.KEY_BACKSPACE:
-			case NativeDefinitions.KEY_TAB:
-			case NativeDefinitions.KEY_Q:
-			case NativeDefinitions.KEY_W:
-			case NativeDefinitions.KEY_E:
-			case NativeDefinitions.KEY_R:
-			case NativeDefinitions.KEY_T:
-			case NativeDefinitions.KEY_Y:
-			case NativeDefinitions.KEY_U:
-			case NativeDefinitions.KEY_I:
-			case NativeDefinitions.KEY_O:
-			case NativeDefinitions.KEY_P:
-			case NativeDefinitions.KEY_LEFTBRACE:
-			case NativeDefinitions.KEY_RIGHTBRACE:
-			case NativeDefinitions.KEY_ENTER:
-			case NativeDefinitions.KEY_LEFTCTRL:
-			case NativeDefinitions.KEY_A:
-			case NativeDefinitions.KEY_S:
-			case NativeDefinitions.KEY_D:
-			case NativeDefinitions.KEY_F:
-			case NativeDefinitions.KEY_G:
-			case NativeDefinitions.KEY_H:
-			case NativeDefinitions.KEY_J:
-			case NativeDefinitions.KEY_K:
-			case NativeDefinitions.KEY_L:
-			case NativeDefinitions.KEY_SEMICOLON:
-			case NativeDefinitions.KEY_APOSTROPHE:
-			case NativeDefinitions.KEY_GRAVE:
-			case NativeDefinitions.KEY_LEFTSHIFT:
-			case NativeDefinitions.KEY_BACKSLASH:
-			case NativeDefinitions.KEY_Z:
-			case NativeDefinitions.KEY_X:
-			case NativeDefinitions.KEY_C:
-			case NativeDefinitions.KEY_V:
-			case NativeDefinitions.KEY_B:
-			case NativeDefinitions.KEY_N:
-			case NativeDefinitions.KEY_M:
-			case NativeDefinitions.KEY_COMMA:
-			case NativeDefinitions.KEY_DOT:
-			case NativeDefinitions.KEY_SLASH:
-			case NativeDefinitions.KEY_RIGHTSHIFT:
-			case NativeDefinitions.KEY_KPASTERISK:
-			case NativeDefinitions.KEY_LEFTALT:
-			case NativeDefinitions.KEY_SPACE:
-			case NativeDefinitions.KEY_CAPSLOCK:
-			case NativeDefinitions.KEY_F1:
-			case NativeDefinitions.KEY_F2:
-			case NativeDefinitions.KEY_F3:
-			case NativeDefinitions.KEY_F4:
-			case NativeDefinitions.KEY_F5:
-			case NativeDefinitions.KEY_F6:
-			case NativeDefinitions.KEY_F7:
-			case NativeDefinitions.KEY_F8:
-			case NativeDefinitions.KEY_F9:
-			case NativeDefinitions.KEY_F10:
-			case NativeDefinitions.KEY_NUMLOCK:
-			case NativeDefinitions.KEY_SCROLLLOCK:
-			case NativeDefinitions.KEY_KP7:
-			case NativeDefinitions.KEY_KP8:
-			case NativeDefinitions.KEY_KP9:
-			case NativeDefinitions.KEY_KPMINUS:
-			case NativeDefinitions.KEY_KP4:
-			case NativeDefinitions.KEY_KP5:
-			case NativeDefinitions.KEY_KP6:
-			case NativeDefinitions.KEY_KPPLUS:
-			case NativeDefinitions.KEY_KP1:
-			case NativeDefinitions.KEY_KP2:
-			case NativeDefinitions.KEY_KP3:
-			case NativeDefinitions.KEY_KP0:
-			case NativeDefinitions.KEY_KPDOT:
-			case NativeDefinitions.KEY_ZENKAKUHANKAKU:
-			case NativeDefinitions.KEY_102ND:
-			case NativeDefinitions.KEY_F11:
-			case NativeDefinitions.KEY_F12:
-			case NativeDefinitions.KEY_RO:
-			case NativeDefinitions.KEY_KATAKANA:
-			case NativeDefinitions.KEY_HIRAGANA:
-			case NativeDefinitions.KEY_HENKAN:
-			case NativeDefinitions.KEY_KATAKANAHIRAGANA:
-			case NativeDefinitions.KEY_MUHENKAN:
-			case NativeDefinitions.KEY_KPJPCOMMA:
-			case NativeDefinitions.KEY_KPENTER:
-			case NativeDefinitions.KEY_RIGHTCTRL:
-			case NativeDefinitions.KEY_KPSLASH:
-			case NativeDefinitions.KEY_SYSRQ:
-			case NativeDefinitions.KEY_RIGHTALT:
-			case NativeDefinitions.KEY_LINEFEED:
-			case NativeDefinitions.KEY_HOME:
-			case NativeDefinitions.KEY_UP:
-			case NativeDefinitions.KEY_PAGEUP:
-			case NativeDefinitions.KEY_LEFT:
-			case NativeDefinitions.KEY_RIGHT:
-			case NativeDefinitions.KEY_END:
-			case NativeDefinitions.KEY_DOWN:
-			case NativeDefinitions.KEY_PAGEDOWN:
-			case NativeDefinitions.KEY_INSERT:
-			case NativeDefinitions.KEY_DELETE:
-			case NativeDefinitions.KEY_MACRO:
-			case NativeDefinitions.KEY_MUTE:
-			case NativeDefinitions.KEY_VOLUMEDOWN:
-			case NativeDefinitions.KEY_VOLUMEUP:
-			case NativeDefinitions.KEY_POWER:
-			case NativeDefinitions.KEY_KPEQUAL:
-			case NativeDefinitions.KEY_KPPLUSMINUS:
-			case NativeDefinitions.KEY_PAUSE:
-			case NativeDefinitions.KEY_KPCOMMA:
-			case NativeDefinitions.KEY_HANGUEL:
-			case NativeDefinitions.KEY_HANJA:
-			case NativeDefinitions.KEY_YEN:
-			case NativeDefinitions.KEY_LEFTMETA:
-			case NativeDefinitions.KEY_RIGHTMETA:
-			case NativeDefinitions.KEY_COMPOSE:
-			case NativeDefinitions.KEY_STOP:
-			case NativeDefinitions.KEY_AGAIN:
-			case NativeDefinitions.KEY_PROPS:
-			case NativeDefinitions.KEY_UNDO:
-			case NativeDefinitions.KEY_FRONT:
-			case NativeDefinitions.KEY_COPY:
-			case NativeDefinitions.KEY_OPEN:
-			case NativeDefinitions.KEY_PASTE:
-			case NativeDefinitions.KEY_FIND:
-			case NativeDefinitions.KEY_CUT:
-			case NativeDefinitions.KEY_HELP:
-			case NativeDefinitions.KEY_MENU:
-			case NativeDefinitions.KEY_CALC:
-			case NativeDefinitions.KEY_SETUP:
-			case NativeDefinitions.KEY_SLEEP:
-			case NativeDefinitions.KEY_WAKEUP:
-			case NativeDefinitions.KEY_FILE:
-			case NativeDefinitions.KEY_SENDFILE:
-			case NativeDefinitions.KEY_DELETEFILE:
-			case NativeDefinitions.KEY_XFER:
-			case NativeDefinitions.KEY_PROG1:
-			case NativeDefinitions.KEY_PROG2:
-			case NativeDefinitions.KEY_WWW:
-			case NativeDefinitions.KEY_MSDOS:
-			case NativeDefinitions.KEY_COFFEE:
-			case NativeDefinitions.KEY_DIRECTION:
-			case NativeDefinitions.KEY_CYCLEWINDOWS:
-			case NativeDefinitions.KEY_MAIL:
-			case NativeDefinitions.KEY_BOOKMARKS:
-			case NativeDefinitions.KEY_COMPUTER:
-			case NativeDefinitions.KEY_BACK:
-			case NativeDefinitions.KEY_FORWARD:
-			case NativeDefinitions.KEY_CLOSECD:
-			case NativeDefinitions.KEY_EJECTCD:
-			case NativeDefinitions.KEY_EJECTCLOSECD:
-			case NativeDefinitions.KEY_NEXTSONG:
-			case NativeDefinitions.KEY_PLAYPAUSE:
-			case NativeDefinitions.KEY_PREVIOUSSONG:
-			case NativeDefinitions.KEY_STOPCD:
-			case NativeDefinitions.KEY_RECORD:
-			case NativeDefinitions.KEY_REWIND:
-			case NativeDefinitions.KEY_PHONE:
-			case NativeDefinitions.KEY_ISO:
-			case NativeDefinitions.KEY_CONFIG:
-			case NativeDefinitions.KEY_HOMEPAGE:
-			case NativeDefinitions.KEY_REFRESH:
-			case NativeDefinitions.KEY_EXIT:
-			case NativeDefinitions.KEY_MOVE:
-			case NativeDefinitions.KEY_EDIT:
-			case NativeDefinitions.KEY_SCROLLUP:
-			case NativeDefinitions.KEY_SCROLLDOWN:
-			case NativeDefinitions.KEY_KPLEFTPAREN:
-			case NativeDefinitions.KEY_KPRIGHTPAREN:
-			case NativeDefinitions.KEY_F13:
-			case NativeDefinitions.KEY_F14:
-			case NativeDefinitions.KEY_F15:
-			case NativeDefinitions.KEY_F16:
-			case NativeDefinitions.KEY_F17:
-			case NativeDefinitions.KEY_F18:
-			case NativeDefinitions.KEY_F19:
-			case NativeDefinitions.KEY_F20:
-			case NativeDefinitions.KEY_F21:
-			case NativeDefinitions.KEY_F22:
-			case NativeDefinitions.KEY_F23:
-			case NativeDefinitions.KEY_F24:
-			case NativeDefinitions.KEY_PLAYCD:
-			case NativeDefinitions.KEY_PAUSECD:
-			case NativeDefinitions.KEY_PROG3:
-			case NativeDefinitions.KEY_PROG4:
-			case NativeDefinitions.KEY_SUSPEND:
-			case NativeDefinitions.KEY_CLOSE:
-			case NativeDefinitions.KEY_PLAY:
-			case NativeDefinitions.KEY_FASTFORWARD:
-			case NativeDefinitions.KEY_BASSBOOST:
-			case NativeDefinitions.KEY_PRINT:
-			case NativeDefinitions.KEY_HP:
-			case NativeDefinitions.KEY_CAMERA:
-			case NativeDefinitions.KEY_SOUND:
-			case NativeDefinitions.KEY_QUESTION:
-			case NativeDefinitions.KEY_EMAIL:
-			case NativeDefinitions.KEY_CHAT:
-			case NativeDefinitions.KEY_SEARCH:
-			case NativeDefinitions.KEY_CONNECT:
-			case NativeDefinitions.KEY_FINANCE:
-			case NativeDefinitions.KEY_SPORT:
-			case NativeDefinitions.KEY_SHOP:
-			case NativeDefinitions.KEY_ALTERASE:
-			case NativeDefinitions.KEY_CANCEL:
-			case NativeDefinitions.KEY_BRIGHTNESSDOWN:
-			case NativeDefinitions.KEY_BRIGHTNESSUP:
-			case NativeDefinitions.KEY_MEDIA:
-			case NativeDefinitions.KEY_SWITCHVIDEOMODE:
-			case NativeDefinitions.KEY_KBDILLUMTOGGLE:
-			case NativeDefinitions.KEY_KBDILLUMDOWN:
-			case NativeDefinitions.KEY_KBDILLUMUP:
-				//    			case NativeDefinitions.KEY_UNKNOWN:
-			case NativeDefinitions.KEY_OK:
-			case NativeDefinitions.KEY_SELECT:
-			case NativeDefinitions.KEY_GOTO:
-			case NativeDefinitions.KEY_CLEAR:
-			case NativeDefinitions.KEY_POWER2:
-			case NativeDefinitions.KEY_OPTION:
-			case NativeDefinitions.KEY_INFO:
-			case NativeDefinitions.KEY_TIME:
-			case NativeDefinitions.KEY_VENDOR:
-			case NativeDefinitions.KEY_ARCHIVE:
-			case NativeDefinitions.KEY_PROGRAM:
-			case NativeDefinitions.KEY_CHANNEL:
-			case NativeDefinitions.KEY_FAVORITES:
-			case NativeDefinitions.KEY_EPG:
-			case NativeDefinitions.KEY_PVR:
-			case NativeDefinitions.KEY_MHP:
-			case NativeDefinitions.KEY_LANGUAGE:
-			case NativeDefinitions.KEY_TITLE:
-			case NativeDefinitions.KEY_SUBTITLE:
-			case NativeDefinitions.KEY_ANGLE:
-			case NativeDefinitions.KEY_ZOOM:
-			case NativeDefinitions.KEY_MODE:
-			case NativeDefinitions.KEY_KEYBOARD:
-			case NativeDefinitions.KEY_SCREEN:
-			case NativeDefinitions.KEY_PC:
-			case NativeDefinitions.KEY_TV:
-			case NativeDefinitions.KEY_TV2:
-			case NativeDefinitions.KEY_VCR:
-			case NativeDefinitions.KEY_VCR2:
-			case NativeDefinitions.KEY_SAT:
-			case NativeDefinitions.KEY_SAT2:
-			case NativeDefinitions.KEY_CD:
-			case NativeDefinitions.KEY_TAPE:
-			case NativeDefinitions.KEY_RADIO:
-			case NativeDefinitions.KEY_TUNER:
-			case NativeDefinitions.KEY_PLAYER:
-			case NativeDefinitions.KEY_TEXT:
-			case NativeDefinitions.KEY_DVD:
-			case NativeDefinitions.KEY_AUX:
-			case NativeDefinitions.KEY_MP3:
-			case NativeDefinitions.KEY_AUDIO:
-			case NativeDefinitions.KEY_VIDEO:
-			case NativeDefinitions.KEY_DIRECTORY:
-			case NativeDefinitions.KEY_LIST:
-			case NativeDefinitions.KEY_MEMO:
-			case NativeDefinitions.KEY_CALENDAR:
-			case NativeDefinitions.KEY_RED:
-			case NativeDefinitions.KEY_GREEN:
-			case NativeDefinitions.KEY_YELLOW:
-			case NativeDefinitions.KEY_BLUE:
-			case NativeDefinitions.KEY_CHANNELUP:
-			case NativeDefinitions.KEY_CHANNELDOWN:
-			case NativeDefinitions.KEY_FIRST:
-			case NativeDefinitions.KEY_LAST:
-			case NativeDefinitions.KEY_AB:
-			case NativeDefinitions.KEY_NEXT:
-			case NativeDefinitions.KEY_RESTART:
-			case NativeDefinitions.KEY_SLOW:
-			case NativeDefinitions.KEY_SHUFFLE:
-			case NativeDefinitions.KEY_BREAK:
-			case NativeDefinitions.KEY_PREVIOUS:
-			case NativeDefinitions.KEY_DIGITS:
-			case NativeDefinitions.KEY_TEEN:
-			case NativeDefinitions.KEY_TWEN:
-			case NativeDefinitions.KEY_DEL_EOL:
-			case NativeDefinitions.KEY_DEL_EOS:
-			case NativeDefinitions.KEY_INS_LINE:
-			case NativeDefinitions.KEY_DEL_LINE:
-			case NativeDefinitions.KEY_FN:
-			case NativeDefinitions.KEY_FN_ESC:
-			case NativeDefinitions.KEY_FN_F1:
-			case NativeDefinitions.KEY_FN_F2:
-			case NativeDefinitions.KEY_FN_F3:
-			case NativeDefinitions.KEY_FN_F4:
-			case NativeDefinitions.KEY_FN_F5:
-			case NativeDefinitions.KEY_FN_F6:
-			case NativeDefinitions.KEY_FN_F7:
-			case NativeDefinitions.KEY_FN_F8:
-			case NativeDefinitions.KEY_FN_F9:
-			case NativeDefinitions.KEY_FN_F10:
-			case NativeDefinitions.KEY_FN_F11:
-			case NativeDefinitions.KEY_FN_F12:
-			case NativeDefinitions.KEY_FN_1:
-			case NativeDefinitions.KEY_FN_2:
-			case NativeDefinitions.KEY_FN_D:
-			case NativeDefinitions.KEY_FN_E:
-			case NativeDefinitions.KEY_FN_F:
-			case NativeDefinitions.KEY_FN_S:
-			case NativeDefinitions.KEY_FN_B:
-				return Controller.Type.KEYBOARD;
-			default:
-				return Controller.Type.UNKNOWN;
-		}
-	}
-			
+    public final static Controller.Type guessButtonTrait(int button_code) {
+        switch (button_code) {
+        case NativeDefinitions.BTN_TRIGGER:
+        case NativeDefinitions.BTN_THUMB:
+        case NativeDefinitions.BTN_THUMB2:
+        case NativeDefinitions.BTN_TOP:
+        case NativeDefinitions.BTN_TOP2:
+        case NativeDefinitions.BTN_PINKIE:
+        case NativeDefinitions.BTN_BASE:
+        case NativeDefinitions.BTN_BASE2:
+        case NativeDefinitions.BTN_BASE3:
+        case NativeDefinitions.BTN_BASE4:
+        case NativeDefinitions.BTN_BASE5:
+        case NativeDefinitions.BTN_BASE6:
+        case NativeDefinitions.BTN_DEAD:
+            return Controller.Type.STICK;
+        case NativeDefinitions.BTN_A:
+        case NativeDefinitions.BTN_B:
+        case NativeDefinitions.BTN_C:
+        case NativeDefinitions.BTN_X:
+        case NativeDefinitions.BTN_Y:
+        case NativeDefinitions.BTN_Z:
+        case NativeDefinitions.BTN_TL:
+        case NativeDefinitions.BTN_TR:
+        case NativeDefinitions.BTN_TL2:
+        case NativeDefinitions.BTN_TR2:
+        case NativeDefinitions.BTN_SELECT:
+        case NativeDefinitions.BTN_START:
+        case NativeDefinitions.BTN_MODE:
+        case NativeDefinitions.BTN_THUMBL:
+        case NativeDefinitions.BTN_THUMBR:
+            return Controller.Type.GAMEPAD;
+        case NativeDefinitions.BTN_0:
+        case NativeDefinitions.BTN_1:
+        case NativeDefinitions.BTN_2:
+        case NativeDefinitions.BTN_3:
+        case NativeDefinitions.BTN_4:
+        case NativeDefinitions.BTN_5:
+        case NativeDefinitions.BTN_6:
+        case NativeDefinitions.BTN_7:
+        case NativeDefinitions.BTN_8:
+        case NativeDefinitions.BTN_9:
+            return Controller.Type.UNKNOWN;
+        case NativeDefinitions.BTN_LEFT:
+        case NativeDefinitions.BTN_RIGHT:
+        case NativeDefinitions.BTN_MIDDLE:
+        case NativeDefinitions.BTN_SIDE:
+        case NativeDefinitions.BTN_EXTRA:
+            return Controller.Type.MOUSE;
+        //				case NativeDefinitions.KEY_RESERVED:
+        case NativeDefinitions.KEY_ESC:
+        case NativeDefinitions.KEY_1:
+        case NativeDefinitions.KEY_2:
+        case NativeDefinitions.KEY_3:
+        case NativeDefinitions.KEY_4:
+        case NativeDefinitions.KEY_5:
+        case NativeDefinitions.KEY_6:
+        case NativeDefinitions.KEY_7:
+        case NativeDefinitions.KEY_8:
+        case NativeDefinitions.KEY_9:
+        case NativeDefinitions.KEY_0:
+        case NativeDefinitions.KEY_MINUS:
+        case NativeDefinitions.KEY_EQUAL:
+        case NativeDefinitions.KEY_BACKSPACE:
+        case NativeDefinitions.KEY_TAB:
+        case NativeDefinitions.KEY_Q:
+        case NativeDefinitions.KEY_W:
+        case NativeDefinitions.KEY_E:
+        case NativeDefinitions.KEY_R:
+        case NativeDefinitions.KEY_T:
+        case NativeDefinitions.KEY_Y:
+        case NativeDefinitions.KEY_U:
+        case NativeDefinitions.KEY_I:
+        case NativeDefinitions.KEY_O:
+        case NativeDefinitions.KEY_P:
+        case NativeDefinitions.KEY_LEFTBRACE:
+        case NativeDefinitions.KEY_RIGHTBRACE:
+        case NativeDefinitions.KEY_ENTER:
+        case NativeDefinitions.KEY_LEFTCTRL:
+        case NativeDefinitions.KEY_A:
+        case NativeDefinitions.KEY_S:
+        case NativeDefinitions.KEY_D:
+        case NativeDefinitions.KEY_F:
+        case NativeDefinitions.KEY_G:
+        case NativeDefinitions.KEY_H:
+        case NativeDefinitions.KEY_J:
+        case NativeDefinitions.KEY_K:
+        case NativeDefinitions.KEY_L:
+        case NativeDefinitions.KEY_SEMICOLON:
+        case NativeDefinitions.KEY_APOSTROPHE:
+        case NativeDefinitions.KEY_GRAVE:
+        case NativeDefinitions.KEY_LEFTSHIFT:
+        case NativeDefinitions.KEY_BACKSLASH:
+        case NativeDefinitions.KEY_Z:
+        case NativeDefinitions.KEY_X:
+        case NativeDefinitions.KEY_C:
+        case NativeDefinitions.KEY_V:
+        case NativeDefinitions.KEY_B:
+        case NativeDefinitions.KEY_N:
+        case NativeDefinitions.KEY_M:
+        case NativeDefinitions.KEY_COMMA:
+        case NativeDefinitions.KEY_DOT:
+        case NativeDefinitions.KEY_SLASH:
+        case NativeDefinitions.KEY_RIGHTSHIFT:
+        case NativeDefinitions.KEY_KPASTERISK:
+        case NativeDefinitions.KEY_LEFTALT:
+        case NativeDefinitions.KEY_SPACE:
+        case NativeDefinitions.KEY_CAPSLOCK:
+        case NativeDefinitions.KEY_F1:
+        case NativeDefinitions.KEY_F2:
+        case NativeDefinitions.KEY_F3:
+        case NativeDefinitions.KEY_F4:
+        case NativeDefinitions.KEY_F5:
+        case NativeDefinitions.KEY_F6:
+        case NativeDefinitions.KEY_F7:
+        case NativeDefinitions.KEY_F8:
+        case NativeDefinitions.KEY_F9:
+        case NativeDefinitions.KEY_F10:
+        case NativeDefinitions.KEY_NUMLOCK:
+        case NativeDefinitions.KEY_SCROLLLOCK:
+        case NativeDefinitions.KEY_KP7:
+        case NativeDefinitions.KEY_KP8:
+        case NativeDefinitions.KEY_KP9:
+        case NativeDefinitions.KEY_KPMINUS:
+        case NativeDefinitions.KEY_KP4:
+        case NativeDefinitions.KEY_KP5:
+        case NativeDefinitions.KEY_KP6:
+        case NativeDefinitions.KEY_KPPLUS:
+        case NativeDefinitions.KEY_KP1:
+        case NativeDefinitions.KEY_KP2:
+        case NativeDefinitions.KEY_KP3:
+        case NativeDefinitions.KEY_KP0:
+        case NativeDefinitions.KEY_KPDOT:
+        case NativeDefinitions.KEY_ZENKAKUHANKAKU:
+        case NativeDefinitions.KEY_102ND:
+        case NativeDefinitions.KEY_F11:
+        case NativeDefinitions.KEY_F12:
+        case NativeDefinitions.KEY_RO:
+        case NativeDefinitions.KEY_KATAKANA:
+        case NativeDefinitions.KEY_HIRAGANA:
+        case NativeDefinitions.KEY_HENKAN:
+        case NativeDefinitions.KEY_KATAKANAHIRAGANA:
+        case NativeDefinitions.KEY_MUHENKAN:
+        case NativeDefinitions.KEY_KPJPCOMMA:
+        case NativeDefinitions.KEY_KPENTER:
+        case NativeDefinitions.KEY_RIGHTCTRL:
+        case NativeDefinitions.KEY_KPSLASH:
+        case NativeDefinitions.KEY_SYSRQ:
+        case NativeDefinitions.KEY_RIGHTALT:
+        case NativeDefinitions.KEY_LINEFEED:
+        case NativeDefinitions.KEY_HOME:
+        case NativeDefinitions.KEY_UP:
+        case NativeDefinitions.KEY_PAGEUP:
+        case NativeDefinitions.KEY_LEFT:
+        case NativeDefinitions.KEY_RIGHT:
+        case NativeDefinitions.KEY_END:
+        case NativeDefinitions.KEY_DOWN:
+        case NativeDefinitions.KEY_PAGEDOWN:
+        case NativeDefinitions.KEY_INSERT:
+        case NativeDefinitions.KEY_DELETE:
+        case NativeDefinitions.KEY_MACRO:
+        case NativeDefinitions.KEY_MUTE:
+        case NativeDefinitions.KEY_VOLUMEDOWN:
+        case NativeDefinitions.KEY_VOLUMEUP:
+        case NativeDefinitions.KEY_POWER:
+        case NativeDefinitions.KEY_KPEQUAL:
+        case NativeDefinitions.KEY_KPPLUSMINUS:
+        case NativeDefinitions.KEY_PAUSE:
+        case NativeDefinitions.KEY_KPCOMMA:
+        case NativeDefinitions.KEY_HANGUEL:
+        case NativeDefinitions.KEY_HANJA:
+        case NativeDefinitions.KEY_YEN:
+        case NativeDefinitions.KEY_LEFTMETA:
+        case NativeDefinitions.KEY_RIGHTMETA:
+        case NativeDefinitions.KEY_COMPOSE:
+        case NativeDefinitions.KEY_STOP:
+        case NativeDefinitions.KEY_AGAIN:
+        case NativeDefinitions.KEY_PROPS:
+        case NativeDefinitions.KEY_UNDO:
+        case NativeDefinitions.KEY_FRONT:
+        case NativeDefinitions.KEY_COPY:
+        case NativeDefinitions.KEY_OPEN:
+        case NativeDefinitions.KEY_PASTE:
+        case NativeDefinitions.KEY_FIND:
+        case NativeDefinitions.KEY_CUT:
+        case NativeDefinitions.KEY_HELP:
+        case NativeDefinitions.KEY_MENU:
+        case NativeDefinitions.KEY_CALC:
+        case NativeDefinitions.KEY_SETUP:
+        case NativeDefinitions.KEY_SLEEP:
+        case NativeDefinitions.KEY_WAKEUP:
+        case NativeDefinitions.KEY_FILE:
+        case NativeDefinitions.KEY_SENDFILE:
+        case NativeDefinitions.KEY_DELETEFILE:
+        case NativeDefinitions.KEY_XFER:
+        case NativeDefinitions.KEY_PROG1:
+        case NativeDefinitions.KEY_PROG2:
+        case NativeDefinitions.KEY_WWW:
+        case NativeDefinitions.KEY_MSDOS:
+        case NativeDefinitions.KEY_COFFEE:
+        case NativeDefinitions.KEY_DIRECTION:
+        case NativeDefinitions.KEY_CYCLEWINDOWS:
+        case NativeDefinitions.KEY_MAIL:
+        case NativeDefinitions.KEY_BOOKMARKS:
+        case NativeDefinitions.KEY_COMPUTER:
+        case NativeDefinitions.KEY_BACK:
+        case NativeDefinitions.KEY_FORWARD:
+        case NativeDefinitions.KEY_CLOSECD:
+        case NativeDefinitions.KEY_EJECTCD:
+        case NativeDefinitions.KEY_EJECTCLOSECD:
+        case NativeDefinitions.KEY_NEXTSONG:
+        case NativeDefinitions.KEY_PLAYPAUSE:
+        case NativeDefinitions.KEY_PREVIOUSSONG:
+        case NativeDefinitions.KEY_STOPCD:
+        case NativeDefinitions.KEY_RECORD:
+        case NativeDefinitions.KEY_REWIND:
+        case NativeDefinitions.KEY_PHONE:
+        case NativeDefinitions.KEY_ISO:
+        case NativeDefinitions.KEY_CONFIG:
+        case NativeDefinitions.KEY_HOMEPAGE:
+        case NativeDefinitions.KEY_REFRESH:
+        case NativeDefinitions.KEY_EXIT:
+        case NativeDefinitions.KEY_MOVE:
+        case NativeDefinitions.KEY_EDIT:
+        case NativeDefinitions.KEY_SCROLLUP:
+        case NativeDefinitions.KEY_SCROLLDOWN:
+        case NativeDefinitions.KEY_KPLEFTPAREN:
+        case NativeDefinitions.KEY_KPRIGHTPAREN:
+        case NativeDefinitions.KEY_F13:
+        case NativeDefinitions.KEY_F14:
+        case NativeDefinitions.KEY_F15:
+        case NativeDefinitions.KEY_F16:
+        case NativeDefinitions.KEY_F17:
+        case NativeDefinitions.KEY_F18:
+        case NativeDefinitions.KEY_F19:
+        case NativeDefinitions.KEY_F20:
+        case NativeDefinitions.KEY_F21:
+        case NativeDefinitions.KEY_F22:
+        case NativeDefinitions.KEY_F23:
+        case NativeDefinitions.KEY_F24:
+        case NativeDefinitions.KEY_PLAYCD:
+        case NativeDefinitions.KEY_PAUSECD:
+        case NativeDefinitions.KEY_PROG3:
+        case NativeDefinitions.KEY_PROG4:
+        case NativeDefinitions.KEY_SUSPEND:
+        case NativeDefinitions.KEY_CLOSE:
+        case NativeDefinitions.KEY_PLAY:
+        case NativeDefinitions.KEY_FASTFORWARD:
+        case NativeDefinitions.KEY_BASSBOOST:
+        case NativeDefinitions.KEY_PRINT:
+        case NativeDefinitions.KEY_HP:
+        case NativeDefinitions.KEY_CAMERA:
+        case NativeDefinitions.KEY_SOUND:
+        case NativeDefinitions.KEY_QUESTION:
+        case NativeDefinitions.KEY_EMAIL:
+        case NativeDefinitions.KEY_CHAT:
+        case NativeDefinitions.KEY_SEARCH:
+        case NativeDefinitions.KEY_CONNECT:
+        case NativeDefinitions.KEY_FINANCE:
+        case NativeDefinitions.KEY_SPORT:
+        case NativeDefinitions.KEY_SHOP:
+        case NativeDefinitions.KEY_ALTERASE:
+        case NativeDefinitions.KEY_CANCEL:
+        case NativeDefinitions.KEY_BRIGHTNESSDOWN:
+        case NativeDefinitions.KEY_BRIGHTNESSUP:
+        case NativeDefinitions.KEY_MEDIA:
+        case NativeDefinitions.KEY_SWITCHVIDEOMODE:
+        case NativeDefinitions.KEY_KBDILLUMTOGGLE:
+        case NativeDefinitions.KEY_KBDILLUMDOWN:
+        case NativeDefinitions.KEY_KBDILLUMUP:
+            //    			case NativeDefinitions.KEY_UNKNOWN:
+        case NativeDefinitions.KEY_OK:
+        case NativeDefinitions.KEY_SELECT:
+        case NativeDefinitions.KEY_GOTO:
+        case NativeDefinitions.KEY_CLEAR:
+        case NativeDefinitions.KEY_POWER2:
+        case NativeDefinitions.KEY_OPTION:
+        case NativeDefinitions.KEY_INFO:
+        case NativeDefinitions.KEY_TIME:
+        case NativeDefinitions.KEY_VENDOR:
+        case NativeDefinitions.KEY_ARCHIVE:
+        case NativeDefinitions.KEY_PROGRAM:
+        case NativeDefinitions.KEY_CHANNEL:
+        case NativeDefinitions.KEY_FAVORITES:
+        case NativeDefinitions.KEY_EPG:
+        case NativeDefinitions.KEY_PVR:
+        case NativeDefinitions.KEY_MHP:
+        case NativeDefinitions.KEY_LANGUAGE:
+        case NativeDefinitions.KEY_TITLE:
+        case NativeDefinitions.KEY_SUBTITLE:
+        case NativeDefinitions.KEY_ANGLE:
+        case NativeDefinitions.KEY_ZOOM:
+        case NativeDefinitions.KEY_MODE:
+        case NativeDefinitions.KEY_KEYBOARD:
+        case NativeDefinitions.KEY_SCREEN:
+        case NativeDefinitions.KEY_PC:
+        case NativeDefinitions.KEY_TV:
+        case NativeDefinitions.KEY_TV2:
+        case NativeDefinitions.KEY_VCR:
+        case NativeDefinitions.KEY_VCR2:
+        case NativeDefinitions.KEY_SAT:
+        case NativeDefinitions.KEY_SAT2:
+        case NativeDefinitions.KEY_CD:
+        case NativeDefinitions.KEY_TAPE:
+        case NativeDefinitions.KEY_RADIO:
+        case NativeDefinitions.KEY_TUNER:
+        case NativeDefinitions.KEY_PLAYER:
+        case NativeDefinitions.KEY_TEXT:
+        case NativeDefinitions.KEY_DVD:
+        case NativeDefinitions.KEY_AUX:
+        case NativeDefinitions.KEY_MP3:
+        case NativeDefinitions.KEY_AUDIO:
+        case NativeDefinitions.KEY_VIDEO:
+        case NativeDefinitions.KEY_DIRECTORY:
+        case NativeDefinitions.KEY_LIST:
+        case NativeDefinitions.KEY_MEMO:
+        case NativeDefinitions.KEY_CALENDAR:
+        case NativeDefinitions.KEY_RED:
+        case NativeDefinitions.KEY_GREEN:
+        case NativeDefinitions.KEY_YELLOW:
+        case NativeDefinitions.KEY_BLUE:
+        case NativeDefinitions.KEY_CHANNELUP:
+        case NativeDefinitions.KEY_CHANNELDOWN:
+        case NativeDefinitions.KEY_FIRST:
+        case NativeDefinitions.KEY_LAST:
+        case NativeDefinitions.KEY_AB:
+        case NativeDefinitions.KEY_NEXT:
+        case NativeDefinitions.KEY_RESTART:
+        case NativeDefinitions.KEY_SLOW:
+        case NativeDefinitions.KEY_SHUFFLE:
+        case NativeDefinitions.KEY_BREAK:
+        case NativeDefinitions.KEY_PREVIOUS:
+        case NativeDefinitions.KEY_DIGITS:
+        case NativeDefinitions.KEY_TEEN:
+        case NativeDefinitions.KEY_TWEN:
+        case NativeDefinitions.KEY_DEL_EOL:
+        case NativeDefinitions.KEY_DEL_EOS:
+        case NativeDefinitions.KEY_INS_LINE:
+        case NativeDefinitions.KEY_DEL_LINE:
+        case NativeDefinitions.KEY_FN:
+        case NativeDefinitions.KEY_FN_ESC:
+        case NativeDefinitions.KEY_FN_F1:
+        case NativeDefinitions.KEY_FN_F2:
+        case NativeDefinitions.KEY_FN_F3:
+        case NativeDefinitions.KEY_FN_F4:
+        case NativeDefinitions.KEY_FN_F5:
+        case NativeDefinitions.KEY_FN_F6:
+        case NativeDefinitions.KEY_FN_F7:
+        case NativeDefinitions.KEY_FN_F8:
+        case NativeDefinitions.KEY_FN_F9:
+        case NativeDefinitions.KEY_FN_F10:
+        case NativeDefinitions.KEY_FN_F11:
+        case NativeDefinitions.KEY_FN_F12:
+        case NativeDefinitions.KEY_FN_1:
+        case NativeDefinitions.KEY_FN_2:
+        case NativeDefinitions.KEY_FN_D:
+        case NativeDefinitions.KEY_FN_E:
+        case NativeDefinitions.KEY_FN_F:
+        case NativeDefinitions.KEY_FN_S:
+        case NativeDefinitions.KEY_FN_B:
+            return Controller.Type.KEYBOARD;
+        default:
+            return Controller.Type.UNKNOWN;
+        }
+    }
+
     /** Return port type from a native port type int id
      * @param nativeid The native port type
      * @return The jinput port type
-     */    
+     */
     public static Controller.PortType getPortType(int nativeid) {
         // Have to do this one this way as there is no BUS_MAX
         switch (nativeid) {
-            case NativeDefinitions.BUS_GAMEPORT :
-                return Controller.PortType.GAME;
-            case NativeDefinitions.BUS_I8042 :
-                return Controller.PortType.I8042;
-            case NativeDefinitions.BUS_PARPORT :
-                return Controller.PortType.PARALLEL;
-            case NativeDefinitions.BUS_RS232 :
-                return Controller.PortType.SERIAL;
-            case NativeDefinitions.BUS_USB :
-                return Controller.PortType.USB;
-            default:
-                return Controller.PortType.UNKNOWN;
+        case NativeDefinitions.BUS_GAMEPORT:
+            return Controller.PortType.GAME;
+        case NativeDefinitions.BUS_I8042:
+            return Controller.PortType.I8042;
+        case NativeDefinitions.BUS_PARPORT:
+            return Controller.PortType.PARALLEL;
+        case NativeDefinitions.BUS_RS232:
+            return Controller.PortType.SERIAL;
+        case NativeDefinitions.BUS_USB:
+            return Controller.PortType.USB;
+        default:
+            return Controller.PortType.UNKNOWN;
         }
     }
-    
+
     /** Gets the identifier for a relative axis
      * @param nativeID The axis type ID
      * @return The jinput id
-     */    
+     */
     public static Component.Identifier getRelAxisID(int nativeID) {
         Component.Identifier retval = null;
-		try {
-        	retval = INSTANCE.relAxesIDs[nativeID];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			log.warning("INSTANCE.relAxesIDis only " + INSTANCE.relAxesIDs.length + " long, so " + nativeID + " not contained");
-			//ignore, pretend it was null
-		}
-        if(retval == null) {
+        try {
+            retval = INSTANCE.relAxesIDs[nativeID];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.warning("INSTANCE.relAxesIDis only " + INSTANCE.relAxesIDs.length + " long, so " + nativeID + " not contained");
+            //ignore, pretend it was null
+        }
+        if (retval == null) {
             retval = Component.Identifier.Axis.SLIDER_VELOCITY;
         }
         return retval;
     }
-    
+
     /** Gets the identifier for a absolute axis
      * @param nativeID The native axis type id
      * @return The jinput id
-     */    
+     */
     public static Component.Identifier getAbsAxisID(int nativeID) {
-		Component.Identifier retval = null;
-		try {
-			retval = INSTANCE.absAxesIDs[nativeID];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			log.warning("INSTANCE.absAxesIDs is only " + INSTANCE.absAxesIDs.length + " long, so " + nativeID + " not contained");
-			//ignore, pretend it was null
-		}
-        if(retval == null) {
+        Component.Identifier retval = null;
+        try {
+            retval = INSTANCE.absAxesIDs[nativeID];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.warning("INSTANCE.absAxesIDs is only " + INSTANCE.absAxesIDs.length + " long, so " + nativeID + " not contained");
+            //ignore, pretend it was null
+        }
+        if (retval == null) {
             retval = Component.Identifier.Axis.SLIDER;
         }
         return retval;
     }
-    
+
     /** Gets the identifier for a button
      * @param nativeID The native button type id
      * @return The jinput id
-     */    
+     */
     public static Component.Identifier getButtonID(int nativeID) {
         Component.Identifier retval = null;
-		try {
-			retval = INSTANCE.buttonIDs[nativeID];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			log.warning("INSTANCE.buttonIDs is only " + INSTANCE.buttonIDs.length + " long, so " + nativeID + " not contained");
-			//ignore, pretend it was null
-		}
-        if(retval == null) {
+        try {
+            retval = INSTANCE.buttonIDs[nativeID];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.warning("INSTANCE.buttonIDs is only " + INSTANCE.buttonIDs.length + " long, so " + nativeID + " not contained");
+            //ignore, pretend it was null
+        }
+        if (retval == null) {
             retval = Component.Identifier.Button.UNKNOWN;
         }
         return retval;

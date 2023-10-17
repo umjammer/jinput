@@ -36,65 +36,73 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-/** Java wrapper for IDirectInput
+
+/**
+ * Java wrapper for IDirectInput
+ *
  * @author martak
  * @author elias
  * @version 1.0
  */
 final class IDirectInput {
-	private final List<IDirectInputDevice> devices = new ArrayList<>();
-	private final long idirectinput_address;
-	private final DummyWindow window;
 
-	public IDirectInput(DummyWindow window) throws IOException {
-		this.window = window;
-		this.idirectinput_address = createIDirectInput();
-		try {
-			enumDevices();
-		} catch (IOException e) {
-			releaseDevices();
-			release();
-			throw e;
-		}
-	}
-	private final static native long createIDirectInput() throws IOException;
+    private final List<IDirectInputDevice> devices = new ArrayList<>();
+    private final long idirectinput_address;
+    private final DummyWindow window;
 
-	public final List<IDirectInputDevice> getDevices() {
-		return devices;
-	}
+    public IDirectInput(DummyWindow window) throws IOException {
+        this.window = window;
+        this.idirectinput_address = createIDirectInput();
+        try {
+            enumDevices();
+        } catch (IOException e) {
+            releaseDevices();
+            release();
+            throw e;
+        }
+    }
 
-	private final void enumDevices() throws IOException {
-		nEnumDevices(idirectinput_address);
-	}
-	private final native void nEnumDevices(long addr) throws IOException;
+    private final static native long createIDirectInput() throws IOException;
 
-	/* This method is called from native code in nEnumDevices
-	 * native side will clean up in case of an exception
-	 */
-	private final void addDevice(long address, byte[] instance_guid, byte[] product_guid, int dev_type, int dev_subtype, String instance_name, String product_name) throws IOException {
-		try {
-			IDirectInputDevice device = new IDirectInputDevice(window, address, instance_guid, product_guid, dev_type, dev_subtype, instance_name, product_name);
-			devices.add(device);
-		} catch (IOException e) {
-			DirectInputEnvironmentPlugin.log("Failed to initialize device " + product_name + " because of: " + e);
-		}
-	}
+    public final List<IDirectInputDevice> getDevices() {
+        return devices;
+    }
 
-	public final void releaseDevices() {
-		for (int i = 0; i < devices.size(); i++) {
-			IDirectInputDevice device = devices.get(i);
-			device.release();
-		}
-	}
-	
-	public final void release() {
-		nRelease(idirectinput_address);
-	}
-	private final static native void nRelease(long address);
+    private final void enumDevices() throws IOException {
+        nEnumDevices(idirectinput_address);
+    }
+
+    private final native void nEnumDevices(long addr) throws IOException;
+
+    /* This method is called from native code in nEnumDevices
+     * native side will clean up in case of an exception
+     */
+    private final void addDevice(long address, byte[] instance_guid, byte[] product_guid, int dev_type, int dev_subtype, String instance_name, String product_name) throws IOException {
+        try {
+            IDirectInputDevice device = new IDirectInputDevice(window, address, instance_guid, product_guid, dev_type, dev_subtype, instance_name, product_name);
+            devices.add(device);
+        } catch (IOException e) {
+            DirectInputEnvironmentPlugin.log("Failed to initialize device " + product_name + " because of: " + e);
+        }
+    }
+
+    public final void releaseDevices() {
+        for (int i = 0; i < devices.size(); i++) {
+            IDirectInputDevice device = devices.get(i);
+            device.release();
+        }
+    }
+
+    public final void release() {
+        nRelease(idirectinput_address);
+    }
+
+    private final static native void nRelease(long address);
 }

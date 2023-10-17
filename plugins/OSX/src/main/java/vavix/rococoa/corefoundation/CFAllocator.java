@@ -24,6 +24,7 @@ import com.sun.jna.PointerType;
 
 /**
  * Brought to you by:
+ *
  * @author semaphore
  * @version May 27, 2010 12:53:32 PM
  */

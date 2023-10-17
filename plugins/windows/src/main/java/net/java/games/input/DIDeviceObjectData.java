@@ -36,38 +36,42 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
-/** Java wrapper for DIDEVICEOBJECTDATA
+/**
+ * Java wrapper for DIDEVICEOBJECTDATA
+ *
  * @author elias
  * @version 1.0
  */
 final class DIDeviceObjectData {
-	private int format_offset;
-	private int data;
-	private int millis;
-	private int sequence;
 
-	public final void set(int format_offset, int data, int millis, int sequence) {
-		this.format_offset = format_offset;
-		this.data = data;
-		this.millis = millis;
-		this.sequence = sequence;
-	}
+    private int format_offset;
+    private int data;
+    private int millis;
+    private int sequence;
 
-	public final void set(DIDeviceObjectData other) {
-		set(other.format_offset, other.data, other.millis, other.sequence);
-	}
+    public final void set(int format_offset, int data, int millis, int sequence) {
+        this.format_offset = format_offset;
+        this.data = data;
+        this.millis = millis;
+        this.sequence = sequence;
+    }
 
-	public final int getData() {
-		return data;
-	}
+    public final void set(DIDeviceObjectData other) {
+        set(other.format_offset, other.data, other.millis, other.sequence);
+    }
 
-	public final int getFormatOffset() {
-		return format_offset;
-	}
+    public final int getData() {
+        return data;
+    }
 
-	public final long getNanos() {
-		return millis*1000000L;
-	}
+    public final int getFormatOffset() {
+        return format_offset;
+    }
+
+    public final long getNanos() {
+        return millis * 1000000L;
+    }
 }

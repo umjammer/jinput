@@ -119,9 +119,11 @@ log.finer("CFBoolean: " + CFLib.INSTANCE.CFBooleanGetTypeID());
         }
 
         public static class ByReference extends dict_context_t implements Structure.ByReference {
+
         }
 
         public static class ByValue extends dict_context_t implements Structure.ByValue {
+
         }
 
         @Override
@@ -150,9 +152,11 @@ log.finer("CFBoolean: " + CFLib.INSTANCE.CFBooleanGetTypeID());
         }
 
         public static class ByReference extends array_context_t implements Structure.ByReference {
+
         }
 
         public static class ByValue extends array_context_t implements Structure.ByValue {
+
         }
 
         @Override
@@ -201,8 +205,7 @@ log.warning("CFNumberGetValue: " + result + ", " + cfnumber);
         return switch (number_type) {
             case kCFNumberSInt8Type, kCFNumberSInt16Type, kCFNumberSInt32Type, kCFNumberSInt64Type,
                     kCFNumberCharType, kCFNumberShortType, kCFNumberIntType, kCFNumberLongType,
-                    kCFNumberLongLongType, kCFNumberCFIndexType ->
-                    createLongObjectFromCFNumber(cfnumber);
+                    kCFNumberLongLongType, kCFNumberCFIndexType -> createLongObjectFromCFNumber(cfnumber);
             case kCFNumberFloat32Type, kCFNumberFloat64Type, kCFNumberFloatType, kCFNumberDoubleType ->
                     createDoubleObjectFromCFNumber(cfnumber);
             default -> {
@@ -229,7 +232,7 @@ log.finer("array(" + array_context.arrayID + "): [" + array_context.index + "] =
         NativeLong size = CFLib.INSTANCE.CFArrayGetCount(cfarray);
         CFRange.ByValue range = new CFRange.ByValue();
         range.location = CFIndex.of(0);
-        range.length =  CFIndex.of(size);
+        range.length = CFIndex.of(size);
         Object[] array = new Object[size.intValue()];
         array_context_t.ByReference array_context = new array_context_t.ByReference();
         array_context.arrayID = arrayID++;
@@ -278,7 +281,7 @@ log.finer(dict_context.getPointer().dump(0, dict_context.size()));
         Object jvalue = createObjectFromCFObject(value);
 log.finer("map(" + dict_context.mapID + "): put: " + jkey + ", " + jvalue);
         if (jkey == null || jvalue == null) {
-log.warning("map: " + dict_context.mapID + ":: put: " + jkey + ", " + jvalue + "(" + (value != null ? value.getType() : "??") + ")");
+            log.warning("map: " + dict_context.mapID + ":: put: " + jkey + ", " + jvalue + "(" + (value != null ? value.getType() : "??") + ")");
             return;
         }
         Map<Object, Object> map = maps.get(dict_context.mapID);

@@ -36,32 +36,37 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 
-/** Java wrapper of RID_DEVICE_INFO
+
+/**
+ * Java wrapper of RID_DEVICE_INFO
+ *
  * @author elias
  * @version 1.0
  */
 abstract class RawDeviceInfo {
-	public abstract Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException;
 
-	public abstract int getUsage();
+    public abstract Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException;
 
-	public abstract int getUsagePage();
+    public abstract int getUsage();
 
-	public abstract long getHandle();
+    public abstract int getUsagePage();
 
-	public final boolean equals(Object other) {
-		if (!(other instanceof RawDeviceInfo))
-			return false;
-		RawDeviceInfo other_info = (RawDeviceInfo)other;
-		return other_info.getUsage() == getUsage() &&
-			other_info.getUsagePage() == getUsagePage();
-	}
+    public abstract long getHandle();
 
-	public final int hashCode() {
-		return getUsage() ^ getUsagePage();
-	}
+    public final boolean equals(Object other) {
+        if (!(other instanceof RawDeviceInfo))
+            return false;
+        RawDeviceInfo other_info = (RawDeviceInfo) other;
+        return other_info.getUsage() == getUsage() &&
+                other_info.getUsagePage() == getUsagePage();
+    }
+
+    public final int hashCode() {
+        return getUsage() ^ getUsagePage();
+    }
 }

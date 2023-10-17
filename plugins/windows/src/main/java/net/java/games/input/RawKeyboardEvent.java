@@ -36,44 +36,49 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 
-/** Java wrapper of RAWKEYBOARD
+
+/**
+ * Java wrapper of RAWKEYBOARD
+ *
  * @author elias
  * @version 1.0
  */
 final class RawKeyboardEvent {
-	private long millis;
-	private int make_code;
-	private int flags;
-	private int vkey;
-	private int message;
-	private long extra_information;
 
-	public final void set(long millis, int make_code, int flags, int vkey, int message, long extra_information) {
-		this.millis = millis;
-		this.make_code = make_code;
-		this.flags = flags;
-		this.vkey = vkey;
-		this.message = message;
-		this.extra_information = extra_information;
-	}
+    private long millis;
+    private int make_code;
+    private int flags;
+    private int vkey;
+    private int message;
+    private long extra_information;
 
-	public final void set(RawKeyboardEvent event) {
-		set(event.millis, event.make_code, event.flags, event.vkey, event.message, event.extra_information);
-	}
+    public final void set(long millis, int make_code, int flags, int vkey, int message, long extra_information) {
+        this.millis = millis;
+        this.make_code = make_code;
+        this.flags = flags;
+        this.vkey = vkey;
+        this.message = message;
+        this.extra_information = extra_information;
+    }
 
-	public final int getVKey() {
-		return vkey;
-	}
+    public final void set(RawKeyboardEvent event) {
+        set(event.millis, event.make_code, event.flags, event.vkey, event.message, event.extra_information);
+    }
 
-	public final int getMessage() {
-		return message;
-	}
+    public final int getVKey() {
+        return vkey;
+    }
 
-	public final long getNanos() {
-		return millis*1000000L;
-	}
+    public final int getMessage() {
+        return message;
+    }
+
+    public final long getNanos() {
+        return millis * 1000000L;
+    }
 }

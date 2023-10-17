@@ -19,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -51,128 +51,128 @@ public abstract class Mouse extends AbstractController {
         return Type.MOUSE;
     }
 
-	/**
-	 * Returns the x-axis for the mouse ball, never null.
-	 */
-	public Component getX() {
-		return getComponent(Component.Identifier.Axis.X);
-	}
+    /**
+     * Returns the x-axis for the mouse ball, never null.
+     */
+    public Component getX() {
+        return getComponent(Component.Identifier.Axis.X);
+    }
 
-	/**
-	 * Returns the y-axis for the mouse ball, never null.
-	 */
-	public Component getY() {
-		return getComponent(Component.Identifier.Axis.Y);
-	}
+    /**
+     * Returns the y-axis for the mouse ball, never null.
+     */
+    public Component getY() {
+        return getComponent(Component.Identifier.Axis.Y);
+    }
 
-	/**
-	 * Returns the mouse wheel, or null if no mouse wheel is present.
-	 */
-	public Component getWheel() {
-		return getComponent(Component.Identifier.Axis.Z);
-	}
+    /**
+     * Returns the mouse wheel, or null if no mouse wheel is present.
+     */
+    public Component getWheel() {
+        return getComponent(Component.Identifier.Axis.Z);
+    }
 
-	/**
-	 * Returns the left or primary mouse button, never null.
-	 */
-	public Component getPrimaryButton() {
-		Component primaryButton = getComponent(Component.Identifier.Button.LEFT);
-		if(primaryButton==null) {
-			primaryButton = getComponent(Component.Identifier.Button._1);
-		}
-		return primaryButton;
-	}
+    /**
+     * Returns the left or primary mouse button, never null.
+     */
+    public Component getPrimaryButton() {
+        Component primaryButton = getComponent(Component.Identifier.Button.LEFT);
+        if (primaryButton == null) {
+            primaryButton = getComponent(Component.Identifier.Button._1);
+        }
+        return primaryButton;
+    }
 
-	/**
-	 * Returns the right or secondary mouse button, null if the mouse is
-	 * a single-button mouse.
-	 */
-	public Component getSecondaryButton() {
-		Component secondaryButton = getComponent(Component.Identifier.Button.RIGHT);
-		if(secondaryButton==null) {
-			secondaryButton = getComponent(Component.Identifier.Button._2);
-		}
-		return secondaryButton;
-	}
+    /**
+     * Returns the right or secondary mouse button, null if the mouse is
+     * a single-button mouse.
+     */
+    public Component getSecondaryButton() {
+        Component secondaryButton = getComponent(Component.Identifier.Button.RIGHT);
+        if (secondaryButton == null) {
+            secondaryButton = getComponent(Component.Identifier.Button._2);
+        }
+        return secondaryButton;
+    }
 
-	/**
-	 * Returns the middle or tertiary mouse button, null if the mouse has
-	 * fewer than three buttons.
-	 */
-	public Component getTertiaryButton() {
-		Component tertiaryButton = getComponent(Component.Identifier.Button.MIDDLE);
-		if(tertiaryButton==null) {
-			tertiaryButton = getComponent(Component.Identifier.Button._3);
-		}
-		return tertiaryButton;
-	}
+    /**
+     * Returns the middle or tertiary mouse button, null if the mouse has
+     * fewer than three buttons.
+     */
+    public Component getTertiaryButton() {
+        Component tertiaryButton = getComponent(Component.Identifier.Button.MIDDLE);
+        if (tertiaryButton == null) {
+            tertiaryButton = getComponent(Component.Identifier.Button._3);
+        }
+        return tertiaryButton;
+    }
 
-	/**
-	 * Returns the left mouse button.
-	 */
-	public Component getLeft() {
-		return getComponent(Component.Identifier.Button.LEFT);
-	}
+    /**
+     * Returns the left mouse button.
+     */
+    public Component getLeft() {
+        return getComponent(Component.Identifier.Button.LEFT);
+    }
 
-	/**
-	 * Returns the right, null if the mouse is a single-button mouse.
-	 */
-	public Component getRight() {
-		return getComponent(Component.Identifier.Button.RIGHT);
-	}
+    /**
+     * Returns the right, null if the mouse is a single-button mouse.
+     */
+    public Component getRight() {
+        return getComponent(Component.Identifier.Button.RIGHT);
+    }
 
-	/**
-	 * Returns the middle, null if the mouse has fewer than three buttons.
-	 */
-	public Component getMiddle() {
-		return getComponent(Component.Identifier.Button.MIDDLE);
-	}
+    /**
+     * Returns the middle, null if the mouse has fewer than three buttons.
+     */
+    public Component getMiddle() {
+        return getComponent(Component.Identifier.Button.MIDDLE);
+    }
 
-	/**
-	 * Returns the side or 4th mouse button, null if the mouse has
-	 * fewer than 4 buttons.
-	 */
-	public Component getSide() {
-		return getComponent(Component.Identifier.Button.SIDE);
-	}
+    /**
+     * Returns the side or 4th mouse button, null if the mouse has
+     * fewer than 4 buttons.
+     */
+    public Component getSide() {
+        return getComponent(Component.Identifier.Button.SIDE);
+    }
 
-	/**
-	 * Returns the extra or 5th mouse button, null if the mouse has
-	 * fewer than 5 buttons.
-	 */
-	public Component getExtra() {
-		return getComponent(Component.Identifier.Button.EXTRA);
-	}
+    /**
+     * Returns the extra or 5th mouse button, null if the mouse has
+     * fewer than 5 buttons.
+     */
+    public Component getExtra() {
+        return getComponent(Component.Identifier.Button.EXTRA);
+    }
 
-	/**
-	 * Returns the forward mouse button, null if the mouse hasn't
-	 * got one.
-	 */
-	public Component getForward() {
-		return getComponent(Component.Identifier.Button.FORWARD);
-	}
+    /**
+     * Returns the forward mouse button, null if the mouse hasn't
+     * got one.
+     */
+    public Component getForward() {
+        return getComponent(Component.Identifier.Button.FORWARD);
+    }
 
-	/**
-	 * Returns the back mouse button, null if the mouse hasn't
-	 * got one.
-	 */
-	public Component getBack() {
-		return getComponent(Component.Identifier.Button.BACK);
-	}
+    /**
+     * Returns the back mouse button, null if the mouse hasn't
+     * got one.
+     */
+    public Component getBack() {
+        return getComponent(Component.Identifier.Button.BACK);
+    }
 
-	/**
-	 * Returns forth mouse button, null if the mouse hasn't
-	 * got one.
-	 */
-	public Component getButton3() {
-		return getComponent(Component.Identifier.Button._3);
-	}
+    /**
+     * Returns forth mouse button, null if the mouse hasn't
+     * got one.
+     */
+    public Component getButton3() {
+        return getComponent(Component.Identifier.Button._3);
+    }
 
-	/**
-	 * Returns fifth mouse button, null if the mouse hasn't
-	 * got one.
-	 */
-	public Component getButton4() {
-		return getComponent(Component.Identifier.Button._4);
-	}
+    /**
+     * Returns fifth mouse button, null if the mouse hasn't
+     * got one.
+     */
+    public Component getButton4() {
+        return getComponent(Component.Identifier.Button._4);
+    }
 }

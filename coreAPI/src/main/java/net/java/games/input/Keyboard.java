@@ -19,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -42,12 +42,13 @@ public abstract class Keyboard extends AbstractController {
     /**
      * Protected constructor.
      * Subclasses should initialize the array of axes to an array of keys.
+     *
      * @param name The name of the keyboard
      */
     protected Keyboard(String name, Component[] keys, Controller[] children, Rumbler[] rumblers) {
         super(name, keys, children, rumblers);
     }
-    
+
     /**
      * Returns the type of the Controller.
      */
@@ -56,10 +57,10 @@ public abstract class Keyboard extends AbstractController {
         return Type.KEYBOARD;
     }
 
-	public final boolean isKeyDown(Component.Identifier.Key key_id) {
-		Component key = getComponent(key_id);
-		if (key == null)
-			return false;
-		return key.getPollData() != 0;
-	}
+    public final boolean isKeyDown(Component.Identifier.Key key_id) {
+        Component key = getComponent(key_id);
+        if (key == null)
+            return false;
+        return key.getPollData() != 0;
+    }
 }

@@ -30,11 +30,15 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  */
+
 package net.java.games.input;
 
-/** Generic Desktop Usages
-* @author elias
-* @version 1.0
-*/
+/**
+ * Generic Desktop Usages
+ *
+ * @author elias
+ * @version 1.0
+ */
 public interface Usage {
+
 }

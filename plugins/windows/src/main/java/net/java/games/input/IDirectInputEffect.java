@@ -36,87 +36,96 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 
-/** Java wrapper for IDirectInputEffect
+
+/**
+ * Java wrapper for IDirectInputEffect
+ *
  * @author elias
  * @version 1.0
  */
 final class IDirectInputEffect implements Rumbler {
-	private final long address;
-	private final DIEffectInfo info;
-	private boolean released;
 
-	public IDirectInputEffect(long address, DIEffectInfo info) {
-		this.address = address;
-		this.info = info;
-	}
+    private final long address;
+    private final DIEffectInfo info;
+    private boolean released;
 
-	public final synchronized void rumble(float intensity) {
-		try {
-			checkReleased();
-			if (intensity > 0) {
-				int int_gain = Math.round(intensity*IDirectInputDevice.DI_FFNOMINALMAX);
-				setGain(int_gain);
-				start(1, 0);
-			} else
-				stop();
-		} catch (IOException e) {
-			DirectInputEnvironmentPlugin.log("Failed to set rumbler gain: " + e.getMessage());
-		}
-	}
+    public IDirectInputEffect(long address, DIEffectInfo info) {
+        this.address = address;
+        this.info = info;
+    }
 
-	public final Component.Identifier getAxisIdentifier() {
-		return null;
-	}
+    public final synchronized void rumble(float intensity) {
+        try {
+            checkReleased();
+            if (intensity > 0) {
+                int int_gain = Math.round(intensity * IDirectInputDevice.DI_FFNOMINALMAX);
+                setGain(int_gain);
+                start(1, 0);
+            } else
+                stop();
+        } catch (IOException e) {
+            DirectInputEnvironmentPlugin.log("Failed to set rumbler gain: " + e.getMessage());
+        }
+    }
 
-	public final String getAxisName() {
-		return null;
-	}
+    public final Component.Identifier getAxisIdentifier() {
+        return null;
+    }
 
-	public final synchronized void release() {
-		if (!released) {
-			released = true;
-			nRelease(address);
-		}
-	}
-	private final static native void nRelease(long address);
+    public final String getAxisName() {
+        return null;
+    }
 
-	private final void checkReleased() throws IOException {
-		if (released)
-			throw new IOException();
-	}
+    public final synchronized void release() {
+        if (!released) {
+            released = true;
+            nRelease(address);
+        }
+    }
 
-	private final void setGain(int gain) throws IOException {
-		int res = nSetGain(address, gain);
-		if (res != IDirectInputDevice.DI_DOWNLOADSKIPPED &&
-			res != IDirectInputDevice.DI_EFFECTRESTARTED &&
-			res != IDirectInputDevice.DI_OK &&
-			res != IDirectInputDevice.DI_TRUNCATED &&
-			res != IDirectInputDevice.DI_TRUNCATEDANDRESTARTED) {
-			throw new IOException("Failed to set effect gain (0x" + Integer.toHexString(res) + ")");
-		}
-	}
-	private final static native int nSetGain(long address, int gain);
+    private final static native void nRelease(long address);
 
-	private final void start(int iterations, int flags) throws IOException {
-		int res = nStart(address, iterations, flags);
-		if (res != IDirectInputDevice.DI_OK)
-			throw new IOException("Failed to start effect (0x" + Integer.toHexString(res) + ")");
-	}
-	private final static native int nStart(long address, int iterations, int flags);
-	
-	private final void stop() throws IOException {
-		int res = nStop(address);
-		if (res != IDirectInputDevice.DI_OK)
-			throw new IOException("Failed to stop effect (0x" + Integer.toHexString(res) + ")");
-	}
-	private final static native int nStop(long address);
+    private final void checkReleased() throws IOException {
+        if (released)
+            throw new IOException();
+    }
 
-	@SuppressWarnings("deprecation")
-	protected void finalize() {
-		release();
-	}
+    private final void setGain(int gain) throws IOException {
+        int res = nSetGain(address, gain);
+        if (res != IDirectInputDevice.DI_DOWNLOADSKIPPED &&
+                res != IDirectInputDevice.DI_EFFECTRESTARTED &&
+                res != IDirectInputDevice.DI_OK &&
+                res != IDirectInputDevice.DI_TRUNCATED &&
+                res != IDirectInputDevice.DI_TRUNCATEDANDRESTARTED) {
+            throw new IOException("Failed to set effect gain (0x" + Integer.toHexString(res) + ")");
+        }
+    }
+
+    private final static native int nSetGain(long address, int gain);
+
+    private final void start(int iterations, int flags) throws IOException {
+        int res = nStart(address, iterations, flags);
+        if (res != IDirectInputDevice.DI_OK)
+            throw new IOException("Failed to start effect (0x" + Integer.toHexString(res) + ")");
+    }
+
+    private final static native int nStart(long address, int iterations, int flags);
+
+    private final void stop() throws IOException {
+        int res = nStop(address);
+        if (res != IDirectInputDevice.DI_OK)
+            throw new IOException("Failed to stop effect (0x" + Integer.toHexString(res) + ")");
+    }
+
+    private final static native int nStop(long address);
+
+    @SuppressWarnings("deprecation")
+    protected void finalize() {
+        release();
+    }
 }

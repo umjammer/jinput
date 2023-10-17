@@ -42,24 +42,26 @@ import java.io.IOException;
 
 /**
  * helper methods for OSX specific Controllers
+ *
  * @author elias
  * @version 1.0
  */
 final class OSXControllers {
-	private final static OSXEvent osx_event = new OSXEvent();
 
-	public final static synchronized float poll(OSXHIDElement element) throws IOException {
-		element.getElementValue(osx_event);
-		return element.convertValue(osx_event.getValue());
-	}
+    private final static OSXEvent osx_event = new OSXEvent();
 
-	/* synchronized to protect osx_event */
-	public final static synchronized boolean getNextDeviceEvent(Event event, OSXHIDQueue queue) throws IOException {
-		if (queue.getNextEvent(osx_event)) {
-			OSXComponent component = queue.mapEvent(osx_event);
-			event.set(component, component.getElement().convertValue(osx_event.getValue()), osx_event.getNanos());
-			return true;
-		} else
-			return false;
-	}
+    public final static synchronized float poll(OSXHIDElement element) throws IOException {
+        element.getElementValue(osx_event);
+        return element.convertValue(osx_event.getValue());
+    }
+
+    /* synchronized to protect osx_event */
+    public final static synchronized boolean getNextDeviceEvent(Event event, OSXHIDQueue queue) throws IOException {
+        if (queue.getNextEvent(osx_event)) {
+            OSXComponent component = queue.mapEvent(osx_event);
+            event.set(component, component.getElement().convertValue(osx_event.getValue()), osx_event.getNanos());
+            return true;
+        } else
+            return false;
+    }
 }

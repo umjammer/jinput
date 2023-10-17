@@ -23,7 +23,7 @@ public class OSXPluginTest {
     @Test
     void test1() throws Exception {
         OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
-Debug.println("getControllers: " + plugin.getControllers().length);
+        Debug.println("getControllers: " + plugin.getControllers().length);
         Arrays.stream(plugin.getControllers()).forEach(System.err::println);
     }
 

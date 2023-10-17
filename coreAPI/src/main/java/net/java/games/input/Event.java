@@ -19,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -36,36 +36,36 @@ public final class Event {
 
     private Component component;
     private float value;
-	private long nanos;
+    private long nanos;
 
     public void set(Event other) {
-		this.set(other.getComponent(), other.getValue(), other.getNanos());
+        this.set(other.getComponent(), other.getValue(), other.getNanos());
     }
 
     public void set(Component component, float value, long nanos) {
-		this.component = component;
-		this.value = value;
-		this.nanos = nanos;
+        this.component = component;
+        this.value = value;
+        this.nanos = nanos;
     }
 
-	public Component getComponent() {
-		return component;
-	}
+    public Component getComponent() {
+        return component;
+    }
 
-	public float getValue() {
-		return value;
-	}
+    public float getValue() {
+        return value;
+    }
 
-	/**
-	 * Return the time the event happened, in nanoseconds.
-	 * The time is relative and therefore can only be used
-	 * to compare with other event times.
-	 */
-	public long getNanos() {
-		return nanos;
-	}
+    /**
+     * Return the time the event happened, in nanoseconds.
+     * The time is relative and therefore can only be used
+     * to compare with other event times.
+     */
+    public long getNanos() {
+        return nanos;
+    }
 
-	public String toString() {
-		return "Event: component = " + component + " | value = " + value;
-	}
+    public String toString() {
+        return "Event: component = " + component + " | value = " + value;
+    }
 }

@@ -18,11 +18,11 @@
 
 package vavix.rococoa.corefoundation;
 
-import com.sun.jna.NativeLong;
-import com.sun.jna.Structure;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.sun.jna.NativeLong;
+import com.sun.jna.Structure;
 
 
 /**
@@ -72,9 +72,11 @@ public class CFRange extends Structure {
     }
 
     public static class ByReference extends CFRange implements Structure.ByReference {
+
     }
 
     public static class ByValue extends CFRange implements Structure.ByValue {
+
     }
 
     @Override

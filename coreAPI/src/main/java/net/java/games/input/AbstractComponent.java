@@ -19,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMEN, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DESTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -47,31 +47,33 @@ public abstract class AbstractComponent implements Component {
      * Human-readable name for this Axis
      */
     private final String name;
-    
+
     private final Identifier id;
 
-	private boolean has_polled;
-	private float value;
-	private float event_value;
-    
+    private boolean has_polled;
+    private float value;
+    private float event_value;
+
     /**
      * Protected constructor
+     *
      * @param name A name for the axis
      */
     protected AbstractComponent(String name, Identifier id) {
         this.name = name;
         this.id = id;
     }
-        
+
     /**
      * Returns the type or identifier of the axis.
      */
     public Identifier getIdentifier() {
         return id;
     }
-    
+
     /**
      * Returns whether or not the axis is analog, or false if it is digital.
+     *
      * @return false by default, can be overridden
      */
     public boolean isAnalog() {
@@ -83,6 +85,7 @@ public abstract class AbstractComponent implements Component {
      * amount polled data can vary before considered a significant change
      * in value.  An application can safely ignore changes less than this
      * value in the positive or negative direction.
+     *
      * @return 0.0f by default, can be overridden
      */
     public float getDeadZone() {
@@ -94,28 +97,29 @@ public abstract class AbstractComponent implements Component {
      * If this axis is a button, the value returned will be either 0.0f or 1.0f.
      * If this axis is normalised, the value returned will be between -1.0f and
      * 1.0f.
+     *
      * @return The data from the last time the control has been polled.
      */
     public final float getPollData() {
-		if (!has_polled && !isRelative()) {
-			has_polled = true;
-			try {
-				setPollData(poll());
-			} catch (IOException e) {
-				log.fine("Failed to poll component: " + e);
-			}
-		}
+        if (!has_polled && !isRelative()) {
+            has_polled = true;
+            try {
+                setPollData(poll());
+            } catch (IOException e) {
+                log.fine("Failed to poll component: " + e);
+            }
+        }
         return value;
     }
 
-	final void resetHasPolled() {
-		has_polled = false;
-	}
+    final void resetHasPolled() {
+        has_polled = false;
+    }
 
     final void setPollData(float value) {
         this.value = value;
     }
- 
+
     final float getEventValue() {
         return event_value;
     }
@@ -123,14 +127,14 @@ public abstract class AbstractComponent implements Component {
     final void setEventValue(float event_value) {
         this.event_value = event_value;
     }
- 
+
     /**
      * Returns a human-readable name for this axis.
      */
     public String getName() {
         return name;
     }
-    
+
     /**
      * Returns a non-localized string description of this axis.
      */
@@ -138,5 +142,5 @@ public abstract class AbstractComponent implements Component {
         return name;
     }
 
-	protected abstract float poll() throws IOException;
+    protected abstract float poll() throws IOException;
 }

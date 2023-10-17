@@ -23,12 +23,13 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
+
 package net.java.games.input;
 
 public class VersionTest {
 
-	public static void main(String[] args) {
-		System.out.println("JInput version: " + Version.getVersion());
-	}
+    public static void main(String[] args) {
+        System.out.println("JInput version: " + Version.getVersion());
+    }
 
 }

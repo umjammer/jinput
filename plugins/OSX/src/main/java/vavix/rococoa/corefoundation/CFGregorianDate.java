@@ -26,6 +26,7 @@ import com.sun.jna.Structure;
 
 /**
  * Brought to you by:
+ *
  * @author semaphore
  * @version May 27, 2010 1:45:16 PM
  */

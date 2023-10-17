@@ -35,26 +35,29 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 public class ControllerTextTest {
+
     ControllerEnvironment ce;
+
     /** Creates a new instance of ControllerScanner */
     public ControllerTextTest() {
         ce = ControllerEnvironment.getDefaultEnvironment();
         System.out.println("JInput version: " + Version.getVersion());
-        System.out.println("Controller Env = "+ce.toString());
-        
-        
+        System.out.println("Controller Env = " + ce.toString());
+
+
         Controller[] ca = ce.getControllers();
-        for(int i =0;i<ca.length;i++){
+        for (int i = 0; i < ca.length; i++) {
             System.out.println(ca[i].getName());
-            System.out.println("Type: "+ca[i].getType().toString());
+            System.out.println("Type: " + ca[i].getType().toString());
             Component[] components = ca[i].getComponents();
-            System.out.println("Component Count: "+components.length);
-            for(int j=0;j<components.length;j++){
-                System.out.println("Component "+j+": "+components[j].getName());
-                System.out.println("    Identifier: "+
+            System.out.println("Component Count: " + components.length);
+            for (int j = 0; j < components.length; j++) {
+                System.out.println("Component " + j + ": " + components[j].getName());
+                System.out.println("    Identifier: " +
                         components[j].getIdentifier().getName());
                 System.out.print("    ComponentType: ");
                 if (components[j].isRelative()) {
@@ -71,14 +74,14 @@ public class ControllerTextTest {
             }
             System.out.println("---------------------------------");
         }
-        
+
     }
-    
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         new ControllerTextTest();
     }
-    
+
 }

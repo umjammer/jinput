@@ -36,6 +36,7 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.security.AccessController;
@@ -47,159 +48,163 @@ import java.io.IOException;
 
 import net.java.games.util.plugins.Plugin;
 
-/** DirectInput implementation of controller environment
+
+/**
+ * DirectInput implementation of controller environment
+ *
  * @author martak
  * @author elias
  * @version 1.0
  */
 public final class RawInputEnvironmentPlugin extends ControllerEnvironment implements Plugin {
-	
-	private static boolean supported = false;
 
-	/**
-	 * Static utility method for loading native libraries.
-	 * It will try to load from either the path given by
-	 * the net.java.games.input.librarypath property
-	 * or through System.loadLibrary().
-	 * 
-	 */
-	static void loadLibrary(final String lib_name) {
-		AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-					    try {
-    						String lib_path = System.getProperty("net.java.games.input.librarypath");
-    						if (lib_path != null)
-    							System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
-    						else
-    							System.loadLibrary(lib_name);
-					    } catch (UnsatisfiedLinkError e) {
-					        e.printStackTrace();
-					        supported = false;
-					    }
-						return null;
-				});
-	}
-    
-	static String getPrivilegedProperty(final String property) {
-	       return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property));
-		}
-		
+    private static boolean supported = false;
 
-	static String getPrivilegedProperty(final String property, final String default_value) {
-       return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, default_value));
-	}
-		
-	static {
-		String osName = getPrivilegedProperty("os.name", "").trim();
-		if(osName.startsWith("Windows")) {
-			supported = true;
-			if("x86".equals(getPrivilegedProperty("os.arch"))) {
-				loadLibrary("jinput-raw");
-			} else {
-				loadLibrary("jinput-raw_64");
-			}
-		}
-	}
+    /**
+     * Static utility method for loading native libraries.
+     * It will try to load from either the path given by
+     * the net.java.games.input.librarypath property
+     * or through System.loadLibrary().
+     */
+    static void loadLibrary(final String lib_name) {
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            try {
+                String lib_path = System.getProperty("net.java.games.input.librarypath");
+                if (lib_path != null)
+                    System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
+                else
+                    System.loadLibrary(lib_name);
+            } catch (UnsatisfiedLinkError e) {
+                e.printStackTrace();
+                supported = false;
+            }
+            return null;
+        });
+    }
+
+    static String getPrivilegedProperty(final String property) {
+        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property));
+    }
+
+
+    static String getPrivilegedProperty(final String property, final String default_value) {
+        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, default_value));
+    }
+
+    static {
+        String osName = getPrivilegedProperty("os.name", "").trim();
+        if (osName.startsWith("Windows")) {
+            supported = true;
+            if ("x86".equals(getPrivilegedProperty("os.arch"))) {
+                loadLibrary("jinput-raw");
+            } else {
+                loadLibrary("jinput-raw_64");
+            }
+        }
+    }
 
     private final Controller[] controllers;
 
-	/** Creates new DirectInputEnvironment */
-	public RawInputEnvironmentPlugin() {
-		RawInputEventQueue queue;
-		Controller[] controllers = new Controller[]{};
-		if(isSupported()) {
-			try {
-				queue = new RawInputEventQueue();
-				controllers = enumControllers(queue);
-			} catch (IOException e) {
-				log("Failed to enumerate devices: " + e.getMessage());
-			}
-		}
-		this.controllers = controllers;
-	}
+    /** Creates new DirectInputEnvironment */
+    public RawInputEnvironmentPlugin() {
+        RawInputEventQueue queue;
+        Controller[] controllers = new Controller[] {};
+        if (isSupported()) {
+            try {
+                queue = new RawInputEventQueue();
+                controllers = enumControllers(queue);
+            } catch (IOException e) {
+                log("Failed to enumerate devices: " + e.getMessage());
+            }
+        }
+        this.controllers = controllers;
+    }
 
-	public final Controller[] getControllers() {
-		return controllers;
-	}
+    public final Controller[] getControllers() {
+        return controllers;
+    }
 
-	private final static SetupAPIDevice lookupSetupAPIDevice(String device_name, List<SetupAPIDevice> setupapi_devices) {
-		/* First, replace # with / in the device name, since that
-		 * seems to be the format in raw input device name
-		 */
-		device_name = device_name.replaceAll("#", "\\\\").toUpperCase();
-		for (int i = 0; i < setupapi_devices.size(); i++) {
-			SetupAPIDevice device = setupapi_devices.get(i);
-			if (device_name.contains(device.getInstanceId().toUpperCase()))
-				return device;
-		}
-		return null;
-	}
-	
-	private final static void createControllersFromDevices(RawInputEventQueue queue, List<Controller> controllers, List<RawDevice> devices, List<SetupAPIDevice> setupapi_devices) throws IOException {
-		List<RawDevice> active_devices = new ArrayList<>();
-		for (int i = 0; i < devices.size(); i++) {
-			RawDevice device = devices.get(i);
-			SetupAPIDevice setupapi_device = lookupSetupAPIDevice(device.getName(), setupapi_devices);
-			if (setupapi_device == null) {
-				/* Either the device is an RDP or we failed to locate the
-				 * SetupAPI device that matches
-				 */
-				continue;
-			}
-			RawDeviceInfo info = device.getInfo();
-			Controller controller = info.createControllerFromDevice(device, setupapi_device);
-			if (controller != null) {
-				controllers.add(controller);
-				active_devices.add(device);
-			}
-		}
-		queue.start(active_devices);
-	}
+    private final static SetupAPIDevice lookupSetupAPIDevice(String device_name, List<SetupAPIDevice> setupapi_devices) {
+        /* First, replace # with / in the device name, since that
+         * seems to be the format in raw input device name
+         */
+        device_name = device_name.replaceAll("#", "\\\\").toUpperCase();
+        for (int i = 0; i < setupapi_devices.size(); i++) {
+            SetupAPIDevice device = setupapi_devices.get(i);
+            if (device_name.contains(device.getInstanceId().toUpperCase()))
+                return device;
+        }
+        return null;
+    }
 
-	private final static native void enumerateDevices(RawInputEventQueue queue, List<RawDevice> devices) throws IOException;
+    private final static void createControllersFromDevices(RawInputEventQueue queue, List<Controller> controllers, List<RawDevice> devices, List<SetupAPIDevice> setupapi_devices) throws IOException {
+        List<RawDevice> active_devices = new ArrayList<>();
+        for (int i = 0; i < devices.size(); i++) {
+            RawDevice device = devices.get(i);
+            SetupAPIDevice setupapi_device = lookupSetupAPIDevice(device.getName(), setupapi_devices);
+            if (setupapi_device == null) {
+                /* Either the device is an RDP or we failed to locate the
+                 * SetupAPI device that matches
+                 */
+                continue;
+            }
+            RawDeviceInfo info = device.getInfo();
+            Controller controller = info.createControllerFromDevice(device, setupapi_device);
+            if (controller != null) {
+                controllers.add(controller);
+                active_devices.add(device);
+            }
+        }
+        queue.start(active_devices);
+    }
 
-	private final Controller[] enumControllers(RawInputEventQueue queue) throws IOException {
-		List<Controller> controllers = new ArrayList<>();
-		List<RawDevice> devices = new ArrayList<>();
-		enumerateDevices(queue, devices);
-		List<SetupAPIDevice> setupapi_devices = enumSetupAPIDevices();
-		createControllersFromDevices(queue, controllers, devices, setupapi_devices);
-		Controller[] controllers_array = new Controller[controllers.size()];
-		controllers.toArray(controllers_array);
-		return controllers_array;
-	}
+    private final static native void enumerateDevices(RawInputEventQueue queue, List<RawDevice> devices) throws IOException;
 
-	public boolean isSupported() {
-		return supported;
-	}
+    private final Controller[] enumControllers(RawInputEventQueue queue) throws IOException {
+        List<Controller> controllers = new ArrayList<>();
+        List<RawDevice> devices = new ArrayList<>();
+        enumerateDevices(queue, devices);
+        List<SetupAPIDevice> setupapi_devices = enumSetupAPIDevices();
+        createControllersFromDevices(queue, controllers, devices, setupapi_devices);
+        Controller[] controllers_array = new Controller[controllers.size()];
+        controllers.toArray(controllers_array);
+        return controllers_array;
+    }
 
-	/*
-	 * The raw input API, while being able to access
-	 * multiple mice and keyboards, is a bit raw (hah)
-	 * since it lacks some important features:
-	 *
-	 * 1. The list of keyboards and the list of mice
-	 *    both include useless Terminal Server
-	 *    devices (RDP_MOU and RDP_KEY) that we'd
-	 *    like to skip.
-	 * 2. The device names returned by GetRawInputDeviceInfo()
-	 *    are not for display, but instead synthesized
-	 *    from a combination of a device instance id
-	 *    and a GUID.
-	 *
-	 * A solution to both problems is the SetupAPI that allows
-	 * us to enumerate all keyboard and mouse devices and fetch their
-	 * descriptive names and at the same time filter out the unwanted
-	 * RDP devices.
-	 */
-	private final static List<SetupAPIDevice> enumSetupAPIDevices() throws IOException {
-		List<SetupAPIDevice> devices = new ArrayList<>();
-		nEnumSetupAPIDevices(getKeyboardClassGUID(), devices);
-		nEnumSetupAPIDevices(getMouseClassGUID(), devices);
-		return devices;
-	}
-	private final static native void nEnumSetupAPIDevices(byte[] guid, List<SetupAPIDevice> devices) throws IOException;
+    public boolean isSupported() {
+        return supported;
+    }
 
-	private final static native byte[] getKeyboardClassGUID();
-	private final static native byte[] getMouseClassGUID();
+    /*
+     * The raw input API, while being able to access
+     * multiple mice and keyboards, is a bit raw (hah)
+     * since it lacks some important features:
+     *
+     * 1. The list of keyboards and the list of mice
+     *    both include useless Terminal Server
+     *    devices (RDP_MOU and RDP_KEY) that we'd
+     *    like to skip.
+     * 2. The device names returned by GetRawInputDeviceInfo()
+     *    are not for display, but instead synthesized
+     *    from a combination of a device instance id
+     *    and a GUID.
+     *
+     * A solution to both problems is the SetupAPI that allows
+     * us to enumerate all keyboard and mouse devices and fetch their
+     * descriptive names and at the same time filter out the unwanted
+     * RDP devices.
+     */
+    private final static List<SetupAPIDevice> enumSetupAPIDevices() throws IOException {
+        List<SetupAPIDevice> devices = new ArrayList<>();
+        nEnumSetupAPIDevices(getKeyboardClassGUID(), devices);
+        nEnumSetupAPIDevices(getMouseClassGUID(), devices);
+        return devices;
+    }
+
+    private final static native void nEnumSetupAPIDevices(byte[] guid, List<SetupAPIDevice> devices) throws IOException;
+
+    private final static native byte[] getKeyboardClassGUID();
+
+    private final static native byte[] getMouseClassGUID();
 
 } // class DirectInputEnvironment

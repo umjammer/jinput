@@ -36,29 +36,36 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 
-/** Java wrapper for a (dummy) window
+
+/**
+ * Java wrapper for a (dummy) window
+ *
  * @author martak
  * @author elias
  * @version 1.0
  */
 final class DummyWindow {
-	private final long hwnd_address;
 
-	public DummyWindow() throws IOException {
-		this.hwnd_address = createWindow();
-	}
-	private final static native long createWindow() throws IOException;
+    private final long hwnd_address;
 
-	public final void destroy() throws IOException {
-		nDestroy(hwnd_address);
-	}
-	private final static native void nDestroy(long hwnd_address) throws IOException;
+    public DummyWindow() throws IOException {
+        this.hwnd_address = createWindow();
+    }
 
-	public final long getHwnd() {
-		return hwnd_address;
-	}
+    private final static native long createWindow() throws IOException;
+
+    public final void destroy() throws IOException {
+        nDestroy(hwnd_address);
+    }
+
+    private final static native void nDestroy(long hwnd_address) throws IOException;
+
+    public final long getHwnd() {
+        return hwnd_address;
+    }
 }

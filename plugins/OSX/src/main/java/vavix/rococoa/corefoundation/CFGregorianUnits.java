@@ -26,6 +26,7 @@ import com.sun.jna.Structure;
 
 /**
  * Brought to you by:
+ *
  * @author semaphore
  * @version May 27, 2010 1:44:34 PM
  */
@@ -75,13 +76,15 @@ public class CFGregorianUnits extends Structure {
     }
 
     public static class ByReference extends CFGregorianUnits implements Structure.ByReference {
+
     }
 
     public static class ByValue extends CFGregorianUnits implements Structure.ByValue {
+
     }
 
     @Override
     protected List<String> getFieldOrder() {
-      return Arrays.asList("years", "months", "days", "hours", "minutes", "seconds");
+        return Arrays.asList("years", "months", "days", "hours", "minutes", "seconds");
     }
 }

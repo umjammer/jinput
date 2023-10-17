@@ -25,6 +25,7 @@ import com.sun.jna.ptr.LongByReference;
 
 /**
  * Brought to you by:
+ *
  * @author semaphore
  * @version May 27, 2010 1:07:16 AM
  */

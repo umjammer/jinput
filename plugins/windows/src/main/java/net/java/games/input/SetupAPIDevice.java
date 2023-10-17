@@ -36,28 +36,33 @@
  * the design, construction, operation or maintenance of any nuclear facility
  *
  *****************************************************************************/
+
 package net.java.games.input;
 
 import java.io.IOException;
 
-/** Java wrapper of a SetupAPI device
+
+/**
+ * Java wrapper of a SetupAPI device
+ *
  * @author elias
  * @version 1.0
  */
 final class SetupAPIDevice {
-	private final String device_instance_id;
-	private final String device_name;
 
-	public SetupAPIDevice(String device_instance_id, String device_name) {
-		this.device_instance_id = device_instance_id;
-		this.device_name = device_name;
-	}
+    private final String device_instance_id;
+    private final String device_name;
 
-	public final String getName() {
-		return device_name;
-	}
+    public SetupAPIDevice(String device_instance_id, String device_name) {
+        this.device_instance_id = device_instance_id;
+        this.device_name = device_name;
+    }
 
-	public final String getInstanceId() {
-		return device_instance_id;
-	}
+    public final String getName() {
+        return device_name;
+    }
+
+    public final String getInstanceId() {
+        return device_instance_id;
+    }
 }

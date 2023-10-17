@@ -47,7 +47,7 @@ public abstract class AbstractController implements Controller {
 
     private static final Logger log = Logger.getLogger(AbstractController.class.getName());
 
-    final static int EVENT_QUEUE_DEPTH = 32;
+    public final static int EVENT_QUEUE_DEPTH = 32;
 
     private final static Event event = new Event();
 

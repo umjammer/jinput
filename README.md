@@ -23,6 +23,6 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
 
 ## TODO
 
-* use proper ServiceLoader instead of proprietary plugin system (backport from vavi-awt-joystick)
-* descriptor to components
-    * how can we know descriptor length?
+* ~~use proper ServiceLoader instead of proprietary plugin system (backport from vavi-awt-joystick)~~
+* linux not tested
+* windows not implemented

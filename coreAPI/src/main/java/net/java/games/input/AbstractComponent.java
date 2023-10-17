@@ -116,7 +116,7 @@ public abstract class AbstractComponent implements Component {
         return value;
     }
 
-    final void resetHasPolled() {
+    protected final void resetHasPolled() {
         has_polled = false;
     }
 

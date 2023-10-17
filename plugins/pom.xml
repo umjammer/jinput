@@ -12,45 +12,15 @@
 
   <modules>
     <module>awt</module>
+    <module>OSX</module>
+    <module>linux</module>
+    <module>windows</module>
   </modules>
 
   <packaging>pom</packaging>
   <name>JInput - plugins</name>
 
   <profiles>
-    <profile>
-      <id>linux</id>
-      <activation>
-        <os>
-          <name>linux</name>
-        </os>
-      </activation>
-      <modules>
-        <module>linux</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <modules>
-        <module>windows</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>osx</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <modules>
-        <module>OSX</module>
-      </modules>
-    </profile>
     <profile>
       <id>wintab</id>
       <activation>

@@ -5,7 +5,7 @@
   <parent>
     <groupId>net.java.jinput</groupId>
     <artifactId>plugins</artifactId>
-    <version>2.0.11v-SNAPSHOT</version>
+    <version>2.0.11v</version>
   </parent>
 
   <artifactId>windows-plugin</artifactId>

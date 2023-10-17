@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.awt;
 
 import java.awt.AWTEvent;
 import java.awt.Toolkit;
@@ -34,6 +34,13 @@ import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.java.games.input.AbstractComponent;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.Event;
+import net.java.games.input.Mouse;
+import net.java.games.input.Rumbler;
 
 
 /**

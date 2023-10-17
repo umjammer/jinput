@@ -24,30 +24,53 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+import net.java.games.input.Controller;
+
 
 /**
+ * struct input_id
+ *
  * @author elias
  */
-final class LinuxInputID {
+class LinuxInputID extends Structure {
 
-    private final int bustype;
-    private final int vendor;
-    private final int product;
-    private final int version;
+    public int bustype;
+    public int vendor;
+    public int product;
+    public int version;
 
-    public LinuxInputID(int bustype, int vendor, int product, int version) {
-        this.bustype = bustype;
-        this.vendor = vendor;
-        this.product = product;
-        this.version = version;
+    public LinuxInputID() {
     }
 
-    public final Controller.PortType getPortType() {
+    public LinuxInputID(Pointer p) {
+        super(p);
+    }
+
+    public static class ByReference extends LinuxInputID implements Structure.ByReference {
+
+    }
+
+    public static class ByValue extends LinuxInputID implements Structure.ByValue {
+
+    }
+
+    @Override
+    protected List<String> getFieldOrder() {
+        return Arrays.asList("bustype", "vendor", "product", "version");
+    }
+
+    public Controller.PortType getPortType() {
         return LinuxNativeTypesMap.getPortType(bustype);
     }
 
-    public final String toString() {
+    public String toString() {
         return "LinuxInputID: bustype = 0x" + Integer.toHexString(bustype) + " | vendor = 0x" + Integer.toHexString(vendor) +
                 " | product = 0x" + Integer.toHexString(product) + " | version = 0x" + Integer.toHexString(version);
     }

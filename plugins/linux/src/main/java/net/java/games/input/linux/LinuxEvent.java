@@ -24,21 +24,44 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+
 
 /**
  * @author elias
  */
-final class LinuxEvent {
+class LinuxEvent extends Structure {
 
-    private long nanos;
+    public timeval time;
+    public int type;
+    public int code;
+    public int value;
     private final LinuxAxisDescriptor descriptor = new LinuxAxisDescriptor();
-    private int value;
 
-    public final void set(long seconds, long microseconds, int type, int code, int value) {
-        this.nanos = (seconds * 1000000 + microseconds) * 1000;
-        this.descriptor.set(type, code);
-        this.value = value;
+    public LinuxEvent() {
+    }
+
+    public LinuxEvent(Pointer p) {
+        super(p);
+    }
+
+    public static class ByReference extends LinuxEvent implements Structure.ByReference {
+
+    }
+
+    public static class ByValue extends LinuxEvent implements Structure.ByValue {
+
+    }
+
+    @Override
+    protected List<String> getFieldOrder() {
+        return Arrays.asList("time", "type", "code", "value");
     }
 
     public final int getValue() {
@@ -50,6 +73,6 @@ final class LinuxEvent {
     }
 
     public final long getNanos() {
-        return nanos;
+        return time.toNanos();
     }
 }

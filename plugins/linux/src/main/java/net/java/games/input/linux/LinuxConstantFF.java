@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.io.IOException;
 
@@ -38,6 +38,7 @@ final class LinuxConstantFF extends LinuxForceFeedbackEffect {
         super(device);
     }
 
+    @Override
     protected final int upload(int id, float intensity) throws IOException {
         int scaled_intensity = Math.round(intensity * 0x7fff);
         return getDevice().uploadConstantEffect(id, 0, 0, 0, 0, 0, scaled_intensity, 0, 0, 0, 0);

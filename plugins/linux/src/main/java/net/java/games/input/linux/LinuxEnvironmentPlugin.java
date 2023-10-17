@@ -24,19 +24,24 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
-import net.java.games.util.plugins.Plugin;
-
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.util.logging.Logger;
+
+import net.java.games.input.AbstractComponent;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Keyboard;
+import net.java.games.input.Mouse;
+import net.java.games.input.Rumbler;
 
 
 /**
@@ -45,7 +50,9 @@ import java.security.PrivilegedAction;
  * @author elias
  * @author Jeremy Booth (jeremy@newdawnsoftware.com)
  */
-public final class LinuxEnvironmentPlugin extends ControllerEnvironment implements Plugin {
+public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
+
+    private static final Logger log = Logger.getLogger(LinuxEnvironmentPlugin.class.getName());
 
     private final static String LIBNAME = "jinput-linux";
     private final static String POSTFIX64BIT = "64";
@@ -55,62 +62,22 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
     private final List<LinuxDevice> devices = new ArrayList<LinuxDevice>();
     private final static LinuxDeviceThread device_thread = new LinuxDeviceThread();
 
-    /**
-     * Static utility method for loading native libraries.
-     * It will try to load from either the path given by
-     * the net.java.games.input.librarypath property
-     * or through System.loadLibrary().
-     */
-    static void loadLibrary(final String lib_name) {
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            String lib_path = System.getProperty("net.java.games.input.librarypath");
-            try {
-                if (lib_path != null)
-                    System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
-                else
-                    System.loadLibrary(lib_name);
-            } catch (UnsatisfiedLinkError e) {
-                log("Failed to load library: " + e.getMessage());
-                e.printStackTrace();
-                supported = false;
-            }
-            return null;
-        });
-    }
-
-    static String getPrivilegedProperty(final String property) {
-        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property));
-    }
-
-
-    static String getPrivilegedProperty(final String property, final String default_value) {
-        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, default_value));
-    }
-
     static {
-        String osName = getPrivilegedProperty("os.name", "").trim();
+        String osName = System.getProperty("os.name", "").trim();
         if (osName.equals("Linux")) {
             supported = true;
-            if ("i386".equals(getPrivilegedProperty("os.arch"))) {
-                loadLibrary(LIBNAME);
-            } else {
-                loadLibrary(LIBNAME + POSTFIX64BIT);
-            }
         }
     }
 
-    public final static Object execute(LinuxDeviceTask task) throws IOException {
+    public static Object execute(LinuxDeviceTask task) throws IOException {
         return device_thread.execute(task);
     }
 
     public LinuxEnvironmentPlugin() {
         if (isSupported()) {
             this.controllers = enumerateControllers();
-            log("Linux plugin claims to have found " + controllers.length + " controllers");
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-                return null;
-            });
+            log.fine("Linux plugin claims to have found " + controllers.length + " controllers");
+            Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
         } else {
             controllers = new Controller[0];
         }
@@ -123,15 +90,15 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
      * @return Returns a list of all controllers available to this environment,
      * or an empty array if there are no controllers in this environment.
      */
-    public final Controller[] getControllers() {
+    @Override
+    public Controller[] getControllers() {
         return controllers;
     }
 
-    private final static Component[] createComponents(List<LinuxEventComponent> event_components, LinuxEventDevice device) {
+    private static Component[] createComponents(List<LinuxEventComponent> event_components, LinuxEventDevice device) {
         LinuxEventComponent[][] povs = new LinuxEventComponent[4][2];
         List<LinuxComponent> components = new ArrayList<>();
-        for (int i = 0; i < event_components.size(); i++) {
-            LinuxEventComponent event_component = event_components.get(i);
+        for (LinuxEventComponent event_component : event_components) {
             Component.Identifier identifier = event_component.getIdentifier();
 
             if (identifier == Component.Identifier.Axis.POV) {
@@ -162,7 +129,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
                     povs[3][1] = event_component;
                     break;
                 default:
-                    log("Unknown POV instance: " + native_code);
+                    log.fine("Unknown POV instance: " + native_code);
                     break;
                 }
             } else if (identifier != null) {
@@ -171,9 +138,9 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
                 device.registerComponent(event_component.getDescriptor(), component);
             }
         }
-        for (int i = 0; i < povs.length; i++) {
-            LinuxEventComponent x = povs[i][0];
-            LinuxEventComponent y = povs[i][1];
+        for (LinuxEventComponent[] pov : povs) {
+            LinuxEventComponent x = pov[0];
+            LinuxEventComponent y = pov[1];
             if (x != null && y != null) {
                 LinuxComponent controller_component = new LinuxPOV(x, y);
                 components.add(controller_component);
@@ -186,7 +153,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
         return components_array;
     }
 
-    private final static Mouse createMouseFromDevice(LinuxEventDevice device, Component[] components) throws IOException {
+    private static Mouse createMouseFromDevice(LinuxEventDevice device, Component[] components) throws IOException {
         Mouse mouse = new LinuxMouse(device, components, new Controller[] {}, device.getRumblers());
         if (mouse.getX() != null && mouse.getY() != null && mouse.getPrimaryButton() != null)
             return mouse;
@@ -194,17 +161,17 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
             return null;
     }
 
-    private final static Keyboard createKeyboardFromDevice(LinuxEventDevice device, Component[] components) throws IOException {
+    private static Keyboard createKeyboardFromDevice(LinuxEventDevice device, Component[] components) throws IOException {
         Keyboard keyboard = new LinuxKeyboard(device, components, new Controller[] {}, device.getRumblers());
         return keyboard;
     }
 
-    private final static Controller createJoystickFromDevice(LinuxEventDevice device, Component[] components, Controller.Type type) throws IOException {
+    private static Controller createJoystickFromDevice(LinuxEventDevice device, Component[] components, Controller.Type type) throws IOException {
         Controller joystick = new LinuxAbstractController(device, components, new Controller[] {}, device.getRumblers(), type);
         return joystick;
     }
 
-    private final static Controller createControllerFromDevice(LinuxEventDevice device) throws IOException {
+    private static Controller createControllerFromDevice(LinuxEventDevice device) throws IOException {
         List<LinuxEventComponent> event_components = device.getComponents();
         Component[] components = createComponents(event_components, device);
         Controller.Type type = device.getType();
@@ -219,7 +186,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
             return null;
     }
 
-    private final Controller[] enumerateControllers() {
+    private Controller[] enumerateControllers() {
         List<Controller> controllers = new ArrayList<>();
         List<Controller> eventControllers = new ArrayList<>();
         List<Controller> jsControllers = new ArrayList<>();
@@ -265,78 +232,45 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
         return controllers_array;
     }
 
-    private final static Component.Identifier.Button getButtonIdentifier(int index) {
-        switch (index) {
-        case 0:
-            return Component.Identifier.Button._0;
-        case 1:
-            return Component.Identifier.Button._1;
-        case 2:
-            return Component.Identifier.Button._2;
-        case 3:
-            return Component.Identifier.Button._3;
-        case 4:
-            return Component.Identifier.Button._4;
-        case 5:
-            return Component.Identifier.Button._5;
-        case 6:
-            return Component.Identifier.Button._6;
-        case 7:
-            return Component.Identifier.Button._7;
-        case 8:
-            return Component.Identifier.Button._8;
-        case 9:
-            return Component.Identifier.Button._9;
-        case 10:
-            return Component.Identifier.Button._10;
-        case 11:
-            return Component.Identifier.Button._11;
-        case 12:
-            return Component.Identifier.Button._12;
-        case 13:
-            return Component.Identifier.Button._13;
-        case 14:
-            return Component.Identifier.Button._14;
-        case 15:
-            return Component.Identifier.Button._15;
-        case 16:
-            return Component.Identifier.Button._16;
-        case 17:
-            return Component.Identifier.Button._17;
-        case 18:
-            return Component.Identifier.Button._18;
-        case 19:
-            return Component.Identifier.Button._19;
-        case 20:
-            return Component.Identifier.Button._20;
-        case 21:
-            return Component.Identifier.Button._21;
-        case 22:
-            return Component.Identifier.Button._22;
-        case 23:
-            return Component.Identifier.Button._23;
-        case 24:
-            return Component.Identifier.Button._24;
-        case 25:
-            return Component.Identifier.Button._25;
-        case 26:
-            return Component.Identifier.Button._26;
-        case 27:
-            return Component.Identifier.Button._27;
-        case 28:
-            return Component.Identifier.Button._28;
-        case 29:
-            return Component.Identifier.Button._29;
-        case 30:
-            return Component.Identifier.Button._30;
-        case 31:
-            return Component.Identifier.Button._31;
-        default:
-            return null;
-        }
+    private static Component.Identifier.Button getButtonIdentifier(int index) {
+        return switch (index) {
+            case 0 -> Component.Identifier.Button._0;
+            case 1 -> Component.Identifier.Button._1;
+            case 2 -> Component.Identifier.Button._2;
+            case 3 -> Component.Identifier.Button._3;
+            case 4 -> Component.Identifier.Button._4;
+            case 5 -> Component.Identifier.Button._5;
+            case 6 -> Component.Identifier.Button._6;
+            case 7 -> Component.Identifier.Button._7;
+            case 8 -> Component.Identifier.Button._8;
+            case 9 -> Component.Identifier.Button._9;
+            case 10 -> Component.Identifier.Button._10;
+            case 11 -> Component.Identifier.Button._11;
+            case 12 -> Component.Identifier.Button._12;
+            case 13 -> Component.Identifier.Button._13;
+            case 14 -> Component.Identifier.Button._14;
+            case 15 -> Component.Identifier.Button._15;
+            case 16 -> Component.Identifier.Button._16;
+            case 17 -> Component.Identifier.Button._17;
+            case 18 -> Component.Identifier.Button._18;
+            case 19 -> Component.Identifier.Button._19;
+            case 20 -> Component.Identifier.Button._20;
+            case 21 -> Component.Identifier.Button._21;
+            case 22 -> Component.Identifier.Button._22;
+            case 23 -> Component.Identifier.Button._23;
+            case 24 -> Component.Identifier.Button._24;
+            case 25 -> Component.Identifier.Button._25;
+            case 26 -> Component.Identifier.Button._26;
+            case 27 -> Component.Identifier.Button._27;
+            case 28 -> Component.Identifier.Button._28;
+            case 29 -> Component.Identifier.Button._29;
+            case 30 -> Component.Identifier.Button._30;
+            case 31 -> Component.Identifier.Button._31;
+            default -> null;
+        };
     }
 
-    private final static Controller createJoystickFromJoystickDevice(LinuxJoystickDevice device) {
+    private static Controller createJoystickFromJoystickDevice(LinuxJoystickDevice device) {
         List<AbstractComponent> components = new ArrayList<>();
         byte[] axisMap = device.getAxisMap();
         char[] buttonMap = device.getButtonMap();
@@ -393,8 +327,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
             if (joystick_device_files == null)
                 return;
         }
-        for (int i = 0; i < joystick_device_files.length; i++) {
-            File event_file = joystick_device_files[i];
+        for (File event_file : joystick_device_files) {
             try {
                 String path = getAbsolutePathPrivileged(event_file);
                 LinuxJoystickDevice device = new LinuxJoystickDevice(path);
@@ -405,45 +338,38 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
                 } else
                     device.close();
             } catch (IOException e) {
-                log("Failed to open device (" + event_file + "): " + e.getMessage());
+                log.fine("Failed to open device (" + event_file + "): " + e.getMessage());
             }
         }
     }
 
-    private final static File[] enumerateJoystickDeviceFiles(final String dev_path) {
-        final File dev = new File(dev_path);
-        return listFilesPrivileged(dev, new FilenameFilter() {
-            public final boolean accept(File dir, String name) {
-                return name.startsWith("js");
-            }
-        });
+    private static File[] enumerateJoystickDeviceFiles(final String dev_path) {
+        File dev = new File(dev_path);
+        return listFilesPrivileged(dev, (dir, name) -> name.startsWith("js"));
     }
 
     private static String getAbsolutePathPrivileged(final File file) {
-        return AccessController.doPrivileged((PrivilegedAction<String>) () -> file.getAbsolutePath());
+        return file.getAbsolutePath();
     }
 
     private static File[] listFilesPrivileged(final File dir, final FilenameFilter filter) {
-        return AccessController.doPrivileged((PrivilegedAction<File[]>) () -> {
-            File[] files = dir.listFiles(filter);
-            if (files == null) {
-                log("dir " + dir.getName() + " exists: " + dir.exists() + ", is writable: " + dir.isDirectory());
-                files = new File[] {};
-            } else {
-                Arrays.sort(files, Comparator.comparing(File::getName));
-            }
-            return files;
-        });
+        File[] files = dir.listFiles(filter);
+        if (files == null) {
+            log.fine("dir " + dir.getName() + " exists: " + dir.exists() + ", is writable: " + dir.isDirectory());
+            files = new File[] {};
+        } else {
+            Arrays.sort(files, Comparator.comparing(File::getName));
+        }
+        return files;
     }
 
-    private final void enumerateEventControllers(List<Controller> controllers) {
+    private void enumerateEventControllers(List<Controller> controllers) {
         final File dev = new File("/dev/input");
         File[] event_device_files = listFilesPrivileged(dev, (File dir, String name) -> name.startsWith("event"));
 
         if (event_device_files == null)
             return;
-        for (int i = 0; i < event_device_files.length; i++) {
-            File event_file = event_device_files[i];
+        for (File event_file : event_device_files) {
             try {
                 String path = getAbsolutePathPrivileged(event_file);
                 LinuxEventDevice device = new LinuxEventDevice(path);
@@ -455,29 +381,27 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment implemen
                     } else
                         device.close();
                 } catch (IOException e) {
-                    log("Failed to create Controller: " + e.getMessage());
+                    log.fine("Failed to create Controller: " + e.getMessage());
                     device.close();
                 }
             } catch (IOException e) {
-                log("Failed to open device (" + event_file + "): " + e.getMessage());
+                log.fine("Failed to open device (" + event_file + "): " + e.getMessage());
             }
         }
     }
 
-    private final class ShutdownHook extends Thread {
-
-        public final void run() {
-            for (int i = 0; i < devices.size(); i++) {
-                try {
-                    LinuxDevice device = devices.get(i);
-                    device.close();
-                } catch (IOException e) {
-                    log("Failed to close device: " + e.getMessage());
-                }
+    private void shutdownHook() {
+        for (LinuxDevice linuxDevice : devices) {
+            try {
+                LinuxDevice device = linuxDevice;
+                device.close();
+            } catch (IOException e) {
+                log.fine("Failed to close device: " + e.getMessage());
             }
         }
     }
 
+    @Override
     public boolean isSupported() {
         return supported;
     }

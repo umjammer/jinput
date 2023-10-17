@@ -24,9 +24,12 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.util.logging.Logger;
+
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
 
 
 /**

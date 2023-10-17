@@ -1,4 +1,4 @@
-package net.java.games.input;
+package net.java.games.input.linux;
 
 
 /**

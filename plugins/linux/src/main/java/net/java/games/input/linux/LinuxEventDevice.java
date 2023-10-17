@@ -24,19 +24,47 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.io.IOException;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
+import com.sun.jna.ptr.IntByReference;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.Rumbler;
+
+import static com.sun.jna.platform.linux.ErrNo.EAGAIN;
+import static net.java.games.input.linux.LinuxIO.EVIOCGABS;
+import static net.java.games.input.linux.LinuxIO.EVIOCGBIT;
+import static net.java.games.input.linux.LinuxIO.EVIOCGEFFECTS;
+import static net.java.games.input.linux.LinuxIO.EVIOCGID;
+import static net.java.games.input.linux.LinuxIO.EVIOCGKEY;
+import static net.java.games.input.linux.LinuxIO.EVIOCGNAME;
+import static net.java.games.input.linux.LinuxIO.EVIOCGVERSION;
+import static net.java.games.input.linux.LinuxIO.EVIOCRMFF;
+import static net.java.games.input.linux.LinuxIO.EVIOCSFF;
+import static net.java.games.input.linux.LinuxIO.O_NONBLOCK;
+import static net.java.games.input.linux.LinuxIO.O_RDONLY;
+import static net.java.games.input.linux.LinuxIO.O_RDWR;
+import static net.java.games.input.linux.ffeffect.FF_CONSTANT;
+import static net.java.games.input.linux.ffeffect.FF_RUMBLE;
 
 
 /**
  * @author elias
  */
 final class LinuxEventDevice implements LinuxDevice {
+
+    private static final Logger log = Logger.getLogger(LinuxEventDevice.class.getName());
 
     private final Map<LinuxAxisDescriptor, LinuxComponent> component_map = new HashMap<>();
     private final Rumbler[] rumblers;
@@ -46,12 +74,14 @@ final class LinuxEventDevice implements LinuxDevice {
     private final List<LinuxEventComponent> components;
     private final Controller.Type type;
 
-    /* Closed state variable that protects the validity of the file descriptor.
-     *  Access to the closed state must be synchronized
+    /**
+     * Closed state variable that protects the validity of the file descriptor.
+     * Access to the closed state must be synchronized
      */
     private boolean closed;
 
-    /* Access to the key_states array could be synchronized, but
+    /**
+     * Access to the key_states array could be synchronized, but
      * it doesn't hurt to have multiple threads read/write from/to it
      */
     private final byte[] key_states = new byte[NativeDefinitions.KEY_MAX / 8 + 1];
@@ -81,16 +111,24 @@ final class LinuxEventDevice implements LinuxDevice {
         }
     }
 
-    private final static native long nOpen(String filename, boolean rw) throws IOException;
+    private static long nOpen(String filename, boolean rw) throws IOException {
+        if (filename == null)
+            return -1;
+        int flags = rw ? O_RDWR : O_RDONLY;
+        flags = flags | O_NONBLOCK;
+        int fd = LinuxIO.INSTANCE.open64(filename, flags);
+        if (fd == -1)
+            throw new IOException(String.format( "Failed to open device %s (%d)\n", filename, Native.getLastError()));
+        return fd;
+    }
 
-    public final Controller.Type getType() {
+    public Controller.Type getType() {
         return type;
     }
 
-    private final static int countComponents(List<LinuxEventComponent> components, Class<?> id_type, boolean relative) {
+    private static int countComponents(List<LinuxEventComponent> components, Class<?> id_type, boolean relative) {
         int count = 0;
-        for (int i = 0; i < components.size(); i++) {
-            LinuxEventComponent component = components.get(i);
+        for (LinuxEventComponent component : components) {
             if (id_type.isInstance(component.getIdentifier()) && relative == component.isRelative())
                 count++;
         }
@@ -99,7 +137,7 @@ final class LinuxEventDevice implements LinuxDevice {
 
     private final Controller.Type guessType() throws IOException {
         List<LinuxEventComponent> components = getComponents();
-        if (components.size() == 0)
+        if (components.isEmpty())
             return Controller.Type.UNKNOWN;
         int num_rel_axes = countComponents(components, Component.Identifier.Axis.class, true);
         int num_abs_axes = countComponents(components, Component.Identifier.Axis.class, false);
@@ -108,21 +146,20 @@ final class LinuxEventDevice implements LinuxDevice {
         int keyboard_traits = 0;
         int joystick_traits = 0;
         int gamepad_traits = 0;
-        if (name.toLowerCase().indexOf("mouse") != -1)
+        if (name.toLowerCase().contains("mouse"))
             mouse_traits++;
-        if (name.toLowerCase().indexOf("keyboard") != -1)
+        if (name.toLowerCase().contains("keyboard"))
             keyboard_traits++;
-        if (name.toLowerCase().indexOf("joystick") != -1)
+        if (name.toLowerCase().contains("joystick"))
             joystick_traits++;
-        if (name.toLowerCase().indexOf("gamepad") != -1)
+        if (name.toLowerCase().contains("gamepad"))
             gamepad_traits++;
         int num_keyboard_button_traits = 0;
         int num_mouse_button_traits = 0;
         int num_joystick_button_traits = 0;
         int num_gamepad_button_traits = 0;
         // count button traits
-        for (int i = 0; i < components.size(); i++) {
-            LinuxEventComponent component = components.get(i);
+        for (LinuxEventComponent component : components) {
             if (component.getButtonTrait() == Controller.Type.MOUSE)
                 num_mouse_button_traits++;
             else if (component.getButtonTrait() == Controller.Type.KEYBOARD)
@@ -172,7 +209,7 @@ final class LinuxEventDevice implements LinuxDevice {
                 rumblers.add(new LinuxRumbleFF(this));
             }
         } catch (IOException e) {
-            LinuxEnvironmentPlugin.log("Failed to enumerate rumblers: " + e.getMessage());
+            log.fine("Failed to enumerate rumblers: " + e.getMessage());
         }
         return rumblers.toArray(new Rumbler[] {});
     }
@@ -186,27 +223,78 @@ final class LinuxEventDevice implements LinuxDevice {
         return nUploadRumbleEffect(fd, id, direction, trigger_button, trigger_interval, replay_length, replay_delay, strong_magnitude, weak_magnitude);
     }
 
-    private final static native int nUploadRumbleEffect(long fd, int id, int direction, int trigger_button, int trigger_interval, int replay_length, int replay_delay, int strong_magnitude, int weak_magnitude) throws IOException;
+    private static int nUploadRumbleEffect(long fd, int id, int direction, int trigger_button, int trigger_interval, int replay_length, int replay_delay, int strong_magnitude, int weak_magnitude) throws IOException {
+        ffeffect effect = new ffeffect();
+
+        effect.type = FF_RUMBLE;
+        effect.id = (short) id;
+        effect.trigger.button = (short) trigger_button;
+        effect.trigger.interval = (short) trigger_interval;
+        effect.replay.length = (short) replay_length;
+        effect.replay.delay = (short) replay_delay;
+        effect.direction = (short) direction;
+        effect.u.rumble.strong_magnitude = (short) strong_magnitude;
+        effect.u.rumble.weak_magnitude = (short) weak_magnitude;
+
+        if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCSFF(effect.size()), effect.getPointer()) == -1) {
+            throw new IOException(String.format( "Failed to upload effect (%d)\n", Native.getLastError()));
+        }
+        effect.read();
+        return effect.id;
+    }
 
     public final synchronized int uploadConstantEffect(int id, int trigger_button, int direction, int trigger_interval, int replay_length, int replay_delay, int constant_level, int constant_env_attack_length, int constant_env_attack_level, int constant_env_fade_length, int constant_env_fade_level) throws IOException {
         checkClosed();
         return nUploadConstantEffect(fd, id, direction, trigger_button, trigger_interval, replay_length, replay_delay, constant_level, constant_env_attack_length, constant_env_attack_level, constant_env_fade_length, constant_env_fade_level);
     }
 
-    private final static native int nUploadConstantEffect(long fd, int id, int direction, int trigger_button, int trigger_interval, int replay_length, int replay_delay, int constant_level, int constant_env_attack_length, int constant_env_attack_level, int constant_env_fade_length, int constant_env_fade_level) throws IOException;
+    private static int nUploadConstantEffect(long fd, int id, int direction, int trigger_button, int trigger_interval, int replay_length, int replay_delay, int constant_level, int constant_env_attack_length, int constant_env_attack_level, int constant_env_fade_length, int constant_env_fade_level) throws IOException {
+        ffeffect effect = new ffeffect();
 
-    final void eraseEffect(int id) throws IOException {
+        effect.type = FF_CONSTANT;
+        effect.id = (short) id;
+        effect.trigger.button = (short) trigger_button;
+        effect.trigger.interval = (short) trigger_interval;
+        effect.replay.length = (short) replay_length;
+        effect.replay.delay = (short) replay_delay;
+        effect.direction = (short) direction;
+        effect.u.constant.level = (short) constant_level;
+        effect.u.constant.envelope.attack_length = (short) constant_env_attack_length;
+        effect.u.constant.envelope.attack_level = (short) constant_env_attack_level;
+        effect.u.constant.envelope.fade_length = (short) constant_env_fade_length;
+        effect.u.constant.envelope.fade_level = (short) constant_env_fade_level;
+
+        if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCSFF(effect.size()), effect.getPointer()) == -1) {
+            throw new IOException(String.format( "Failed to upload effect (%d)\n", Native.getLastError()));
+        }
+        return effect.id;
+    }
+
+    void eraseEffect(int id) throws IOException {
         nEraseEffect(fd, id);
     }
 
-    private final static native void nEraseEffect(long fd, int ff_id) throws IOException;
+    private static void nEraseEffect(long fd, int ff_id) throws IOException {
+        if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCRMFF, ff_id) == -1)
+            throw new IOException(String.format( "Failed to erase effect (%d)\n", Native.getLastError()));
+    }
+
 
     public final synchronized void writeEvent(int type, int code, int value) throws IOException {
         checkClosed();
         nWriteEvent(fd, type, code, value);
     }
 
-    private final static native void nWriteEvent(long fd, int type, int code, int value) throws IOException;
+    private static  void nWriteEvent(long fd, int type, int code, int value) throws IOException {
+        LinuxEvent event = new LinuxEvent();
+        event.type = type;
+        event.code = code;
+        event.value = value;
+
+        if (LinuxIO.INSTANCE.write((int) fd, event.getPointer(), new NativeLong(event.size())).intValue() == -1) {
+            throw new IOException(String.format( "Failed to write to device (%d)\n", Native.getLastError()));
+        }
+    }
 
     public final void registerComponent(LinuxAxisDescriptor desc, LinuxComponent component) {
         component_map.put(desc, component);
@@ -228,33 +316,67 @@ final class LinuxEventDevice implements LinuxDevice {
         return nGetInputID(fd);
     }
 
-    private final static native LinuxInputID nGetInputID(long fd) throws IOException;
+    private static LinuxInputID nGetInputID(long fd) throws IOException {
+        LinuxInputID id = new LinuxInputID();
+        int result = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGID(id.size()), id.getPointer());
+        if (result == -1) {
+            throw new IOException(String.format( "Failed to get input id for device (%d)\n", Native.getLastError()));
+        }
+        id.read();
+        return id;
+    }
 
     public final int getNumEffects() throws IOException {
         return nGetNumEffects(fd);
     }
 
-    private final static native int nGetNumEffects(long fd) throws IOException;
+    private static int nGetNumEffects(long fd) throws IOException {
+        IntByReference num_effects = new IntByReference();
+        if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGEFFECTS, num_effects.getPointer()) == -1) {
+            throw new IOException(String.format( "Failed to get number of device effects (%d)\n", Native.getLastError()));
+        }
+        return num_effects.getValue();
+    }
+
 
     private final int getVersion() throws IOException {
         return nGetVersion(fd);
     }
 
-    private final static native int nGetVersion(long fd) throws IOException;
+    private static int nGetVersion(long fd) throws IOException {
+        IntByReference version = new IntByReference();
+        if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGVERSION, version.getPointer()) == -1) {
+            throw new IOException(String.format( "Failed to get device version (%d)\n", Native.getLastError()));
+        }
+        return version.getValue();
+    }
+
 
     public final synchronized boolean getNextEvent(LinuxEvent linux_event) throws IOException {
         checkClosed();
         return nGetNextEvent(fd, linux_event);
     }
 
-    private final static native boolean nGetNextEvent(long fd, LinuxEvent linux_event) throws IOException;
+    private static boolean nGetNextEvent(long fd, LinuxEvent linux_event) throws IOException {
+        if (LinuxIO.INSTANCE.read((int) fd, linux_event.getPointer(), new NativeLong(linux_event.size())).intValue() == -1) {
+            if (Native.getLastError() == EAGAIN)
+                return false;
+            throw new IOException(String.format( "Failed to read next device event (%d)\n", Native.getLastError()));
+        }
+        return true;
+    }
 
-    public final synchronized void getAbsInfo(int abs_axis, LinuxAbsInfo abs_info) throws IOException {
+    public synchronized void getAbsInfo(int abs_axis, LinuxAbsInfo abs_info) throws IOException {
         checkClosed();
         nGetAbsInfo(fd, abs_axis, abs_info);
     }
 
-    private final static native void nGetAbsInfo(long fd, int abs_axis, LinuxAbsInfo abs_info) throws IOException;
+    private static void nGetAbsInfo(long fd, int abs_axis, LinuxAbsInfo abs_info) throws IOException {
+        int result = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGABS(abs_axis, abs_info.size()), abs_info.getPointer());
+        if (result == -1) {
+            throw new IOException(String.format( "Failed to get abs info for axis (%d)\n", Native.getLastError()));
+        }
+    }
 
     private final void addKeys(List<LinuxEventComponent> components) throws IOException {
         byte[] bits = getKeysBits();
@@ -332,51 +454,80 @@ final class LinuxEventDevice implements LinuxDevice {
         return bits;
     }
 
-    private final static native void nGetBits(long fd, int ev_type, byte[] evtype_bits) throws IOException;
+    private static void nGetBits(long fd, int ev_type, byte[] evtype_bits) throws IOException {
+        int len = evtype_bits.length;
+        Memory bits = new Memory(len);
+        int res = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGBIT(ev_type, len), bits);
+        if (res == -1)
+            throw new IOException(String.format( "Failed to get device bits (%d)\n", Native.getLastError()));
+        bits.read(0, evtype_bits, 0, len);
+    }
 
-    public final synchronized void pollKeyStates() throws IOException {
+    public synchronized void pollKeyStates() throws IOException {
         nGetKeyStates(fd, key_states);
     }
 
-    private final static native void nGetKeyStates(long fd, byte[] states) throws IOException;
+    private static void nGetKeyStates(long fd, byte[] states) throws IOException {
+        int len = states.length;
+        Memory bits = new Memory(len);
+        int res = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGKEY(len), bits);
+        if (res == -1)
+            throw new IOException(String.format( "Failed to get device key states (%d)\n", Native.getLastError()));
+        bits.read(0, states, 0, len);
+    }
 
-    public final boolean isKeySet(int bit) {
+    public boolean isKeySet(int bit) {
         return isBitSet(key_states, bit);
     }
 
-    public final static boolean isBitSet(byte[] bits, int bit) {
+    public static boolean isBitSet(byte[] bits, int bit) {
         return (bits[bit / 8] & (1 << (bit % 8))) != 0;
     }
 
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
-    private final String getDeviceName() throws IOException {
+    private String getDeviceName() throws IOException {
         return nGetName(fd);
     }
 
-    private final static native String nGetName(long fd) throws IOException;
+    private static String nGetName(long fd) throws IOException {
+        int BUFFER_SIZE = 1024;
+        Memory device_name = new Memory(BUFFER_SIZE);
 
-    public synchronized final void close() throws IOException {
+        if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGNAME(BUFFER_SIZE), device_name) == -1) {
+            throw new IOException(String.format( "Failed to get device name (%d)\n", Native.getLastError()));
+        }
+        return device_name.getString(0, StandardCharsets.UTF_8.name());
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
         if (closed)
             return;
         closed = true;
         LinuxEnvironmentPlugin.execute(new LinuxDeviceTask() {
-            protected final Object execute() throws IOException {
+            @Override protected Object execute() throws IOException {
                 nClose(fd);
                 return null;
             }
         });
     }
 
-    private final static native void nClose(long fd) throws IOException;
+    private void nClose(long fd) throws IOException {
+        int result = LinuxIO.INSTANCE.close((int) fd);
+        if (result == -1)
+            throw new IOException(String.format( "Failed to close device (%d)\n", Native.getLastError()));
+    }
+
 
     private final void checkClosed() throws IOException {
         if (closed)
             throw new IOException("Device is closed");
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     protected void finalize() throws IOException {
         close();

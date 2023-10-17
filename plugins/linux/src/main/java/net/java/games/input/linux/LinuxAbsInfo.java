@@ -24,18 +24,47 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+
 
 /**
+ * struct input_absinfo
+ *
  * @author elias
  */
-final class LinuxAbsInfo {
+class LinuxAbsInfo extends Structure {
 
-    private int value;
-    private int minimum;
-    private int maximum;
-    private int fuzz;
-    private int flat;
+    public int value;
+    public int minimum;
+    public int maximum;
+    public int fuzz;
+    public int flat;
+
+    public LinuxAbsInfo() {
+    }
+
+    public LinuxAbsInfo(Pointer p) {
+        super(p);
+    }
+
+    public static class ByReference extends LinuxAbsInfo implements Structure.ByReference {
+
+    }
+
+    public static class ByValue extends LinuxAbsInfo implements Structure.ByValue {
+
+    }
+
+    @Override
+    protected List<String> getFieldOrder() {
+        return Arrays.asList("value", "minimum", "maximum", "fuzz", "flat");
+    }
 
     public final void set(int value, int min, int max, int fuzz, int flat) {
         this.value = value;

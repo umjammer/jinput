@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,12 +28,14 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+
+import net.java.games.input.Component;
 
 
 /**
@@ -50,6 +46,8 @@ import java.io.IOException;
  */
 final class LinuxPOV extends LinuxComponent {
 
+    private static final Logger log = Logger.getLogger(LinuxPOV.class.getName());
+    
     private final LinuxEventComponent component_x;
     private final LinuxEventComponent component_y;
 
@@ -62,12 +60,14 @@ final class LinuxPOV extends LinuxComponent {
         this.component_y = component_y;
     }
 
-    protected final float poll() throws IOException {
+    @Override
+    protected float poll() throws IOException {
         last_x = LinuxControllers.poll(component_x);
         last_y = LinuxControllers.poll(component_y);
         return convertValue(0f, null);
     }
 
+    @Override
     public float convertValue(float value, LinuxAxisDescriptor descriptor) {
         if (descriptor == component_x.getDescriptor())
             last_x = value;
@@ -93,7 +93,7 @@ final class LinuxPOV extends LinuxComponent {
         else if (last_x == 1 && last_y == 1)
             return Component.POV.DOWN_RIGHT;
         else {
-            LinuxEnvironmentPlugin.log("Unknown values x = " + last_x + " | y = " + last_y);
+            log.fine("Unknown values x = " + last_x + " | y = " + last_y);
             return Component.POV.OFF;
         }
     }

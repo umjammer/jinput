@@ -24,9 +24,12 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.io.IOException;
+
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
 
 
 /**
@@ -56,7 +59,7 @@ final class LinuxEventComponent {
         this.descriptor = new LinuxAxisDescriptor();
         descriptor.set(native_type, native_code);
         if (native_type == NativeDefinitions.EV_ABS) {
-            LinuxAbsInfo abs_info = new LinuxAbsInfo();
+            LinuxAbsInfo.ByReference abs_info = new LinuxAbsInfo.ByReference();
             getAbsInfo(abs_info);
             this.min = abs_info.getMin();
             this.max = abs_info.getMax();

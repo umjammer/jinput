@@ -37,9 +37,11 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.io.IOException;
+
+import net.java.games.input.AbstractComponent;
 
 
 /**
@@ -53,11 +55,11 @@ class LinuxJoystickAxis extends AbstractComponent {
     private float value;
     private boolean analog;
 
-    public LinuxJoystickAxis(Component.Identifier.Axis axis_id) {
+    public LinuxJoystickAxis(Identifier.Axis axis_id) {
         this(axis_id, true);
     }
 
-    public LinuxJoystickAxis(Component.Identifier.Axis axis_id, boolean analog) {
+    public LinuxJoystickAxis(Identifier.Axis axis_id, boolean analog) {
         super(axis_id.getName(), axis_id);
         this.analog = analog;
     }

@@ -24,23 +24,43 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.input.linux;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+
 
 /**
  * @author elias
  */
-final class LinuxJoystickEvent {
+class LinuxJoystickEvent extends Structure {
 
-    private long nanos;
-    private int value;
-    private int type;
-    private int number;
+    public timeval time;
+    public int value;
+    public int type;
+    public int number;
 
-    public final void set(long millis, int value, int type, int number) {
-        this.nanos = millis * 1000000;
-        this.value = value;
-        this.type = type;
-        this.number = number;
+    public LinuxJoystickEvent() {
+    }
+
+    public LinuxJoystickEvent(Pointer p) {
+        super(p);
+    }
+
+    public static class ByReference extends LinuxJoystickEvent implements Structure.ByReference {
+
+    }
+
+    public static class ByValue extends LinuxJoystickEvent implements Structure.ByValue {
+
+    }
+
+    @Override
+    protected List<String> getFieldOrder() {
+        return Arrays.asList("time", "value", "type", "number");
     }
 
     public final int getValue() {
@@ -56,6 +76,6 @@ final class LinuxJoystickEvent {
     }
 
     public final long getNanos() {
-        return nanos;
+        return time.toNanos();
     }
 }

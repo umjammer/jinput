@@ -37,9 +37,11 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.input.linux;
 
 import java.io.IOException;
+
+import net.java.games.input.AbstractComponent;
 
 
 /**
@@ -52,7 +54,7 @@ final class LinuxJoystickButton extends AbstractComponent {
 
     private float value;
 
-    public LinuxJoystickButton(Component.Identifier button_id) {
+    public LinuxJoystickButton(Identifier button_id) {
         super(button_id.getName(), button_id);
     }
 

@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,19 +28,21 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.input;
+package net.java.games.windows;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
-import net.java.games.util.plugins.Plugin;
+import net.java.games.input.AbstractController;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Keyboard;
+import net.java.games.input.Mouse;
 
 
 /**
@@ -56,50 +52,16 @@ import net.java.games.util.plugins.Plugin;
  * @author elias
  * @version 1.0
  */
-public final class DirectInputEnvironmentPlugin extends ControllerEnvironment implements Plugin {
+public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
+
+    private static final Logger log = Logger.getLogger(DirectInputEnvironmentPlugin.class.getName());
 
     private static boolean supported = false;
 
-    /**
-     * Static utility method for loading native libraries.
-     * It will try to load from either the path given by
-     * the net.java.games.input.librarypath property
-     * or through System.loadLibrary().
-     */
-    static void loadLibrary(final String lib_name) {
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            try {
-                String lib_path = System.getProperty("net.java.games.input.librarypath");
-                if (lib_path != null)
-                    System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
-                else
-                    System.loadLibrary(lib_name);
-            } catch (UnsatisfiedLinkError e) {
-                e.printStackTrace();
-                supported = false;
-            }
-            return null;
-        });
-    }
-
-    static String getPrivilegedProperty(final String property) {
-        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property));
-    }
-
-
-    static String getPrivilegedProperty(final String property, final String default_value) {
-        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, default_value));
-    }
-
     static {
-        String osName = getPrivilegedProperty("os.name", "").trim();
+        String osName = System.getProperty("os.name", "").trim();
         if (osName.startsWith("Windows")) {
             supported = true;
-            if ("x86".equals(getPrivilegedProperty("os.arch"))) {
-                loadLibrary("jinput-dx8");
-            } else {
-                loadLibrary("jinput-dx8_64");
-            }
         }
     }
 
@@ -121,14 +83,11 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
                     throw e;
                 }
             } catch (IOException e) {
-                log("Failed to enumerate devices: " + e.getMessage());
+                log.fine("Failed to enumerate devices: " + e.getMessage());
             }
             this.window = window;
             this.controllers = controllers;
-            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-                return null;
-            });
+            Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
         } else {
             // These are final fields, so can't set them, then over ride
             // them if we are supported.
@@ -137,15 +96,15 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
         }
     }
 
+    @Override
     public final Controller[] getControllers() {
         return controllers;
     }
 
-    private final Component[] createComponents(IDirectInputDevice device, boolean map_mouse_buttons) {
+    private Component[] createComponents(IDirectInputDevice device, boolean map_mouse_buttons) {
         List<DIDeviceObject> device_objects = device.getObjects();
         List<DIComponent> controller_components = new ArrayList<>();
-        for (int i = 0; i < device_objects.size(); i++) {
-            DIDeviceObject device_object = device_objects.get(i);
+        for (DIDeviceObject device_object : device_objects) {
             Component.Identifier identifier = device_object.getIdentifier();
             if (identifier == null)
                 continue;
@@ -161,7 +120,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
         return components;
     }
 
-    private final Mouse createMouseFromDevice(IDirectInputDevice device) {
+    private Mouse createMouseFromDevice(IDirectInputDevice device) {
         Component[] components = createComponents(device, true);
         Mouse mouse = new DIMouse(device, components, new Controller[] {}, device.getRumblers());
         if (mouse.getX() != null && mouse.getY() != null && mouse.getPrimaryButton() != null)
@@ -170,36 +129,27 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
             return null;
     }
 
-    private final AbstractController createControllerFromDevice(IDirectInputDevice device, Controller.Type type) {
+    private AbstractController createControllerFromDevice(IDirectInputDevice device, Controller.Type type) {
         Component[] components = createComponents(device, false);
         AbstractController controller = new DIAbstractController(device, components, new Controller[] {}, device.getRumblers(), type);
         return controller;
     }
 
-    private final Keyboard createKeyboardFromDevice(IDirectInputDevice device) {
+    private Keyboard createKeyboardFromDevice(IDirectInputDevice device) {
         Component[] components = createComponents(device, false);
         return new DIKeyboard(device, components, new Controller[] {}, device.getRumblers());
     }
 
-    private final Controller createControllerFromDevice(IDirectInputDevice device) {
-        switch (device.getType()) {
-        case IDirectInputDevice.DI8DEVTYPE_MOUSE:
-            return createMouseFromDevice(device);
-        case IDirectInputDevice.DI8DEVTYPE_KEYBOARD:
-            return createKeyboardFromDevice(device);
-        case IDirectInputDevice.DI8DEVTYPE_GAMEPAD:
-            return createControllerFromDevice(device, Controller.Type.GAMEPAD);
-        case IDirectInputDevice.DI8DEVTYPE_DRIVING:
-            return createControllerFromDevice(device, Controller.Type.WHEEL);
-        case IDirectInputDevice.DI8DEVTYPE_1STPERSON:
-            /* Fall through */
-        case IDirectInputDevice.DI8DEVTYPE_FLIGHT:
-            /* Fall through */
-        case IDirectInputDevice.DI8DEVTYPE_JOYSTICK:
-            return createControllerFromDevice(device, Controller.Type.STICK);
-        default:
-            return createControllerFromDevice(device, Controller.Type.UNKNOWN);
-        }
+    private Controller createControllerFromDevice(IDirectInputDevice device) {
+        return switch (device.getType()) {
+            case IDirectInputDevice.DI8DEVTYPE_MOUSE -> createMouseFromDevice(device);
+            case IDirectInputDevice.DI8DEVTYPE_KEYBOARD -> createKeyboardFromDevice(device);
+            case IDirectInputDevice.DI8DEVTYPE_GAMEPAD -> createControllerFromDevice(device, Controller.Type.GAMEPAD);
+            case IDirectInputDevice.DI8DEVTYPE_DRIVING -> createControllerFromDevice(device, Controller.Type.WHEEL);
+            case IDirectInputDevice.DI8DEVTYPE_1STPERSON, IDirectInputDevice.DI8DEVTYPE_FLIGHT, IDirectInputDevice.DI8DEVTYPE_JOYSTICK ->
+                    createControllerFromDevice(device, Controller.Type.STICK);
+            default -> createControllerFromDevice(device, Controller.Type.UNKNOWN);
+        };
     }
 
     private final Controller[] enumControllers(DummyWindow window) throws IOException {
@@ -207,8 +157,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
         IDirectInput dinput = new IDirectInput(window);
         try {
             List<IDirectInputDevice> devices = dinput.getDevices();
-            for (int i = 0; i < devices.size(); i++) {
-                IDirectInputDevice device = devices.get(i);
+            for (IDirectInputDevice device : devices) {
                 Controller controller = createControllerFromDevice(device);
                 if (controller != null) {
                     controllers.add(controller);
@@ -224,20 +173,16 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment im
         return controllers_array;
     }
 
-    private final class ShutdownHook extends Thread {
-
-        public final void run() {
-            /* Release the devices to kill off active force feedback effects */
-            for (int i = 0; i < active_devices.size(); i++) {
-                IDirectInputDevice device = active_devices.get(i);
-                device.release();
-            }
-            /* We won't release the window since it is
-             * owned by the thread that created the environment.
-             */
+    private void shutdownHook() {
+        // Release the devices to kill off active force feedback effects
+        for (IDirectInputDevice device : active_devices) {
+            device.release();
         }
+        // We won't release the window since it is
+        // owned by the thread that created the environment.
     }
 
+    @Override
     public boolean isSupported() {
         return supported;
     }

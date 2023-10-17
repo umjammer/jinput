@@ -31,7 +31,7 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.windows;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;

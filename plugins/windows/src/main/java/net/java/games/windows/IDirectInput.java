@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,14 +28,14 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.input;
+package net.java.games.windows;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 
 /**
@@ -52,6 +46,8 @@ import java.util.ArrayList;
  * @version 1.0
  */
 final class IDirectInput {
+
+    private static final Logger log = Logger.getLogger(IDirectInput.class.getName());
 
     private final List<IDirectInputDevice> devices = new ArrayList<>();
     private final long idirectinput_address;
@@ -69,7 +65,7 @@ final class IDirectInput {
         }
     }
 
-    private final static native long createIDirectInput() throws IOException;
+    private static native long createIDirectInput() throws IOException;
 
     public final List<IDirectInputDevice> getDevices() {
         return devices;
@@ -89,20 +85,19 @@ final class IDirectInput {
             IDirectInputDevice device = new IDirectInputDevice(window, address, instance_guid, product_guid, dev_type, dev_subtype, instance_name, product_name);
             devices.add(device);
         } catch (IOException e) {
-            DirectInputEnvironmentPlugin.log("Failed to initialize device " + product_name + " because of: " + e);
+            log.fine("Failed to initialize device " + product_name + " because of: " + e);
         }
     }
 
     public final void releaseDevices() {
-        for (int i = 0; i < devices.size(); i++) {
-            IDirectInputDevice device = devices.get(i);
+        for (IDirectInputDevice device : devices) {
             device.release();
         }
     }
 
-    public final void release() {
+    public void release() {
         nRelease(idirectinput_address);
     }
 
-    private final static native void nRelease(long address);
+    private static native void nRelease(long address);
 }

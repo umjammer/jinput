@@ -37,7 +37,10 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.windows;
+
+import net.java.games.input.Component;
+
 
 /**
  * @author elias

@@ -24,10 +24,13 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.input;
+package net.java.games.windows;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
 
 
 /**

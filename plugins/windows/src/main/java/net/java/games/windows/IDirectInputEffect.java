@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,12 +28,15 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.input;
+package net.java.games.windows;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+
+import net.java.games.input.Component;
+import net.java.games.input.Rumbler;
 
 
 /**
@@ -50,6 +47,8 @@ import java.io.IOException;
  */
 final class IDirectInputEffect implements Rumbler {
 
+    private static final Logger log = Logger.getLogger(IDirectInputEffect.class.getName());
+
     private final long address;
     private final DIEffectInfo info;
     private boolean released;
@@ -59,7 +58,7 @@ final class IDirectInputEffect implements Rumbler {
         this.info = info;
     }
 
-    public final synchronized void rumble(float intensity) {
+    public synchronized void rumble(float intensity) {
         try {
             checkReleased();
             if (intensity > 0) {
@@ -69,33 +68,33 @@ final class IDirectInputEffect implements Rumbler {
             } else
                 stop();
         } catch (IOException e) {
-            DirectInputEnvironmentPlugin.log("Failed to set rumbler gain: " + e.getMessage());
+            log.fine("Failed to set rumbler gain: " + e.getMessage());
         }
     }
 
-    public final Component.Identifier getAxisIdentifier() {
+    public Component.Identifier getAxisIdentifier() {
         return null;
     }
 
-    public final String getAxisName() {
+    public String getAxisName() {
         return null;
     }
 
-    public final synchronized void release() {
+    public synchronized void release() {
         if (!released) {
             released = true;
             nRelease(address);
         }
     }
 
-    private final static native void nRelease(long address);
+    private static native void nRelease(long address);
 
-    private final void checkReleased() throws IOException {
+    private void checkReleased() throws IOException {
         if (released)
             throw new IOException();
     }
 
-    private final void setGain(int gain) throws IOException {
+    private void setGain(int gain) throws IOException {
         int res = nSetGain(address, gain);
         if (res != IDirectInputDevice.DI_DOWNLOADSKIPPED &&
                 res != IDirectInputDevice.DI_EFFECTRESTARTED &&
@@ -106,24 +105,25 @@ final class IDirectInputEffect implements Rumbler {
         }
     }
 
-    private final static native int nSetGain(long address, int gain);
+    private static native int nSetGain(long address, int gain);
 
-    private final void start(int iterations, int flags) throws IOException {
+    private void start(int iterations, int flags) throws IOException {
         int res = nStart(address, iterations, flags);
         if (res != IDirectInputDevice.DI_OK)
             throw new IOException("Failed to start effect (0x" + Integer.toHexString(res) + ")");
     }
 
-    private final static native int nStart(long address, int iterations, int flags);
+    private static native int nStart(long address, int iterations, int flags);
 
-    private final void stop() throws IOException {
+    private void stop() throws IOException {
         int res = nStop(address);
         if (res != IDirectInputDevice.DI_OK)
             throw new IOException("Failed to stop effect (0x" + Integer.toHexString(res) + ")");
     }
 
-    private final static native int nStop(long address);
+    private static native int nStop(long address);
 
+    @Override
     @SuppressWarnings("deprecation")
     protected void finalize() {
         release();

@@ -37,9 +37,15 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.windows;
 
 import java.io.IOException;
+
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.Event;
+import net.java.games.input.Mouse;
+import net.java.games.input.Rumbler;
 
 
 /**

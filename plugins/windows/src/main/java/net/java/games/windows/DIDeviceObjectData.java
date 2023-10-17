@@ -37,7 +37,7 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.windows;
 
 /**
  * Java wrapper for DIDEVICEOBJECTDATA

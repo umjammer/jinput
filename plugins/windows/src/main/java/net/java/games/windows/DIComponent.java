@@ -37,9 +37,11 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
+package net.java.games.windows;
 
 import java.io.IOException;
+
+import net.java.games.input.AbstractComponent;
 
 
 /**
@@ -50,7 +52,7 @@ final class DIComponent extends AbstractComponent {
 
     private final DIDeviceObject object;
 
-    public DIComponent(Component.Identifier identifier, DIDeviceObject object) {
+    public DIComponent(Identifier identifier, DIDeviceObject object) {
         super(object.getName(), identifier);
         this.object = object;
     }

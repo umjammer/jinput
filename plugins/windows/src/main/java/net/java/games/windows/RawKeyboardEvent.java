@@ -37,9 +37,7 @@
  *
  *****************************************************************************/
 
-package net.java.games.input;
-
-import java.io.IOException;
+package net.java.games.windows;
 
 
 /**

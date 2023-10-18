@@ -118,7 +118,7 @@ final class LinuxEventDevice implements LinuxDevice {
         flags = flags | O_NONBLOCK;
         int fd = LinuxIO.INSTANCE.open64(filename, flags);
         if (fd == -1)
-            throw new IOException(String.format( "Failed to open device %s (%d)\n", filename, Native.getLastError()));
+            throw new IOException(String.format( "Failed to open device %s (%d)", filename, Native.getLastError()));
         return fd;
     }
 
@@ -237,7 +237,7 @@ final class LinuxEventDevice implements LinuxDevice {
         effect.u.rumble.weak_magnitude = (short) weak_magnitude;
 
         if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCSFF(effect.size()), effect.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to upload effect (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to upload effect (%d)", Native.getLastError()));
         }
         effect.read();
         return effect.id;
@@ -265,7 +265,7 @@ final class LinuxEventDevice implements LinuxDevice {
         effect.u.constant.envelope.fade_level = (short) constant_env_fade_level;
 
         if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCSFF(effect.size()), effect.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to upload effect (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to upload effect (%d)", Native.getLastError()));
         }
         return effect.id;
     }
@@ -276,7 +276,7 @@ final class LinuxEventDevice implements LinuxDevice {
 
     private static void nEraseEffect(long fd, int ff_id) throws IOException {
         if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCRMFF, ff_id) == -1)
-            throw new IOException(String.format( "Failed to erase effect (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to erase effect (%d)", Native.getLastError()));
     }
 
 
@@ -292,7 +292,7 @@ final class LinuxEventDevice implements LinuxDevice {
         event.value = value;
 
         if (LinuxIO.INSTANCE.write((int) fd, event.getPointer(), new NativeLong(event.size())).intValue() == -1) {
-            throw new IOException(String.format( "Failed to write to device (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to write to device (%d)", Native.getLastError()));
         }
     }
 
@@ -320,7 +320,7 @@ final class LinuxEventDevice implements LinuxDevice {
         LinuxInputID id = new LinuxInputID();
         int result = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGID(id.size()), id.getPointer());
         if (result == -1) {
-            throw new IOException(String.format( "Failed to get input id for device (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get input id for device (%d)", Native.getLastError()));
         }
         id.read();
         return id;
@@ -333,7 +333,7 @@ final class LinuxEventDevice implements LinuxDevice {
     private static int nGetNumEffects(long fd) throws IOException {
         IntByReference num_effects = new IntByReference();
         if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGEFFECTS, num_effects.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to get number of device effects (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get number of device effects (%d)", Native.getLastError()));
         }
         return num_effects.getValue();
     }
@@ -346,7 +346,7 @@ final class LinuxEventDevice implements LinuxDevice {
     private static int nGetVersion(long fd) throws IOException {
         IntByReference version = new IntByReference();
         if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGVERSION, version.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to get device version (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get device version (%d)", Native.getLastError()));
         }
         return version.getValue();
     }
@@ -361,7 +361,7 @@ final class LinuxEventDevice implements LinuxDevice {
         if (LinuxIO.INSTANCE.read((int) fd, linux_event.getPointer(), new NativeLong(linux_event.size())).intValue() == -1) {
             if (Native.getLastError() == EAGAIN)
                 return false;
-            throw new IOException(String.format( "Failed to read next device event (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to read next device event (%d)", Native.getLastError()));
         }
         return true;
     }
@@ -374,7 +374,7 @@ final class LinuxEventDevice implements LinuxDevice {
     private static void nGetAbsInfo(long fd, int abs_axis, LinuxAbsInfo abs_info) throws IOException {
         int result = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGABS(abs_axis, abs_info.size()), abs_info.getPointer());
         if (result == -1) {
-            throw new IOException(String.format( "Failed to get abs info for axis (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get abs info for axis (%d)", Native.getLastError()));
         }
     }
 
@@ -459,7 +459,7 @@ final class LinuxEventDevice implements LinuxDevice {
         Memory bits = new Memory(len);
         int res = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGBIT(ev_type, len), bits);
         if (res == -1)
-            throw new IOException(String.format( "Failed to get device bits (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get device bits (%d)", Native.getLastError()));
         bits.read(0, evtype_bits, 0, len);
     }
 
@@ -472,7 +472,7 @@ final class LinuxEventDevice implements LinuxDevice {
         Memory bits = new Memory(len);
         int res = LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGKEY(len), bits);
         if (res == -1)
-            throw new IOException(String.format( "Failed to get device key states (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get device key states (%d)", Native.getLastError()));
         bits.read(0, states, 0, len);
     }
 
@@ -497,7 +497,7 @@ final class LinuxEventDevice implements LinuxDevice {
         Memory device_name = new Memory(BUFFER_SIZE);
 
         if (LinuxIO.INSTANCE.ioctl((int) fd, EVIOCGNAME(BUFFER_SIZE), device_name) == -1) {
-            throw new IOException(String.format( "Failed to get device name (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get device name (%d)", Native.getLastError()));
         }
         return device_name.getString(0, StandardCharsets.UTF_8.name());
     }
@@ -518,7 +518,7 @@ final class LinuxEventDevice implements LinuxDevice {
     private void nClose(long fd) throws IOException {
         int result = LinuxIO.INSTANCE.close((int) fd);
         if (result == -1)
-            throw new IOException(String.format( "Failed to close device (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to close device (%d)", Native.getLastError()));
     }
 
 

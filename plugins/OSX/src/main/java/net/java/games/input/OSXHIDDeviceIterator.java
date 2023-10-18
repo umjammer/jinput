@@ -144,8 +144,8 @@ if (ioReturnValue0 != kIOReturnSuccess) {
 }
 log.finer("Found device type: " + new String(className.array()).replace("\u0000", ""));
 
-log.finer("kIOHIDDeviceUserClientTypeID\n" + kIOHIDDeviceUserClientTypeID.dump(0, 32));
-log.finer("kIOCFPlugInInterfaceID\n" + kIOCFPlugInInterfaceID.dump(0, 32));
+log.finer("kIOHIDDeviceUserClientTypeID" + kIOHIDDeviceUserClientTypeID.dump(0, 32));
+log.finer("kIOCFPlugInInterfaceID" + kIOCFPlugInInterfaceID.dump(0, 32));
 
         int ioReturnValue = INSTANCE.IOCreatePlugInInterfaceForService(hidDevice,
                 kIOHIDDeviceUserClientTypeID,
@@ -161,7 +161,7 @@ log.finer("kIOCFPlugInInterfaceID\n" + kIOCFPlugInInterfaceID.dump(0, 32));
 log.finer(ppPlugInInterface.getValue().getPointer(0).dump(0, 64));
         IOCFPlugInInterface plugInInterface = new IOCFPlugInInterface(ppPlugInInterface.getValue().getPointer(0));
 log.finer(plugInInterface.toString());
-log.finer("CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID):\n" + CFLib.INSTANCE.CFUUIDGetUUIDBytes(IOKitLib.kIOHIDDeviceInterfaceID).getPointer().dump(0, 16));
+log.finer("CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID):" + CFLib.INSTANCE.CFUUIDGetUUIDBytes(IOKitLib.kIOHIDDeviceInterfaceID).getPointer().dump(0, 16));
         int plugInResult = plugInInterface.queryInterface.invoke(
                 ppPlugInInterface.getValue(),
                 CFLib.INSTANCE.CFUUIDGetUUIDBytes(IOKitLib.kIOHIDDeviceInterfaceID),

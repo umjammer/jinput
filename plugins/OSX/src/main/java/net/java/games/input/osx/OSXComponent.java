@@ -30,41 +30,44 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
+
+import java.io.IOException;
+
+import net.java.games.input.AbstractComponent;
 
 
 /**
- * HID Element types
+ * Represents an OSX Component
  *
  * @author elias
  * @version 1.0
  */
-final class ElementType {
+class OSXComponent extends AbstractComponent {
 
-    private final static ElementType[] map = new ElementType[514];
+    private final OSXHIDElement element;
 
-    public final static ElementType INPUT_MISC = new ElementType(1);
-    public final static ElementType INPUT_BUTTON = new ElementType(2);
-    public final static ElementType INPUT_AXIS = new ElementType(3);
-    public final static ElementType INPUT_SCANCODES = new ElementType(4);
-    public final static ElementType OUTPUT = new ElementType(129);
-    public final static ElementType FEATURE = new ElementType(257);
-    public final static ElementType COLLECTION = new ElementType(513);
-
-    private final int type_id;
-
-    public static ElementType map(int type_id) {
-        if (type_id < 0 || type_id >= map.length)
-            return null;
-        return map[type_id];
+    public OSXComponent(Identifier id, OSXHIDElement element) {
+        super(id.getName(), id);
+        this.element = element;
     }
 
-    private ElementType(int type_id) {
-        map[type_id] = this;
-        this.type_id = type_id;
+    @Override
+    public final boolean isRelative() {
+        return element.isRelative();
     }
 
-    public final String toString() {
-        return "ElementType (0x" + Integer.toHexString(type_id) + ")";
+    @Override
+    public boolean isAnalog() {
+        return element.isAnalog();
+    }
+
+    public final OSXHIDElement getElement() {
+        return element;
+    }
+
+    @Override
+    protected float poll() throws IOException {
+        return OSXControllers.poll(element);
     }
 }

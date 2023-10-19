@@ -99,20 +99,54 @@ public interface IOKitLib extends Library {
 
     String kIOHIDDeviceKey = "IOHIDDevice";
     String kIOServicePlane = "IOService";
-    String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
+    String kIOHIDReportDescriptorKey = "ReportDescriptor";
+
+    String kIOHIDTransportKey = "Transport";
     String kIOHIDVendorIDKey = "VendorID";
+    String kIOHIDVendorIDSourceKey = "VendorIDSource";
     String kIOHIDProductIDKey = "ProductID";
-    String kIOHIDMaxInputReportSizeKey = "MaxInputReportSize";
-    String kIOHIDSerialNumberKey = "SerialNumber";
+    String kIOHIDVersionNumberKey = "VersionNumber";
     String kIOHIDManufacturerKey = "Manufacturer";
     String kIOHIDProductKey = "Product";
-    String kIOHIDVersionNumberKey = "VersionNumber";
-    String kIOHIDTransportKey = "Transport";
-    String kIOHIDDeviceUsagePageKey = "DeviceUsagePage";
+    String kIOHIDSerialNumberKey = "SerialNumber";
+    String kIOHIDCountryCodeKey = "CountryCode";
+    String kIOHIDLocationIDKey = "LocationID";
     String kIOHIDDeviceUsageKey = "DeviceUsage";
-    String kIOHIDPrimaryUsagePageKey = "PrimaryUsagePage";
+    String kIOHIDDeviceUsagePageKey = "DeviceUsagePage";
+    String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
     String kIOHIDPrimaryUsageKey = "PrimaryUsage";
-    String kIOHIDReportDescriptorKey = "ReportDescriptor";
+    String kIOHIDPrimaryUsagePageKey = "PrimaryUsagePage";
+    String kIOHIDMaxInputReportSizeKey = "MaxInputReportSize";
+    String kIOHIDMaxOutputReportSizeKey = "MaxOutputReportSize";
+    String kIOHIDMaxFeatureReportSizeKey = "MaxFeatureReportSize";
+
+    String kIOHIDElementKey = "Elements";
+
+    String kIOHIDElementCookieKey = "ElementCookie";
+    String kIOHIDElementTypeKey = "Type";
+    String kIOHIDElementCollectionTypeKey = "CollectionType";
+    String kIOHIDElementUsageKey = "Usage";
+    String kIOHIDElementUsagePageKey = "UsagePage";
+    String kIOHIDElementMinKey = "Min";
+    String kIOHIDElementMaxKey = "Max";
+    String kIOHIDElementScaledMinKey = "ScaledMin";
+    String kIOHIDElementScaledMaxKey = "ScaledMax";
+    String kIOHIDElementSizeKey = "Size";
+    String kIOHIDElementReportSizeKey = "ReportSize";
+    String kIOHIDElementReportCountKey = "ReportCount";
+    String kIOHIDElementReportIDKey = "ReportID";
+    String kIOHIDElementIsArrayKey = "IsArray";
+    String kIOHIDElementIsRelativeKey = "IsRelative";
+    String kIOHIDElementIsWrappingKey = "IsWrapping";
+    String kIOHIDElementIsNonLinearKey = "IsNonLinear";
+    String kIOHIDElementHasPreferredStateKey = "HasPreferredState";
+    String kIOHIDElementHasNullStateKey = "HasNullState";
+    String kIOHIDElementUnitKey = "Unit";
+    String kIOHIDElementUnitExponentKey = "UnitExponent";
+    String kIOHIDElementNameKey = "Name";
+    String kIOHIDElementValueLocationKey = "ValueLocation";
+    String kIOHIDElementDuplicateIndexKey = "DuplicateIndex";
+    String kIOHIDElementParentCollectionKey = "ParentCollection";
 
     /** @see "https://opensource.apple.com/source/IOHIDFamily/IOHIDFamily-1035.1.4/IOHIDFamily/IOHIDKeys.h" */
     String kIOHIDTransportUSBValue = "USB";

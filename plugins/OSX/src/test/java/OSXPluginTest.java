@@ -7,7 +7,7 @@
 import java.util.Arrays;
 
 import net.java.games.input.ControllerEnvironment;
-import net.java.games.input.OSXEnvironmentPlugin;
+import net.java.games.input.osx.OSXEnvironmentPlugin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;

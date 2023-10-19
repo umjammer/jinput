@@ -30,41 +30,41 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
+
 
 /**
- * OSX Event structure corresponding to IOHIDEventStruct
+ * HID Element types
  *
  * @author elias
  * @version 1.0
  */
-class OSXEvent {
+final class ElementType {
 
-    private long type;
-    private long cookie;
-    private int value;
-    private long nanos;
+    private final static ElementType[] map = new ElementType[514];
 
-    public void set(long type, long cookie, int value, long nanos) {
-        this.type = type;
-        this.cookie = cookie;
-        this.value = value;
-        this.nanos = nanos;
+    public final static ElementType INPUT_MISC = new ElementType(1);
+    public final static ElementType INPUT_BUTTON = new ElementType(2);
+    public final static ElementType INPUT_AXIS = new ElementType(3);
+    public final static ElementType INPUT_SCANCODES = new ElementType(4);
+    public final static ElementType OUTPUT = new ElementType(129);
+    public final static ElementType FEATURE = new ElementType(257);
+    public final static ElementType COLLECTION = new ElementType(513);
+
+    private final int type_id;
+
+    public static ElementType map(int type_id) {
+        if (type_id < 0 || type_id >= map.length)
+            return null;
+        return map[type_id];
     }
 
-    public long getType() {
-        return type;
+    private ElementType(int type_id) {
+        map[type_id] = this;
+        this.type_id = type_id;
     }
 
-    public long getCookie() {
-        return cookie;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public long getNanos() {
-        return nanos;
+    public final String toString() {
+        return "ElementType (0x" + Integer.toHexString(type_id) + ")";
     }
 }

@@ -30,44 +30,53 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
+
+import java.io.IOException;
+
+import net.java.games.input.AbstractController;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.Event;
+import net.java.games.input.Rumbler;
 
 
 /**
- * Usage/Page pair
+ * Represents an OSX AbstractController
  *
  * @author elias
  * @version 1.0
  */
-class UsagePair {
+final class OSXAbstractController extends AbstractController {
 
-    private final UsagePage usage_page;
-    private final Usage usage;
+    private final PortType port;
+    private final OSXHIDQueue queue;
+    private final Type type;
 
-    public UsagePair(UsagePage usage_page, Usage usage) {
-        this.usage_page = usage_page;
-        this.usage = usage;
+    OSXAbstractController(OSXHIDDevice device, OSXHIDQueue queue, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) {
+        super(device.getProductName(), components, children, rumblers);
+        this.queue = queue;
+        this.type = type;
+        this.port = device.getPortType();
     }
 
-    public final UsagePage getUsagePage() {
-        return usage_page;
+    @Override
+    protected final boolean getNextDeviceEvent(Event event) throws IOException {
+        return OSXControllers.getNextDeviceEvent(event, queue);
     }
 
-    public final Usage getUsage() {
-        return usage;
+    @Override
+    protected final void setDeviceEventQueueSize(int size) throws IOException {
+        queue.setQueueDepth(size);
     }
 
-    public final int hashCode() {
-        return usage.hashCode() ^ usage_page.hashCode();
+    @Override
+    public Type getType() {
+        return type;
     }
 
-    public final boolean equals(Object other) {
-        if (!(other instanceof UsagePair other_pair))
-            return false;
-        return other_pair.usage.equals(usage) && other_pair.usage_page.equals(usage_page);
-    }
-
-    public final String toString() {
-        return "UsagePair: (page = " + usage_page + ", usage = " + usage + ")";
+    @Override
+    public final PortType getPortType() {
+        return port;
     }
 }

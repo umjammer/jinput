@@ -37,7 +37,7 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

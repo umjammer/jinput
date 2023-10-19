@@ -1,10 +1,5 @@
 /*
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- *
- * ---
- *
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -35,33 +30,41 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.input;
-
-import java.io.IOException;
-
+package net.java.games.input.osx;
 
 /**
- * helper methods for OSX specific Controllers
+ * OSX Event structure corresponding to IOHIDEventStruct
  *
  * @author elias
  * @version 1.0
  */
-final class OSXControllers {
+class OSXEvent {
 
-    private final static OSXEvent osx_event = new OSXEvent();
+    private long type;
+    private long cookie;
+    private int value;
+    private long nanos;
 
-    public static synchronized float poll(OSXHIDElement element) throws IOException {
-        element.getElementValue(osx_event);
-        return element.convertValue(osx_event.getValue());
+    public void set(long type, long cookie, int value, long nanos) {
+        this.type = type;
+        this.cookie = cookie;
+        this.value = value;
+        this.nanos = nanos;
     }
 
-    /* synchronized to protect osx_event */
-    public static synchronized boolean getNextDeviceEvent(Event event, OSXHIDQueue queue) throws IOException {
-        if (queue.getNextEvent(osx_event)) {
-            OSXComponent component = queue.mapEvent(osx_event);
-            event.set(component, component.getElement().convertValue(osx_event.getValue()), osx_event.getNanos());
-            return true;
-        } else
-            return false;
+    public long getType() {
+        return type;
+    }
+
+    public long getCookie() {
+        return cookie;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public long getNanos() {
+        return nanos;
     }
 }

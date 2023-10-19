@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.awt;
+package net.java.games.input.awt;
 
 import java.awt.event.KeyEvent;
 

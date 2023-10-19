@@ -31,7 +31,7 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.lang.reflect.Method;
 

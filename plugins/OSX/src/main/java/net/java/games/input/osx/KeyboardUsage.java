@@ -31,7 +31,10 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
+
+import net.java.games.input.Component;
+
 
 /**
  * Mapping from Keyboard HID usages to Component.Identifier.Key

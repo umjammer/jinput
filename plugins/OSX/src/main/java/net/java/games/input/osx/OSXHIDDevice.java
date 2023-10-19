@@ -31,7 +31,7 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,16 +41,29 @@ import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import net.java.games.input.Controller;
 import vavix.rococoa.corefoundation.CFAllocator;
 import vavix.rococoa.corefoundation.CFDictionary;
 import vavix.rococoa.iokit.IOKitLib;
 import vavix.rococoa.iokit.IOKitLib.IOHIDDeviceInterface;
 import vavix.rococoa.kernel.KernelLib;
 
-import static net.java.games.input.NativeUtil.copyEvent;
-import static net.java.games.input.NativeUtil.createMapFromCFDictionary;
+import static net.java.games.input.osx.NativeUtil.copyEvent;
+import static net.java.games.input.osx.NativeUtil.createMapFromCFDictionary;
 import static vavix.rococoa.iokit.IOKitLib.INSTANCE;
 import static vavix.rococoa.iokit.IOKitLib.IOHIDEventStruct;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementCookieKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementIsRelativeKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementMaxKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementMinKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementTypeKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementUsageKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementUsagePageKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsageKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsagePageKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDTransportKey;
 
 
 /**
@@ -67,53 +80,6 @@ final class OSXHIDDevice {
     private final static int AXIS_DEFAULT_MIN_VALUE = 0;
     private final static int AXIS_DEFAULT_MAX_VALUE = 64 * 1024;
 
-    private final static String kIOHIDTransportKey = "Transport";
-    private final static String kIOHIDVendorIDKey = "VendorID";
-    private final static String kIOHIDVendorIDSourceKey = "VendorIDSource";
-    private final static String kIOHIDProductIDKey = "ProductID";
-    private final static String kIOHIDVersionNumberKey = "VersionNumber";
-    private final static String kIOHIDManufacturerKey = "Manufacturer";
-    private final static String kIOHIDProductKey = "Product";
-    private final static String kIOHIDSerialNumberKey = "SerialNumber";
-    private final static String kIOHIDCountryCodeKey = "CountryCode";
-    private final static String kIOHIDLocationIDKey = "LocationID";
-    private final static String kIOHIDDeviceUsageKey = "DeviceUsage";
-    private final static String kIOHIDDeviceUsagePageKey = "DeviceUsagePage";
-    private final static String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
-    private final static String kIOHIDPrimaryUsageKey = "PrimaryUsage";
-    private final static String kIOHIDPrimaryUsagePageKey = "PrimaryUsagePage";
-    private final static String kIOHIDMaxInputReportSizeKey = "MaxInputReportSize";
-    private final static String kIOHIDMaxOutputReportSizeKey = "MaxOutputReportSize";
-    private final static String kIOHIDMaxFeatureReportSizeKey = "MaxFeatureReportSize";
-
-    private final static String kIOHIDElementKey = "Elements";
-
-    private final static String kIOHIDElementCookieKey = "ElementCookie";
-    private final static String kIOHIDElementTypeKey = "Type";
-    private final static String kIOHIDElementCollectionTypeKey = "CollectionType";
-    private final static String kIOHIDElementUsageKey = "Usage";
-    private final static String kIOHIDElementUsagePageKey = "UsagePage";
-    private final static String kIOHIDElementMinKey = "Min";
-    private final static String kIOHIDElementMaxKey = "Max";
-    private final static String kIOHIDElementScaledMinKey = "ScaledMin";
-    private final static String kIOHIDElementScaledMaxKey = "ScaledMax";
-    private final static String kIOHIDElementSizeKey = "Size";
-    private final static String kIOHIDElementReportSizeKey = "ReportSize";
-    private final static String kIOHIDElementReportCountKey = "ReportCount";
-    private final static String kIOHIDElementReportIDKey = "ReportID";
-    private final static String kIOHIDElementIsArrayKey = "IsArray";
-    private final static String kIOHIDElementIsRelativeKey = "IsRelative";
-    private final static String kIOHIDElementIsWrappingKey = "IsWrapping";
-    private final static String kIOHIDElementIsNonLinearKey = "IsNonLinear";
-    private final static String kIOHIDElementHasPreferredStateKey = "HasPreferredState";
-    private final static String kIOHIDElementHasNullStateKey = "HasNullState";
-    private final static String kIOHIDElementUnitKey = "Unit";
-    private final static String kIOHIDElementUnitExponentKey = "UnitExponent";
-    private final static String kIOHIDElementNameKey = "Name";
-    private final static String kIOHIDElementValueLocationKey = "ValueLocation";
-    private final static String kIOHIDElementDuplicateIndexKey = "DuplicateIndex";
-    private final static String kIOHIDElementParentCollectionKey = "ParentCollection";
-
     private final Pointer device_address;
     private final Pointer/*IOHIDDeviceInterface**/ device_interface_address;
     private final IOHIDDeviceInterface device_interface;
@@ -129,7 +95,7 @@ final class OSXHIDDevice {
         open();
     }
 
-    public final Controller.PortType getPortType() {
+    public Controller.PortType getPortType() {
         String transport = (String) properties.get(kIOHIDTransportKey);
         if (transport == null)
             return Controller.PortType.UNKNOWN;
@@ -140,7 +106,7 @@ final class OSXHIDDevice {
         }
     }
 
-    public final String getProductName() {
+    public String getProductName() {
         return (String) properties.get(kIOHIDProductKey);
     }
 
@@ -196,7 +162,7 @@ final class OSXHIDDevice {
         }
     }
 
-    public final List<OSXHIDElement> getElements() {
+    public List<OSXHIDElement> getElements() {
         List<OSXHIDElement> elements = new ArrayList<>();
         addElements(elements, properties);
         return elements;

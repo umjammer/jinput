@@ -31,7 +31,7 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ import vavix.rococoa.iokit.IOKitLib;
 import vavix.rococoa.iokit.IOKitLib.IOHIDEventStruct;
 import vavix.rococoa.iokit.IOKitLib.IOHIDQueueInterface;
 
-import static net.java.games.input.NativeUtil.copyEvent;
+import static net.java.games.input.osx.NativeUtil.copyEvent;
 import static vavix.rococoa.iokit.IOKitLib.kIOReturnSuccess;
 import static vavix.rococoa.iokit.IOKitLib.log;
 

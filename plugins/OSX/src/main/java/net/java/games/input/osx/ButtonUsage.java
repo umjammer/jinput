@@ -31,10 +31,12 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import net.java.games.input.Component;
 
 
 /**

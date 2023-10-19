@@ -31,7 +31,7 @@
  *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +39,14 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.java.games.input.AbstractController;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Keyboard;
+import net.java.games.input.Mouse;
+import net.java.games.input.Rumbler;
 
 
 /**

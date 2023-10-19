@@ -30,42 +30,44 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.input;
-
-import java.io.IOException;
+package net.java.games.input.osx;
 
 
 /**
- * Represents an OSX Component
+ * Usage/Page pair
  *
  * @author elias
  * @version 1.0
  */
-class OSXComponent extends AbstractComponent {
+class UsagePair {
 
-    private final OSXHIDElement element;
+    private final UsagePage usage_page;
+    private final Usage usage;
 
-    public OSXComponent(Component.Identifier id, OSXHIDElement element) {
-        super(id.getName(), id);
-        this.element = element;
+    public UsagePair(UsagePage usage_page, Usage usage) {
+        this.usage_page = usage_page;
+        this.usage = usage;
     }
 
-    @Override
-    public final boolean isRelative() {
-        return element.isRelative();
+    public final UsagePage getUsagePage() {
+        return usage_page;
     }
 
-    @Override
-    public boolean isAnalog() {
-        return element.isAnalog();
+    public final Usage getUsage() {
+        return usage;
     }
 
-    public final OSXHIDElement getElement() {
-        return element;
+    public final int hashCode() {
+        return usage.hashCode() ^ usage_page.hashCode();
     }
 
-    @Override
-    protected float poll() throws IOException {
-        return OSXControllers.poll(element);
+    public final boolean equals(Object other) {
+        if (!(other instanceof UsagePair other_pair))
+            return false;
+        return other_pair.usage.equals(usage) && other_pair.usage_page.equals(usage_page);
+    }
+
+    public final String toString() {
+        return "UsagePair: (page = " + usage_page + ", usage = " + usage + ")";
     }
 }

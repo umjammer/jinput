@@ -1,4 +1,9 @@
 /*
+ * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
+ * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ *
+ * ---
+ *
  * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,17 +33,37 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
+
+import java.io.IOException;
+
+import net.java.games.input.Event;
+
 
 /**
- * Generic Desktop Usages
+ * helper methods for OSX specific Controllers
  *
  * @author elias
  * @version 1.0
  */
-public interface Usage {
+final class OSXControllers {
 
+    private final static OSXEvent osx_event = new OSXEvent();
+
+    public static synchronized float poll(OSXHIDElement element) throws IOException {
+        element.getElementValue(osx_event);
+        return element.convertValue(osx_event.getValue());
+    }
+
+    /* synchronized to protect osx_event */
+    public static synchronized boolean getNextDeviceEvent(Event event, OSXHIDQueue queue) throws IOException {
+        if (queue.getNextEvent(osx_event)) {
+            OSXComponent component = queue.mapEvent(osx_event);
+            event.set(component, component.getElement().convertValue(osx_event.getValue()), osx_event.getNanos());
+            return true;
+        } else
+            return false;
+    }
 }

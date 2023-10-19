@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.awt;
+package net.java.games.input.awt;
 
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;

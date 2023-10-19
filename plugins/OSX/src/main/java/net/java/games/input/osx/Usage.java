@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,49 +28,17 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
+ *
  */
 
-package net.java.games.input;
-
-import java.io.IOException;
-
+package net.java.games.input.osx;
 
 /**
- * Represents an OSX AbstractController
+ * Generic Desktop Usages
  *
  * @author elias
  * @version 1.0
  */
-final class OSXAbstractController extends AbstractController {
+public interface Usage {
 
-    private final PortType port;
-    private final OSXHIDQueue queue;
-    private final Type type;
-
-    OSXAbstractController(OSXHIDDevice device, OSXHIDQueue queue, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) {
-        super(device.getProductName(), components, children, rumblers);
-        this.queue = queue;
-        this.type = type;
-        this.port = device.getPortType();
-    }
-
-    @Override
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return OSXControllers.getNextDeviceEvent(event, queue);
-    }
-
-    @Override
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
-        queue.setQueueDepth(size);
-    }
-
-    @Override
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public final PortType getPortType() {
-        return port;
-    }
 }

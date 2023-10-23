@@ -47,26 +47,31 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class OSXAbstractController extends AbstractController {
+final class OSXController extends AbstractController {
 
-    private final PortType port;
     private final OSXHIDQueue queue;
     private final Type type;
+    private final OSXHIDDevice device;
 
-    OSXAbstractController(OSXHIDDevice device, OSXHIDQueue queue, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) {
+    OSXController(OSXHIDDevice device, OSXHIDQueue queue, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) {
         super(device.getProductName(), components, children, rumblers);
         this.queue = queue;
         this.type = type;
-        this.port = device.getPortType();
+        this.device = device;
     }
 
     @Override
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return OSXControllers.getNextDeviceEvent(event, queue);
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+        if (queue.getNextEvent(device.osxEvent)) {
+            OSXComponent component = queue.mapEvent(device.osxEvent);
+            event.set(component, component.getElement().convertValue(), device.osxEvent.getNanos());
+            return true;
+        } else
+            return false;
     }
 
     @Override
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         queue.setQueueDepth(size);
     }
 
@@ -76,7 +81,7 @@ final class OSXAbstractController extends AbstractController {
     }
 
     @Override
-    public final PortType getPortType() {
-        return port;
+    public PortType getPortType() {
+        return device.getPortType();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,17 +28,37 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
  */
 
-package net.java.games.input.osx;
+package net.java.games.input.usb;
+
+
+import java.util.Arrays;
+
 
 /**
- * Generic Desktop Usages
+ * HID Element types
  *
  * @author elias
  * @version 1.0
  */
-public interface Usage {
+public enum ElementType {
 
+    INPUT_MISC(1),
+    INPUT_BUTTON(2),
+    INPUT_AXIS(3),
+    INPUT_SCANCODES(4),
+    OUTPUT(129),
+    FEATURE(257),
+    COLLECTION(513);
+
+    private final int typeId;
+
+    public static ElementType map(int typeId) {
+        return Arrays.stream(values()).filter(e -> e.typeId == typeId).findFirst().orElse(null);
+    }
+
+    ElementType(int typeId) {
+        this.typeId = typeId;
+    }
 }

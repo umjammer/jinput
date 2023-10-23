@@ -50,9 +50,9 @@ public abstract class AbstractComponent implements Component {
 
     private final Identifier id;
 
-    private boolean has_polled;
+    private boolean hasPolled;
     private float value;
-    private float event_value;
+    private float eventValue;
 
     /**
      * Protected constructor
@@ -105,8 +105,8 @@ public abstract class AbstractComponent implements Component {
      */
     @Override
     public final float getPollData() {
-        if (!has_polled && !isRelative()) {
-            has_polled = true;
+        if (!hasPolled && !isRelative()) {
+            hasPolled = true;
             try {
                 setPollData(poll());
             } catch (IOException e) {
@@ -117,7 +117,7 @@ public abstract class AbstractComponent implements Component {
     }
 
     protected final void resetHasPolled() {
-        has_polled = false;
+        hasPolled = false;
     }
 
     final void setPollData(float value) {
@@ -125,11 +125,11 @@ public abstract class AbstractComponent implements Component {
     }
 
     final float getEventValue() {
-        return event_value;
+        return eventValue;
     }
 
-    final void setEventValue(float event_value) {
-        this.event_value = event_value;
+    final void setEventValue(float eventValue) {
+        this.eventValue = eventValue;
     }
 
     /**

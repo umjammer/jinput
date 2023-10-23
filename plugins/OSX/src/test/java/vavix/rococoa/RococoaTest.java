@@ -4,6 +4,8 @@
  * Programmed by Naohide Sano
  */
 
+package vavix.rococoa;
+
 import com.sun.jna.ptr.IntByReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -27,7 +29,7 @@ public class RococoaTest {
 
     @Test
     void test1() {
-        Debug.println(CFLib.kCFRunLoopDefaultMode.getString());
+Debug.println(CFLib.kCFRunLoopDefaultMode.getString());
         assertEquals("kCFRunLoopDefaultMode", CFLib.kCFRunLoopDefaultMode.getString());
     }
 
@@ -36,7 +38,7 @@ public class RococoaTest {
         IntByReference ip = new IntByReference(127);
         CFNumber cfn = CFLib.INSTANCE.CFNumberCreate(CFAllocator.kCFAllocatorDefault, CFLib.CFNumberType.kCFNumberIntType, ip);
 
-        Debug.println(cfn);
+Debug.println(cfn);
         assertEquals(127, cfn.getInt());
     }
 }

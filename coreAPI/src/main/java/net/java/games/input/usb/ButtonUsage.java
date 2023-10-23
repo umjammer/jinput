@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,43 +28,49 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
+ *
  */
 
-package net.java.games.input.osx;
+package net.java.games.input.usb;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import net.java.games.input.Component;
 
 
 /**
- * HID Element types
+ * Button Usages
  *
  * @author elias
  * @version 1.0
  */
-final class ElementType {
+public final class ButtonUsage implements Usage {
 
-    private final static ElementType[] map = new ElementType[514];
+    private final static Map<Integer, ButtonUsage> map = new HashMap<>();
 
-    public final static ElementType INPUT_MISC = new ElementType(1);
-    public final static ElementType INPUT_BUTTON = new ElementType(2);
-    public final static ElementType INPUT_AXIS = new ElementType(3);
-    public final static ElementType INPUT_SCANCODES = new ElementType(4);
-    public final static ElementType OUTPUT = new ElementType(129);
-    public final static ElementType FEATURE = new ElementType(257);
-    public final static ElementType COLLECTION = new ElementType(513);
+    private final int buttonId;
 
-    private final int type_id;
-
-    public static ElementType map(int type_id) {
-        if (type_id < 0 || type_id >= map.length)
-            return null;
-        return map[type_id];
+    public static ButtonUsage map(int buttonId) {
+        ButtonUsage existing = map.get(buttonId);
+        if (existing != null)
+            return existing;
+        ButtonUsage newButton = new ButtonUsage(buttonId);
+        map.put(buttonId, newButton);
+        return newButton;
     }
 
-    private ElementType(int type_id) {
-        map[type_id] = this;
-        this.type_id = type_id;
+    private ButtonUsage(int buttonId) {
+        this.buttonId = buttonId;
     }
 
-    public final String toString() {
-        return "ElementType (0x" + Integer.toHexString(type_id) + ")";
+    @Override
+    public Component.Identifier.Button getIdentifier() {
+        return Arrays.stream(Component.Identifier.Button.values()).filter(e -> e.getName().equals(String.valueOf(buttonId - 1))).findFirst().orElse(null);
+    }
+
+    public String toString() {
+        return "ButtonUsage(" + buttonId + ")";
     }
 }

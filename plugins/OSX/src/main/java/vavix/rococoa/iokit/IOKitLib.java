@@ -559,7 +559,7 @@ public interface IOKitLib extends Library {
 
         public interface OpenCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOOptionBits*/flags);
+            int invoke(Pointer self, int /* IOOptionBits */ flags);
         }
 
         public interface CloseCallback extends Callback {
@@ -574,17 +574,17 @@ public interface IOKitLib extends Library {
 
         public interface GetElementValueCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /*IOHIDElementCookie*/ elementCookie, IOHIDEventStruct.ByReference valueEvent);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, IOHIDEventStruct.ByReference valueEvent);
         }
 
         public interface SetElementValueCallback extends Callback {
 
-            int invoke(Pointer self, int/*IOHIDElementCookie*/ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         public interface QueryElementValueCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDElementCookie*/ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         public interface StartAllQueuesCallback extends Callback {
@@ -604,32 +604,32 @@ public interface IOKitLib extends Library {
 
         public interface AllocOutputTransactionCallback extends Callback {
 
-            PointerByReference/*IOHIDOutputTransactionInterface.ByReference*/ invoke(Pointer self);
+            PointerByReference /* IOHIDOutputTransactionInterface.ByReference */ invoke(Pointer self);
         }
 
         // since 1.2.1
 
         public interface SetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDReportType*/ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         public interface GetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDReportType*/ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /*IOHIDReportType */ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         // since 1.2.2
 
         public interface CopyMatchingElementsCallback extends Callback {
 
-            int invoke(Pointer self, CFDictionary matchingDict, PointerByReference/*CFArrayRef*/ pElements, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, CFDictionary matchingDict, PointerByReference /* CFArrayRef */ pElements, int /* IOOptionBits */ options);
         }
 
         public interface SetInputReportCallbackCallback extends Callback {
 
             int invoke(Pointer self, Pointer report, CFIndex reportLength,
-                       IOHIDReportCallback callback, Pointer context, int /*IOOptionBits*/ options);
+                       IOHIDReportCallback callback, Pointer context, int /* IOOptionBits */ options);
         }
 
         // IUNKNOWN_C_GUTS
@@ -696,11 +696,9 @@ log.finer("IOHIDDeviceInterface:\n" + this);
         }
 
         public static class ByReference extends IOHIDDeviceInterface implements Structure.ByReference {
-
         }
 
         public static class ByValue extends IOHIDDeviceInterface implements Structure.ByValue {
-
         }
 
         @Override
@@ -723,22 +721,22 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface CreateAsyncEventSourceCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*CFRunLoopSourceRef*/ source);
+            int invoke(Pointer self, Pointer /* CFRunLoopSourceRef */ source);
         }
 
         public interface GetAsyncEventSourceCallback extends Callback {
 
-            int invoke(Pointer self, PointerByReference/*CFTypeRef */ pSource);
+            int invoke(Pointer self, PointerByReference /* CFTypeRef */ pSource);
         }
 
         public interface CreateAsyncPortCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*mach_port_t*/port);
+            int invoke(Pointer self, Pointer /* mach_port_t */ port);
         }
 
         public interface GetAsyncPortCallback extends Callback {
 
-            Pointer/*mach_port_t*/ invoke(Pointer self);
+            Pointer /* mach_port_t */ invoke(Pointer self);
         }
 
         public interface CreateCallback extends Callback {
@@ -753,17 +751,17 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface AddElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDElementCookie*/ elementCookie, int/*IOOptionBits*/ flags);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, int /* IOOptionBits */ flags);
         }
 
         public interface RemoveElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /*IOHIDElementCookie*/ elementCookie, int /*IOOptionBits*/ flags);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, int /* IOOptionBits */ flags);
         }
 
         public interface HasElementCallback extends Callback {
 
-            boolean invoke(Pointer self, int/*IOHIDElementCookie*/ elementCookie);
+            boolean invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie);
         }
 
         public interface StartCallback extends Callback {
@@ -778,7 +776,7 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface GetNextEventCallback extends Callback {
 
-            int invoke(Pointer self, IOHIDEventStruct.ByReference event, long/*AbsoluteTime*/ maxTime, int timeoutMS);
+            int invoke(Pointer self, IOHIDEventStruct.ByReference event, long /* AbsoluteTime */ maxTime, int timeoutMS);
         }
 
         public interface SetEventCalloutCallback extends Callback {
@@ -788,7 +786,7 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface GetEventCalloutCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDCallbackFunction*/ outCallback, PointerByReference outCallbackTarget, PointerByReference outCallbackRefcon);
+            int invoke(Pointer self, Pointer/* IOHIDCallbackFunction */ outCallback, PointerByReference outCallbackTarget, PointerByReference outCallbackRefcon);
         }
 
         // IUNKNOWN_C_GUTS

@@ -58,8 +58,8 @@ public abstract class Keyboard extends AbstractController {
         return Type.KEYBOARD;
     }
 
-    public final boolean isKeyDown(Component.Identifier.Key key_id) {
-        Component key = getComponent(key_id);
+    public final boolean isKeyDown(Component.Identifier.Key keyId) {
+        Component key = getComponent(keyId);
         if (key == null)
             return false;
         return key.getPollData() != 0;

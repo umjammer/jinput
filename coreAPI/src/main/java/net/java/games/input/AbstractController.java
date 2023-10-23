@@ -74,9 +74,9 @@ public abstract class AbstractController implements Controller {
     /**
      * Map from Component.Identifiers to Components
      */
-    private final Map<Component.Identifier, Component> id_to_components = new HashMap<>();
+    private final Map<Component.Identifier, Component> idToComponents = new HashMap<>();
 
-    private EventQueue event_queue = new EventQueue(EVENT_QUEUE_DEPTH);
+    private EventQueue eventQueue = new EventQueue(EVENT_QUEUE_DEPTH);
 
     /**
      * Protected constructor for a controller containing the specified
@@ -94,7 +94,7 @@ public abstract class AbstractController implements Controller {
         this.rumblers = rumblers;
         // process from last to first to let earlier listed Components get higher priority
         for (int i = components.length - 1; i >= 0; i--) {
-            id_to_components.put(components[i].getIdentifier(), components[i]);
+            idToComponents.put(components[i].getIdentifier(), components[i]);
         }
     }
 
@@ -129,7 +129,7 @@ public abstract class AbstractController implements Controller {
      */
     @Override
     public final Component getComponent(Component.Identifier id) {
-        return id_to_components.get(id);
+        return idToComponents.get(id);
     }
 
     /**
@@ -191,7 +191,7 @@ public abstract class AbstractController implements Controller {
     public final void setEventQueueSize(int size) {
         try {
             setDeviceEventQueueSize(size);
-            event_queue = new EventQueue(size);
+            eventQueue = new EventQueue(size);
         } catch (IOException e) {
             log.fine("Failed to create new event queue of size " + size + ": " + e);
         }
@@ -205,7 +205,7 @@ public abstract class AbstractController implements Controller {
 
     @Override
     public final EventQueue getEventQueue() {
-        return event_queue;
+        return eventQueue;
     }
 
     protected abstract boolean getNextDeviceEvent(Event event) throws IOException;
@@ -241,8 +241,8 @@ public abstract class AbstractController implements Controller {
                         continue;
                     component.setEventValue(value);
                 }
-                if (!event_queue.isFull())
-                    event_queue.add(event);
+                if (!eventQueue.isFull())
+                    eventQueue.add(event);
             }
             return true;
         } catch (IOException e) {

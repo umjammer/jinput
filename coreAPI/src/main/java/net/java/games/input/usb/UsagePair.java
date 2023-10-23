@@ -1,10 +1,5 @@
 /*
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- *
- * ---
- *
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -35,35 +30,24 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.input.osx;
-
-import java.io.IOException;
-
-import net.java.games.input.Event;
+package net.java.games.input.usb;
 
 
 /**
- * helper methods for OSX specific Controllers
+ * Usage/Page pair
  *
  * @author elias
  * @version 1.0
  */
-final class OSXControllers {
+public record UsagePair(UsagePage usagePage, Usage usage) {
 
-    private final static OSXEvent osx_event = new OSXEvent();
-
-    public static synchronized float poll(OSXHIDElement element) throws IOException {
-        element.getElementValue(osx_event);
-        return element.convertValue(osx_event.getValue());
+    public int hashCode() {
+        return usage.hashCode() ^ usagePage.hashCode();
     }
 
-    /* synchronized to protect osx_event */
-    public static synchronized boolean getNextDeviceEvent(Event event, OSXHIDQueue queue) throws IOException {
-        if (queue.getNextEvent(osx_event)) {
-            OSXComponent component = queue.mapEvent(osx_event);
-            event.set(component, component.getElement().convertValue(osx_event.getValue()), osx_event.getNanos());
-            return true;
-        } else
+    public boolean equals(Object other) {
+        if (!(other instanceof UsagePair otherPair))
             return false;
+        return otherPair.usage.equals(usage) && otherPair.usagePage.equals(usagePage);
     }
 }

@@ -71,7 +71,7 @@ final class OSXHIDDeviceIterator {
 
     private static final Logger log = Logger.getLogger(OSXHIDDeviceIterator.class.getName());
 
-    private final Pointer iterator_address;
+    private final Pointer iteratorAddress;
 
     public OSXHIDDeviceIterator() throws IOException {
         PointerByReference /* io_iterator_t */ hidObjectIterator = new PointerByReference();
@@ -92,17 +92,17 @@ final class OSXHIDDeviceIterator {
         }
 
 log.finer("iterator: " + hidObjectIterator.getValue());
-        this.iterator_address = hidObjectIterator.getValue();
+        this.iteratorAddress = hidObjectIterator.getValue();
     }
 
     public void close() {
-        INSTANCE.IOObjectRelease(iterator_address);
+        INSTANCE.IOObjectRelease(iteratorAddress);
     }
 
     public OSXHIDDevice next() throws IOException {
         Pointer /* io_object_t */ hidDevice;
 
-        hidDevice = INSTANCE.IOIteratorNext(iterator_address);
+        hidDevice = INSTANCE.IOIteratorNext(iteratorAddress);
         if (hidDevice == null)
             return null;
 
@@ -114,22 +114,22 @@ if (result != IOKitLib.KERN_SUCCESS) {
 }
 log.finer("IORegistryEntryGetPath: " + new String(path.array()).replace("\u0000", ""));
 
-        Pointer /* HidDeviceInterface** */ device_interface = createHIDDevice(hidDevice);
-log.finer("device_interface: " + device_interface.toString());
-        if (device_interface == MACH_PORT_NULL) {
+        Pointer /* HidDeviceInterface** */ deviceInterface = createHIDDevice(hidDevice);
+log.finer("deviceInterface: " + deviceInterface.toString());
+        if (deviceInterface == MACH_PORT_NULL) {
             INSTANCE.IOObjectRelease(hidDevice);
-log.fine("device_interface is MACH_PORT_NULL");
+log.fine("deviceInterface is MACH_PORT_NULL");
             return null;
         }
 
-        OSXHIDDevice device_object = new OSXHIDDevice(hidDevice, device_interface);
-//		if (device_object == null) {
-//			device_interface.Release();
+        OSXHIDDevice deviceObject = new OSXHIDDevice(hidDevice, deviceInterface);
+//		if (deviceObject == null) {
+//			deviceInterface.Release();
 //			library.IOObjectRelease(hidDevice);
 //			return null;
 //		}
 
-        return device_object;
+        return deviceObject;
     }
 
     private static Pointer /* HidDeviceInterface** */ createHIDDevice(Pointer /* io_object_t */ hidDevice) throws IOException {
@@ -137,7 +137,7 @@ log.fine("device_interface is MACH_PORT_NULL");
         IntByReference score = new IntByReference();
         PointerByReference /* IOCFPlugInInterface** */ ppPlugInInterface = new PointerByReference();
 
-ByteBuffer /*io_name_t*/ className = ByteBuffer.allocate(512);
+ByteBuffer /* io_name_t */ className = ByteBuffer.allocate(512);
 int ioReturnValue0 = INSTANCE.IOObjectGetClass(hidDevice, className);
 if (ioReturnValue0 != kIOReturnSuccess) {
  log.fine("Failed to get IOObject class name.");

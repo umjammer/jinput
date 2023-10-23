@@ -32,10 +32,6 @@
 
 package net.java.games.input;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-
-
 /**
  * An axis is a single button, slider, or dial, which has a single range.  An
  * axis can hold information for motion (linear or rotational), velocity,
@@ -94,14 +90,6 @@ public interface Component {
          * Returns a non-localized string description of this axis type.
          */
         String getName();
-
-        /** @return nullable */
-        static Identifier _byName(Identifier[] values, String name) {
-            return Arrays.stream(values)
-                    .filter(e -> e.getName().equals(name))
-                    .findFirst()
-                    .orElse(null);
-        }
 
         enum Axis implements Identifier {
 
@@ -270,10 +258,6 @@ public interface Component {
              */
             Axis(String name) {
                 this.name = name;
-            }
-
-            static Identifier byName(String name) {
-                return _byName(values(), name);
             }
         }
 
@@ -641,10 +625,6 @@ public interface Component {
             Button(String name) {
                 this.name = name;
             }
-
-            static Identifier byName(String name) {
-                return _byName(values(), name);
-            }
         }
 
         /**
@@ -917,14 +897,6 @@ public interface Component {
              */
             Key(String name) {
                 this.name = name;
-            }
-
-            static Identifier byName(String name) {
-                try {
-                    return _byName(values(), name);
-                } catch (NoSuchElementException e) {
-                    return UNKNOWN;
-                }
             }
         }
     }

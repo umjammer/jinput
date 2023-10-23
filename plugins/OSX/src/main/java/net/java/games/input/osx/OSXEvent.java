@@ -32,6 +32,10 @@
 
 package net.java.games.input.osx;
 
+
+import vavix.rococoa.iokit.IOKitLib;
+
+
 /**
  * OSX Event structure corresponding to IOHIDEventStruct
  *
@@ -41,22 +45,23 @@ package net.java.games.input.osx;
 class OSXEvent {
 
     private long type;
-    private long cookie;
+    private int /* IOHIDElementCookie */ cookie;
     private int value;
     private long nanos;
 
-    public void set(long type, long cookie, int value, long nanos) {
-        this.type = type;
-        this.cookie = cookie;
-        this.value = value;
-        this.nanos = nanos;
+    void set(IOKitLib.IOHIDEventStruct.ByReference nativeEvent) {
+        this.type = nativeEvent.type;
+        this.cookie = nativeEvent.elementCookie;
+        this.value = nativeEvent.value;
+        this.nanos = System.nanoTime();
     }
 
     public long getType() {
         return type;
     }
 
-    public long getCookie() {
+    /** @return IOHIDElementCookie */
+    public int getCookie() {
         return cookie;
     }
 

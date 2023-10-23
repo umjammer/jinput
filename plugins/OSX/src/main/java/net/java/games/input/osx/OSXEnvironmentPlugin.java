@@ -47,6 +47,9 @@ import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
 import net.java.games.input.Rumbler;
+import net.java.games.input.usb.GenericDesktopUsage;
+import net.java.games.input.usb.UsagePage;
+import net.java.games.input.usb.UsagePair;
 
 
 /**
@@ -71,22 +74,22 @@ log.fine(osName);
         }
     }
 
-    private static boolean isMacOSXEqualsOrBetterThan(int major_required, int minor_required) {
-        String os_version = System.getProperty("os.version");
-        StringTokenizer version_tokenizer = new StringTokenizer(os_version, ".");
+    private static boolean isMacOSXEqualsOrBetterThan(int majorRequired, int minorRequired) {
+        String osVersion = System.getProperty("os.version");
+        StringTokenizer versionTokenizer = new StringTokenizer(osVersion, ".");
         int major;
         int minor;
         try {
-            String major_str = version_tokenizer.nextToken();
-            String minor_str = version_tokenizer.nextToken();
-            major = Integer.parseInt(major_str);
-            minor = Integer.parseInt(minor_str);
+            String majorStr = versionTokenizer.nextToken();
+            String minorStr = versionTokenizer.nextToken();
+            major = Integer.parseInt(majorStr);
+            minor = Integer.parseInt(minorStr);
         } catch (Exception e) {
             log.fine("Exception occurred while trying to determine OS version: " + e);
             // Best guess, no
             return false;
         }
-        return major > major_required || (major == major_required && minor >= minor_required);
+        return major > majorRequired || (major == majorRequired && minor >= minorRequired);
     }
 
     private final Controller[] controllers;
@@ -101,7 +104,7 @@ log.fine(osName);
     }
 
     @Override
-    public final Controller[] getControllers() {
+    public Controller[] getControllers() {
         return controllers;
     }
 
@@ -110,12 +113,13 @@ log.fine(osName);
         return supported;
     }
 
-    private static void addElements(OSXHIDQueue queue, List<OSXHIDElement> elements, List<OSXComponent> components, boolean map_mouse_buttons) throws IOException {
+    private static void addElements(OSXHIDQueue queue, List<OSXHIDElement> elements, List<Component> components, boolean mapMouseButtons) throws IOException {
         for (OSXHIDElement element : elements) {
+log.finer(element.toString());
             Component.Identifier id = element.getIdentifier();
             if (id == null)
                 continue;
-            if (map_mouse_buttons) {
+            if (mapMouseButtons) {
                 if (id == Component.Identifier.Button._0) {
                     id = Component.Identifier.Button.LEFT;
                 } else if (id == Component.Identifier.Button._1) {
@@ -131,7 +135,7 @@ log.fine(osName);
     }
 
     private static Keyboard createKeyboardFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
-        List<OSXComponent> components = new ArrayList<>();
+        List<Component> components = new ArrayList<>();
         OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
         try {
             addElements(queue, elements, components, false);
@@ -141,13 +145,11 @@ log.fine(osName);
         }
 log.fine("@@@ components: " + components.size());
 log.fine("@@@ components: " + components);
-        Component[] components_array = new Component[components.size()];
-        components.toArray(components_array);
-        return new OSXKeyboard(device, queue, components_array, new Controller[] {}, new Rumbler[] {});
+        return new OSXKeyboard(device, queue, components.toArray(Component[]::new), new Controller[0], new Rumbler[0]);
     }
 
     private static Mouse createMouseFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
-        List<OSXComponent> components = new ArrayList<>();
+        List<Component> components = new ArrayList<>();
         OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
         try {
             addElements(queue, elements, components, true);
@@ -157,9 +159,7 @@ log.fine("@@@ components: " + components);
         }
 log.fine("@@@ components: " + components.size());
 log.fine("@@@ components: " + components);
-        Component[] components_array = new Component[components.size()];
-        components.toArray(components_array);
-        Mouse mouse = new OSXMouse(device, queue, components_array, new Controller[] {}, new Rumbler[] {});
+        Mouse mouse = new OSXMouse(device, queue, components.toArray(Component[]::new), new Controller[0], new Rumbler[0]);
         if (mouse.getPrimaryButton() != null && mouse.getX() != null && mouse.getY() != null) {
             return mouse;
         } else {
@@ -169,8 +169,11 @@ log.fine("@@@ components: " + components);
     }
 
     private static AbstractController createControllerFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements, Controller.Type type) throws IOException {
-        List<OSXComponent> components = new ArrayList<>();
+        List<Component> components = new ArrayList<>();
+        List<Controller> controllers = new ArrayList<>();
+        List<Rumbler> rumblers = new ArrayList<>();
         OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
+        // osx elements
         try {
             addElements(queue, elements, components, false);
         } catch (IOException e) {
@@ -179,36 +182,38 @@ log.fine("@@@ components: " + components);
         }
 log.fine("@@@ components: " + components.size());
 log.fine("@@@ components: " + components);
-        Component[] components_array = new Component[components.size()];
-        components.toArray(components_array);
-        return new OSXAbstractController(device, queue, components_array, new Controller[] {}, new Rumbler[] {}, type);
+        return new OSXController(device, queue,
+                components.toArray(Component[]::new),
+                controllers.toArray(Controller[]::new),
+                rumblers.toArray(Rumbler[]::new),
+                type);
     }
 
     private static void createControllersFromDevice(OSXHIDDevice device, List<Controller> controllers) throws IOException {
-        UsagePair usage_pair = device.getUsagePair();
-        if (usage_pair == null) {
+        UsagePair usagePage = device.getUsagePair();
+        if (usagePage == null) {
 log.finer("device: '" + device.getProductName() + "' has no usage pair");
             return;
         }
 log.fine("-------- device: '" + device.getProductName() + "' --------");
         List<OSXHIDElement> elements = device.getElements();
-        if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && (usage_pair.getUsage() == GenericDesktopUsage.MOUSE ||
-                usage_pair.getUsage() == GenericDesktopUsage.POINTER)) {
+        if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && (usagePage.usage() == GenericDesktopUsage.MOUSE ||
+                usagePage.usage() == GenericDesktopUsage.POINTER)) {
 log.fine("mouse device: '" + device.getProductName() + "' --------");
             Controller mouse = createMouseFromDevice(device, elements);
             if (mouse != null)
                 controllers.add(mouse);
-        } else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && (usage_pair.getUsage() == GenericDesktopUsage.KEYBOARD ||
-                usage_pair.getUsage() == GenericDesktopUsage.KEYPAD)) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && (usagePage.usage() == GenericDesktopUsage.KEYBOARD ||
+                usagePage.usage() == GenericDesktopUsage.KEYPAD)) {
 log.fine("keyboard device: '" + device.getProductName() + "' --------");
             controllers.add(createKeyboardFromDevice(device, elements));
-        } else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.JOYSTICK) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usage() == GenericDesktopUsage.JOYSTICK) {
 log.fine("joystick device: '" + device.getProductName() + "' --------");
             controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
-        } else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.MULTI_AXIS_CONTROLLER) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usage() == GenericDesktopUsage.MULTI_AXIS_CONTROLLER) {
 log.fine("multi-axis device: '" + device.getProductName() + "' --------");
             controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
-        } else if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP && usage_pair.getUsage() == GenericDesktopUsage.GAME_PAD) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usage() == GenericDesktopUsage.GAME_PAD) {
 log.fine("gamepad device: '" + device.getProductName() + "' --------");
             controllers.add(createControllerFromDevice(device, elements, Controller.Type.GAMEPAD));
         }
@@ -225,15 +230,15 @@ log.fine("gamepad device: '" + device.getProductName() + "' --------");
                         device = it.next();
                         if (device == null)
                             break;
-                        boolean device_used = false;
+                        boolean deviceUsed = false;
                         try {
-                            int old_size = controllers.size();
+                            int oldSize = controllers.size();
                             createControllersFromDevice(device, controllers);
-                            device_used = old_size != controllers.size();
+                            deviceUsed = oldSize != controllers.size();
                         } catch (IOException e) {
                             log.log(Level.FINE, "Failed to create controllers from device: " + device.getProductName(), e);
                         }
-                        if (!device_used)
+                        if (!deviceUsed)
                             device.release();
                     } catch (IOException e) {
                         log.log(Level.FINE, "Failed to enumerate device: ", e);
@@ -244,10 +249,8 @@ log.fine("gamepad device: '" + device.getProductName() + "' --------");
             }
         } catch (IOException e) {
             log.log(Level.FINE, "Failed to enumerate devices: " + e.getMessage(), e);
-            return new Controller[] {};
+            return new Controller[0];
         }
-        Controller[] controllers_array = new Controller[controllers.size()];
-        controllers.toArray(controllers_array);
-        return controllers_array;
+        return controllers.toArray(Controller[]::new);
     }
 }

@@ -67,7 +67,8 @@ class OSXComponent extends AbstractComponent {
     }
 
     @Override
-    protected float poll() throws IOException {
-        return OSXControllers.poll(element);
+    protected synchronized float poll() throws IOException {
+        element.fillElementValue();
+        return element.convertValue();
     }
 }

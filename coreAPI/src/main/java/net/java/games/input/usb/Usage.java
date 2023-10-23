@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,46 +28,25 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
+ *
  */
 
-package net.java.games.input.osx;
+package net.java.games.input.usb;
+
+
+import net.java.games.input.Component;
 
 
 /**
- * Usage/Page pair
+ * Generic Desktop Usages
  *
  * @author elias
  * @version 1.0
  */
-class UsagePair {
+public interface Usage {
 
-    private final UsagePage usage_page;
-    private final Usage usage;
+    // static Usage map(int id);
 
-    public UsagePair(UsagePage usage_page, Usage usage) {
-        this.usage_page = usage_page;
-        this.usage = usage;
-    }
-
-    public final UsagePage getUsagePage() {
-        return usage_page;
-    }
-
-    public final Usage getUsage() {
-        return usage;
-    }
-
-    public final int hashCode() {
-        return usage.hashCode() ^ usage_page.hashCode();
-    }
-
-    public final boolean equals(Object other) {
-        if (!(other instanceof UsagePair other_pair))
-            return false;
-        return other_pair.usage.equals(usage) && other_pair.usage_page.equals(usage_page);
-    }
-
-    public final String toString() {
-        return "UsagePair: (page = " + usage_page + ", usage = " + usage + ")";
-    }
+    /** */
+    Component.Identifier getIdentifier();
 }

@@ -51,25 +51,32 @@ final class OSXMouse extends Mouse {
 
     private final PortType port;
     private final OSXHIDQueue queue;
+    private final OSXEvent osxEvent;
 
     OSXMouse(OSXHIDDevice device, OSXHIDQueue queue, Component[] components, Controller[] children, Rumbler[] rumblers) {
         super(device.getProductName(), components, children, rumblers);
         this.queue = queue;
         this.port = device.getPortType();
+        this.osxEvent = device.osxEvent;
     }
 
     @Override
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return OSXControllers.getNextDeviceEvent(event, queue);
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+        if (queue.getNextEvent(osxEvent)) {
+            OSXComponent component = queue.mapEvent(osxEvent);
+            event.set(component, component.getElement().convertValue(), osxEvent.getNanos());
+            return true;
+        } else
+            return false;
     }
 
     @Override
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         queue.setQueueDepth(size);
     }
 
     @Override
-    public final PortType getPortType() {
+    public PortType getPortType() {
         return port;
     }
 }

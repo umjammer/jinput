@@ -34,8 +34,9 @@ package net.java.games.input.osx;
 
 import java.io.IOException;
 
-import com.sun.jna.Pointer;
 import net.java.games.input.Component;
+import net.java.games.input.usb.ElementType;
+import net.java.games.input.usb.UsagePair;
 
 
 /**
@@ -48,65 +49,58 @@ import net.java.games.input.Component;
 final class OSXHIDElement {
 
     private final OSXHIDDevice device;
-    private final UsagePair usage_pair;
-    private final Pointer element_cookie;
-    private final ElementType element_type;
+    private final UsagePair usagePair;
+    private final int /* IOHIDElementCookie */ elementCookie;
+    private final ElementType elementType;
     private final int min;
     private final int max;
     private final Component.Identifier identifier;
-    private final boolean is_relative;
+    private final boolean isRelative;
 
-    public OSXHIDElement(OSXHIDDevice device, UsagePair usage_pair, Pointer element_cookie, ElementType element_type, int min, int max, boolean is_relative) {
+    public OSXHIDElement(OSXHIDDevice device, UsagePair usagePair, int elementCookie, ElementType elementType, int min, int max, boolean isRelative) {
         this.device = device;
-        this.usage_pair = usage_pair;
-        this.element_cookie = element_cookie;
-        this.element_type = element_type;
+        this.usagePair = usagePair;
+        this.elementCookie = elementCookie;
+        this.elementType = elementType;
         this.min = min;
         this.max = max;
-        this.identifier = computeIdentifier();
-        this.is_relative = is_relative;
+        this.identifier = usagePair.usage().getIdentifier();
+        this.isRelative = isRelative;
     }
 
-    private Component.Identifier computeIdentifier() {
-        if (usage_pair.getUsagePage() == UsagePage.GENERIC_DESKTOP) {
-            return ((GenericDesktopUsage) usage_pair.getUsage()).getIdentifier();
-        } else if (usage_pair.getUsagePage() == UsagePage.BUTTON) {
-            return ((ButtonUsage) usage_pair.getUsage()).getIdentifier();
-        } else if (usage_pair.getUsagePage() == UsagePage.KEYBOARD_OR_KEYPAD) {
-            return ((KeyboardUsage) usage_pair.getUsage()).getIdentifier();
-        } else
-            return null;
-    }
-
-    final Component.Identifier getIdentifier() {
+    Component.Identifier getIdentifier() {
         return identifier;
     }
 
-    final Pointer getCookie() {
-        return element_cookie;
+    /** @return IOHIDElementCookie */
+    int getCookie() {
+        return elementCookie;
     }
 
-    final ElementType getType() {
-        return element_type;
+    ElementType getType() {
+        return elementType;
     }
 
-    final boolean isRelative() {
-        return is_relative && identifier instanceof Component.Identifier.Axis;
+    boolean isRelative() {
+        return isRelative && identifier instanceof Component.Identifier.Axis;
     }
 
-    final boolean isAnalog() {
+    boolean isAnalog() {
         return identifier instanceof Component.Identifier.Axis && identifier != Component.Identifier.Axis.POV;
     }
 
     private UsagePair getUsagePair() {
-        return usage_pair;
+        return usagePair;
     }
 
-    final void getElementValue(OSXEvent event) throws IOException {
-        device.getElementValue(element_cookie, event);
+    /** fill device.osxEvent buffer */
+    void fillElementValue() throws IOException {
+        device.fillElementValue(elementCookie, device.osxEvent);
     }
 
-    final float convertValue(float value) {
+    /** convert and get data from device.osxEvent buffer */
+    float convertValue() {
+        float value = device.osxEvent.getValue();
         if (identifier == Component.Identifier.Axis.POV) {
             return switch ((int) value) {
                 case 0 -> Component.POV.UP;
@@ -120,7 +114,7 @@ final class OSXHIDElement {
                 case 8 -> Component.POV.OFF;
                 default -> Component.POV.OFF;
             };
-        } else if (identifier instanceof Component.Identifier.Axis && !is_relative) {
+        } else if (identifier instanceof Component.Identifier.Axis && !isRelative) {
             if (min == max)
                 return 0;
             else if (value > max)
@@ -130,5 +124,19 @@ final class OSXHIDElement {
             return 2 * (value - min) / (max - min) - 1;
         } else
             return value;
+    }
+
+    @Override
+    public String toString() {
+        return "OSXHIDElement{" +
+                "device=" + device +
+                ", usagePair=" + usagePair +
+                ", elementCookie=" + elementCookie +
+                ", elementType=" + elementType +
+                ", min=" + min +
+                ", max=" + max +
+                ", identifier=" + identifier +
+                ", isRelative=" + isRelative +
+                '}';
     }
 }

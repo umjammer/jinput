@@ -58,15 +58,17 @@ final class LinuxJoystickButton extends AbstractComponent {
         super(button_id.getName(), button_id);
     }
 
-    public final boolean isRelative() {
+    @Override
+    public boolean isRelative() {
         return false;
     }
 
-    final void setValue(float value) {
+    void setValue(float value) {
         this.value = value;
     }
 
-    protected final float poll() throws IOException {
+    @Override
+    protected float poll() throws IOException {
         return value;
     }
 }

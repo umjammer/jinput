@@ -39,7 +39,7 @@ final class LinuxRumbleFF extends LinuxForceFeedbackEffect {
     }
 
     @Override
-    protected final int upload(int id, float intensity) throws IOException {
+    protected int upload(int id, float intensity) throws IOException {
         int weak_magnitude;
         int strong_magnitude;
         if (intensity > 0.666666f) {

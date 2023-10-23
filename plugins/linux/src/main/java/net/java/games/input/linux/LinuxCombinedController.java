@@ -17,19 +17,23 @@ public class LinuxCombinedController extends AbstractController {
         this.joystickController = joystickController;
     }
 
+    @Override
     protected boolean getNextDeviceEvent(Event event) throws IOException {
         return joystickController.getNextDeviceEvent(event);
     }
 
+    @Override
     public final PortType getPortType() {
         return eventController.getPortType();
     }
 
+    @Override
     public final void pollDevice() throws IOException {
         eventController.pollDevice();
         joystickController.pollDevice();
     }
 
+    @Override
     public Type getType() {
         return eventController.getType();
     }

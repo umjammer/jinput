@@ -58,23 +58,27 @@ final class LinuxJoystickAbstractController extends AbstractController {
 
     private final LinuxJoystickDevice device;
 
-    protected LinuxJoystickAbstractController(LinuxJoystickDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
+    LinuxJoystickAbstractController(LinuxJoystickDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
         super(device.getName(), components, children, rumblers);
         this.device = device;
     }
 
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    @Override
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         device.setBufferSize(size);
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.poll();
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
         return device.getNextEvent(event);
     }
 
+    @Override
     public Type getType() {
         return Controller.Type.STICK;
     }

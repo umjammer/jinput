@@ -59,7 +59,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
     private static boolean supported = false;
 
     private final Controller[] controllers;
-    private final List<LinuxDevice> devices = new ArrayList<LinuxDevice>();
+    private final List<LinuxDevice> devices = new ArrayList<>();
     private final static LinuxDeviceThread device_thread = new LinuxDeviceThread();
 
     static {
@@ -320,7 +320,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         return new LinuxJoystickAbstractController(device, components.toArray(new Component[] {}), new Controller[] {}, new Rumbler[] {});
     }
 
-    private final void enumerateJoystickControllers(List<Controller> controllers) {
+    private void enumerateJoystickControllers(List<Controller> controllers) {
         File[] joystick_device_files = enumerateJoystickDeviceFiles("/dev/input");
         if (joystick_device_files == null || joystick_device_files.length == 0) {
             joystick_device_files = enumerateJoystickDeviceFiles("/dev");
@@ -343,16 +343,16 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         }
     }
 
-    private static File[] enumerateJoystickDeviceFiles(final String dev_path) {
+    private static File[] enumerateJoystickDeviceFiles(String dev_path) {
         File dev = new File(dev_path);
         return listFilesPrivileged(dev, (dir, name) -> name.startsWith("js"));
     }
 
-    private static String getAbsolutePathPrivileged(final File file) {
+    private static String getAbsolutePathPrivileged(File file) {
         return file.getAbsolutePath();
     }
 
-    private static File[] listFilesPrivileged(final File dir, final FilenameFilter filter) {
+    private static File[] listFilesPrivileged(File dir, FilenameFilter filter) {
         File[] files = dir.listFiles(filter);
         if (files == null) {
             log.fine("dir " + dir.getName() + " exists: " + dir.exists() + ", is writable: " + dir.isDirectory());
@@ -364,7 +364,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
     }
 
     private void enumerateEventControllers(List<Controller> controllers) {
-        final File dev = new File("/dev/input");
+        File dev = new File("/dev/input");
         File[] event_device_files = listFilesPrivileged(dev, (File dir, String name) -> name.startsWith("event"));
 
         if (event_device_files == null)

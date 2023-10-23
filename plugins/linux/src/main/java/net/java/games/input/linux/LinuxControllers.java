@@ -55,7 +55,7 @@ final class LinuxControllers {
     private final static LinuxEvent linux_event = new LinuxEvent();
 
     /* Declared synchronized to protect linux_event */
-    public final static synchronized boolean getNextDeviceEvent(Event event, LinuxEventDevice device) throws IOException {
+    public static synchronized boolean getNextDeviceEvent(Event event, LinuxEventDevice device) throws IOException {
         while (device.getNextEvent(linux_event)) {
             LinuxAxisDescriptor descriptor = linux_event.getDescriptor();
             LinuxComponent component = device.mapDescriptor(descriptor);
@@ -71,7 +71,7 @@ final class LinuxControllers {
     private final static LinuxAbsInfo abs_info = new LinuxAbsInfo();
 
     /* Declared synchronized to protect abs_info */
-    public final static synchronized float poll(LinuxEventComponent event_component) throws IOException {
+    public static synchronized float poll(LinuxEventComponent event_component) throws IOException {
         int native_type = event_component.getDescriptor().getType();
         switch (native_type) {
         case NativeDefinitions.EV_KEY:

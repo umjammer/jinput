@@ -189,7 +189,7 @@ final class LinuxJoystickDevice implements LinuxDevice {
         povYs.put(yIndex, pov);
     }
 
-    public final synchronized boolean getNextEvent(Event event) throws IOException {
+    public synchronized boolean getNextEvent(Event event) throws IOException {
         return event_queue.getNextEvent(event);
     }
 
@@ -214,23 +214,23 @@ final class LinuxJoystickDevice implements LinuxDevice {
         return true;
     }
 
-    public final int getNumAxes() {
+    public int getNumAxes() {
         return axes.length;
     }
 
-    public final int getNumButtons() {
+    public int getNumButtons() {
         return buttons.length;
     }
 
-    public final byte[] getAxisMap() {
+    public byte[] getAxisMap() {
         return axisMap;
     }
 
-    public final char[] getButtonMap() {
+    public char[] getButtonMap() {
         return buttonMap;
     }
 
-    private final int getNumDeviceButtons() throws IOException {
+    private int getNumDeviceButtons() throws IOException {
         return nGetNumButtons(fd);
     }
 
@@ -255,7 +255,7 @@ final class LinuxJoystickDevice implements LinuxDevice {
     }
 
 
-    private final byte[] getDeviceAxisMap() throws IOException {
+    private byte[] getDeviceAxisMap() throws IOException {
         return nGetAxisMap(fd);
     }
 

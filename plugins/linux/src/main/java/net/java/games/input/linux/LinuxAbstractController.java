@@ -60,25 +60,29 @@ final class LinuxAbstractController extends AbstractController {
     private final LinuxEventDevice device;
     private final Type type;
 
-    protected LinuxAbstractController(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) throws IOException {
+    LinuxAbstractController(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) throws IOException {
         super(device.getName(), components, children, rumblers);
         this.device = device;
         this.port = device.getPortType();
         this.type = type;
     }
 
-    public final PortType getPortType() {
+    @Override
+    public PortType getPortType() {
         return port;
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.pollKeyStates();
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
         return LinuxControllers.getNextDeviceEvent(event, device);
     }
 
+    @Override
     public Type getType() {
         return type;
     }

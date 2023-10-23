@@ -64,10 +64,12 @@ class LinuxJoystickAxis extends AbstractComponent {
         this.analog = analog;
     }
 
+    @Override
     public final boolean isRelative() {
         return false;
     }
 
+    @Override
     public final boolean isAnalog() {
         return analog;
     }
@@ -77,6 +79,7 @@ class LinuxJoystickAxis extends AbstractComponent {
         resetHasPolled();
     }
 
+    @Override
     protected final float poll() throws IOException {
         return value;
     }

@@ -59,21 +59,24 @@ final class LinuxKeyboard extends Keyboard {
     private final PortType port;
     private final LinuxEventDevice device;
 
-    protected LinuxKeyboard(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) throws IOException {
+    LinuxKeyboard(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) throws IOException {
         super(device.getName(), components, children, rumblers);
         this.device = device;
         this.port = device.getPortType();
     }
 
-    public final PortType getPortType() {
+    @Override
+    public PortType getPortType() {
         return port;
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
         return LinuxControllers.getNextDeviceEvent(event, device);
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.pollKeyStates();
     }
 }

@@ -34,31 +34,30 @@ final class LinuxAxisDescriptor {
     private int type;
     private int code;
 
-    public final void set(int type, int code) {
+    public void set(int type, int code) {
         this.type = type;
         this.code = code;
     }
 
-    public final int getType() {
+    public int getType() {
         return type;
     }
 
-    public final int getCode() {
+    public int getCode() {
         return code;
     }
 
-    public final int hashCode() {
+    public int hashCode() {
         return type ^ code;
     }
 
-    public final boolean equals(Object other) {
-        if (!(other instanceof LinuxAxisDescriptor))
+    public boolean equals(Object other) {
+        if (!(other instanceof LinuxAxisDescriptor descriptor))
             return false;
-        LinuxAxisDescriptor descriptor = (LinuxAxisDescriptor) other;
         return descriptor.type == type && descriptor.code == code;
     }
 
-    public final String toString() {
+    public String toString() {
         return "LinuxAxis: type = 0x" + Integer.toHexString(type) + ", code = 0x" + Integer.toHexString(code);
     }
 }

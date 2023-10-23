@@ -71,36 +71,36 @@ final class LinuxEventComponent {
         }
     }
 
-    public final LinuxEventDevice getDevice() {
+    public LinuxEventDevice getDevice() {
         return device;
     }
 
-    public final void getAbsInfo(LinuxAbsInfo abs_info) throws IOException {
+    public void getAbsInfo(LinuxAbsInfo abs_info) throws IOException {
         assert descriptor.getType() == NativeDefinitions.EV_ABS;
         device.getAbsInfo(descriptor.getCode(), abs_info);
     }
 
-    public final Controller.Type getButtonTrait() {
+    public Controller.Type getButtonTrait() {
         return button_trait;
     }
 
-    public final Component.Identifier getIdentifier() {
+    public Component.Identifier getIdentifier() {
         return identifier;
     }
 
-    public final LinuxAxisDescriptor getDescriptor() {
+    public LinuxAxisDescriptor getDescriptor() {
         return descriptor;
     }
 
-    public final boolean isRelative() {
+    public boolean isRelative() {
         return is_relative;
     }
 
-    public final boolean isAnalog() {
+    public boolean isAnalog() {
         return identifier instanceof Component.Identifier.Axis && identifier != Component.Identifier.Axis.POV;
     }
 
-    final float convertValue(float value) {
+    float convertValue(float value) {
         if (identifier instanceof Component.Identifier.Axis && !is_relative) {
             // Some axes have min = max = 0
             if (min == max)
@@ -115,7 +115,7 @@ final class LinuxEventComponent {
         }
     }
 
-    final float getDeadZone() {
+    float getDeadZone() {
         return flat / (2f * (max - min));
     }
 }

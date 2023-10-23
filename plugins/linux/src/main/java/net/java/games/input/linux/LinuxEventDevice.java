@@ -135,7 +135,7 @@ final class LinuxEventDevice implements LinuxDevice {
         return count;
     }
 
-    private final Controller.Type guessType() throws IOException {
+    private Controller.Type guessType() throws IOException {
         List<LinuxEventComponent> components = getComponents();
         if (components.isEmpty())
             return Controller.Type.UNKNOWN;
@@ -198,7 +198,7 @@ final class LinuxEventDevice implements LinuxDevice {
             return null;
     }
 
-    private final Rumbler[] enumerateRumblers() {
+    private Rumbler[] enumerateRumblers() {
         List<Rumbler> rumblers = new ArrayList<>();
         try {
             int num_effects = getNumEffects();
@@ -214,11 +214,11 @@ final class LinuxEventDevice implements LinuxDevice {
         return rumblers.toArray(new Rumbler[] {});
     }
 
-    public final Rumbler[] getRumblers() {
+    public Rumbler[] getRumblers() {
         return rumblers;
     }
 
-    public final synchronized int uploadRumbleEffect(int id, int trigger_button, int direction, int trigger_interval, int replay_length, int replay_delay, int strong_magnitude, int weak_magnitude) throws IOException {
+    public synchronized int uploadRumbleEffect(int id, int trigger_button, int direction, int trigger_interval, int replay_length, int replay_delay, int strong_magnitude, int weak_magnitude) throws IOException {
         checkClosed();
         return nUploadRumbleEffect(fd, id, direction, trigger_button, trigger_interval, replay_length, replay_delay, strong_magnitude, weak_magnitude);
     }
@@ -243,7 +243,7 @@ final class LinuxEventDevice implements LinuxDevice {
         return effect.id;
     }
 
-    public final synchronized int uploadConstantEffect(int id, int trigger_button, int direction, int trigger_interval, int replay_length, int replay_delay, int constant_level, int constant_env_attack_length, int constant_env_attack_level, int constant_env_fade_length, int constant_env_fade_level) throws IOException {
+    public synchronized int uploadConstantEffect(int id, int trigger_button, int direction, int trigger_interval, int replay_length, int replay_delay, int constant_level, int constant_env_attack_length, int constant_env_attack_level, int constant_env_fade_length, int constant_env_fade_level) throws IOException {
         checkClosed();
         return nUploadConstantEffect(fd, id, direction, trigger_button, trigger_interval, replay_length, replay_delay, constant_level, constant_env_attack_length, constant_env_attack_level, constant_env_fade_length, constant_env_fade_level);
     }
@@ -280,7 +280,7 @@ final class LinuxEventDevice implements LinuxDevice {
     }
 
 
-    public final synchronized void writeEvent(int type, int code, int value) throws IOException {
+    public synchronized void writeEvent(int type, int code, int value) throws IOException {
         checkClosed();
         nWriteEvent(fd, type, code, value);
     }
@@ -296,23 +296,23 @@ final class LinuxEventDevice implements LinuxDevice {
         }
     }
 
-    public final void registerComponent(LinuxAxisDescriptor desc, LinuxComponent component) {
+    public void registerComponent(LinuxAxisDescriptor desc, LinuxComponent component) {
         component_map.put(desc, component);
     }
 
-    public final LinuxComponent mapDescriptor(LinuxAxisDescriptor desc) {
+    public LinuxComponent mapDescriptor(LinuxAxisDescriptor desc) {
         return component_map.get(desc);
     }
 
-    public final Controller.PortType getPortType() throws IOException {
+    public Controller.PortType getPortType() throws IOException {
         return input_id.getPortType();
     }
 
-    public final LinuxInputID getInputID() {
+    public LinuxInputID getInputID() {
         return input_id;
     }
 
-    private final LinuxInputID getDeviceInputID() throws IOException {
+    private LinuxInputID getDeviceInputID() throws IOException {
         return nGetInputID(fd);
     }
 
@@ -326,7 +326,7 @@ final class LinuxEventDevice implements LinuxDevice {
         return id;
     }
 
-    public final int getNumEffects() throws IOException {
+    public int getNumEffects() throws IOException {
         return nGetNumEffects(fd);
     }
 
@@ -339,7 +339,7 @@ final class LinuxEventDevice implements LinuxDevice {
     }
 
 
-    private final int getVersion() throws IOException {
+    private int getVersion() throws IOException {
         return nGetVersion(fd);
     }
 
@@ -352,7 +352,7 @@ final class LinuxEventDevice implements LinuxDevice {
     }
 
 
-    public final synchronized boolean getNextEvent(LinuxEvent linux_event) throws IOException {
+    public synchronized boolean getNextEvent(LinuxEvent linux_event) throws IOException {
         checkClosed();
         return nGetNextEvent(fd, linux_event);
     }
@@ -378,7 +378,7 @@ final class LinuxEventDevice implements LinuxDevice {
         }
     }
 
-    private final void addKeys(List<LinuxEventComponent> components) throws IOException {
+    private void addKeys(List<LinuxEventComponent> components) throws IOException {
         byte[] bits = getKeysBits();
         for (int i = 0; i < bits.length * 8; i++) {
             if (isBitSet(bits, i)) {
@@ -388,7 +388,7 @@ final class LinuxEventDevice implements LinuxDevice {
         }
     }
 
-    private final void addAbsoluteAxes(List<LinuxEventComponent> components) throws IOException {
+    private void addAbsoluteAxes(List<LinuxEventComponent> components) throws IOException {
         byte[] bits = getAbsoluteAxesBits();
         for (int i = 0; i < bits.length * 8; i++) {
             if (isBitSet(bits, i)) {
@@ -398,7 +398,7 @@ final class LinuxEventDevice implements LinuxDevice {
         }
     }
 
-    private final void addRelativeAxes(List<LinuxEventComponent> components) throws IOException {
+    private void addRelativeAxes(List<LinuxEventComponent> components) throws IOException {
         byte[] bits = getRelativeAxesBits();
         for (int i = 0; i < bits.length * 8; i++) {
             if (isBitSet(bits, i)) {
@@ -408,11 +408,11 @@ final class LinuxEventDevice implements LinuxDevice {
         }
     }
 
-    public final List<LinuxEventComponent> getComponents() {
+    public List<LinuxEventComponent> getComponents() {
         return components;
     }
 
-    private final List<LinuxEventComponent> getDeviceComponents() throws IOException {
+    private List<LinuxEventComponent> getDeviceComponents() throws IOException {
         List<LinuxEventComponent> components = new ArrayList<>();
         byte[] evtype_bits = getEventTypeBits();
         if (isBitSet(evtype_bits, NativeDefinitions.EV_KEY))
@@ -424,31 +424,31 @@ final class LinuxEventDevice implements LinuxDevice {
         return components;
     }
 
-    private final byte[] getForceFeedbackBits() throws IOException {
+    private byte[] getForceFeedbackBits() throws IOException {
         byte[] bits = new byte[NativeDefinitions.FF_MAX / 8 + 1];
         nGetBits(fd, NativeDefinitions.EV_FF, bits);
         return bits;
     }
 
-    private final byte[] getKeysBits() throws IOException {
+    private byte[] getKeysBits() throws IOException {
         byte[] bits = new byte[NativeDefinitions.KEY_MAX / 8 + 1];
         nGetBits(fd, NativeDefinitions.EV_KEY, bits);
         return bits;
     }
 
-    private final byte[] getAbsoluteAxesBits() throws IOException {
+    private byte[] getAbsoluteAxesBits() throws IOException {
         byte[] bits = new byte[NativeDefinitions.ABS_MAX / 8 + 1];
         nGetBits(fd, NativeDefinitions.EV_ABS, bits);
         return bits;
     }
 
-    private final byte[] getRelativeAxesBits() throws IOException {
+    private byte[] getRelativeAxesBits() throws IOException {
         byte[] bits = new byte[NativeDefinitions.REL_MAX / 8 + 1];
         nGetBits(fd, NativeDefinitions.EV_REL, bits);
         return bits;
     }
 
-    private final byte[] getEventTypeBits() throws IOException {
+    private byte[] getEventTypeBits() throws IOException {
         byte[] bits = new byte[NativeDefinitions.EV_MAX / 8 + 1];
         nGetBits(fd, 0, bits);
         return bits;
@@ -522,7 +522,7 @@ final class LinuxEventDevice implements LinuxDevice {
     }
 
 
-    private final void checkClosed() throws IOException {
+    private void checkClosed() throws IOException {
         if (closed)
             throw new IOException("Device is closed");
     }

@@ -50,7 +50,8 @@ final class LinuxDeviceThread extends Thread {
         start();
     }
 
-    public synchronized final void run() {
+    @Override
+    public synchronized void run() {
         while (true) {
             if (!tasks.isEmpty()) {
                 LinuxDeviceTask task = tasks.remove(0);
@@ -68,7 +69,7 @@ final class LinuxDeviceThread extends Thread {
         }
     }
 
-    public final Object execute(LinuxDeviceTask task) throws IOException {
+    public Object execute(LinuxDeviceTask task) throws IOException {
         synchronized (this) {
             tasks.add(task);
             notify();
@@ -82,13 +83,10 @@ final class LinuxDeviceThread extends Thread {
                 }
             }
         }
-        switch (task.getState()) {
-        case LinuxDeviceTask.COMPLETED:
-            return task.getResult();
-        case LinuxDeviceTask.FAILED:
-            throw task.getException();
-        default:
-            throw new RuntimeException("Invalid task state: " + task.getState());
-        }
+        return switch (task.getState()) {
+            case LinuxDeviceTask.COMPLETED -> task.getResult();
+            case LinuxDeviceTask.FAILED -> throw task.getException();
+            default -> throw new RuntimeException("Invalid task state: " + task.getState());
+        };
     }
 }

@@ -77,6 +77,7 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
 
     private void scanControllers() {
         try {
+log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
             for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
                 try {
 log.fine("@@@ ControllerEnvironment " + ce.getClass().getName());

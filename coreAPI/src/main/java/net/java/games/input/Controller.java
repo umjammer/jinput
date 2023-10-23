@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 /**
  * A Controller represents a physical device, such as a keyboard, mouse,
  * or joystick, or a logical grouping of related controls, such as a button

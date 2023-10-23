@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 /**
  * A Keyboard is a type of controller consisting of a single controller,
  * they keypad, which contains several axes (the keys).  By default, all keys

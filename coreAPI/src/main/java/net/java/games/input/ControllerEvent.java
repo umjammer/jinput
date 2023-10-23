@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 /**
  * An event that is fired when the state of a controller changes
  */

@@ -33,6 +33,7 @@
 package net.java.games.input;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -87,718 +88,844 @@ public interface Component {
     /**
      * Identifiers for different Axes.
      */
-    class Identifier {
-
-        /**
-         * Name of axis type
-         */
-        private final String name;
-
-        /**
-         * Protected constructor
-         */
-        protected Identifier(String name) {
-            this.name = name;
-        }
+    interface Identifier {
 
         /**
          * Returns a non-localized string description of this axis type.
          */
-        public String getName() {
-            return name;
-        }
+        String getName();
 
-        /**
-         * Returns a non-localized string description of this axis type.
-         */
-        public String toString() {
-            return name;
-        }
-
-        public static Identifier byName(String name) {
-            return Arrays.stream(Identifier.class.getDeclaredFields())
-                    .filter(f -> {
-                        try {
-                            return f.getName().equals(name) && f.get(null) instanceof Identifier;
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .map(f -> {
-                        try {
-                            return (Identifier) f.get(null);
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
+        /** @return nullable */
+        static Identifier _byName(Identifier[] values, String name) {
+            return Arrays.stream(values)
+                    .filter(e -> e.getName().equals(name))
                     .findFirst()
-                    .get();
+                    .orElse(null);
         }
 
-        public static class Axis extends Identifier {
-
-            /**
-             * @param name name of axis
-             */
-            protected Axis(String name) {
-                super(name);
-            }
+        enum Axis implements Identifier {
 
             /**
              * An axis for specifying vertical data.
              */
-            public static final Axis X = new Axis("x");
+            X("x"),
 
             /**
              * An axis for specifying horizontal data.
              */
-            public static final Axis Y = new Axis("y");
+            Y("y"),
 
             /**
              * An axis for specifying third dimensional up/down
              * data, or linear data in any direction that is
              * neither horizontal nor vertical.
              */
-            public static final Axis Z = new Axis("z");
+            Z("z"),
 
             /**
              * An axis for specifying left-right rotational data.
              */
-            public static final Axis RX = new Axis("rx");
+            RX("rx"),
 
             /**
              * An axis for specifying forward-back rotational data.
              */
-            public static final Axis RY = new Axis("ry");
+            RY("ry"),
 
             /**
              * An axis for specifying up-down rotational data
              * (rudder control).
              */
-            public static final Axis RZ = new Axis("rz");
+            RZ("rz"),
 
             /**
              * An axis for a slider or mouse wheel.
              */
-            public static final Axis SLIDER = new Axis("slider");
+            SLIDER("slider"),
 
             /**
              * An axis for slider or mouse wheel acceleration data.
              */
-            public static final Axis SLIDER_ACCELERATION = new Axis("slider-acceleration");
+            SLIDER_ACCELERATION("slider-acceleration"),
 
             /**
              * An axis for slider force data.
              */
-            public static final Axis SLIDER_FORCE = new Axis("slider-force");
+            SLIDER_FORCE("slider-force"),
 
             /**
              * An axis for slider or mouse wheel velocity data.
              */
-            public static final Axis SLIDER_VELOCITY = new Axis("slider-velocity");
+            SLIDER_VELOCITY("slider-velocity"),
 
             /**
              * An axis for specifying vertical acceleration data.
              */
-            public static final Axis X_ACCELERATION = new Axis("x-acceleration");
+            X_ACCELERATION("x-acceleration"),
 
             /**
              * An axis for specifying vertical force data.
              */
-            public static final Axis X_FORCE = new Axis("x-force");
+            X_FORCE("x-force"),
 
             /**
              * An axis for specifying vertical velocity data.
              */
-            public static final Axis X_VELOCITY = new Axis("x-velocity");
+            X_VELOCITY("x-velocity"),
 
             /**
              * An axis for specifying horizontal acceleration data.
              */
-            public static final Axis Y_ACCELERATION = new Axis("y-acceleration");
+            Y_ACCELERATION("y-acceleration"),
 
             /**
              * An axis for specifying horizontal force data.
              */
-            public static final Axis Y_FORCE = new Axis("y-force");
+            Y_FORCE("y-force"),
 
             /**
              * An axis for specifying horizontal velocity data.
              */
-            public static final Axis Y_VELOCITY = new Axis("y-velocity");
+            Y_VELOCITY("y-velocity"),
 
             /**
              * An axis for specifying third dimensional up/down acceleration data.
              */
-            public static final Axis Z_ACCELERATION = new Axis("z-acceleration");
+            Z_ACCELERATION("z-acceleration"),
 
             /**
              * An axis for specifying third dimensional up/down force data.
              */
-            public static final Axis Z_FORCE = new Axis("z-force");
+            Z_FORCE("z-force"),
 
             /**
              * An axis for specifying third dimensional up/down velocity data.
              */
-            public static final Axis Z_VELOCITY = new Axis("z-velocity");
+            Z_VELOCITY("z-velocity"),
 
             /**
              * An axis for specifying left-right angular acceleration data.
              */
-            public static final Axis RX_ACCELERATION = new Axis("rx-acceleration");
+            RX_ACCELERATION("rx-acceleration"),
 
             /**
              * An axis for specifying left-right angular force (torque) data.
              */
-            public static final Axis RX_FORCE = new Axis("rx-force");
+            RX_FORCE("rx-force"),
 
             /**
              * An axis for specifying left-right angular velocity data.
              */
-            public static final Axis RX_VELOCITY = new Axis("rx-velocity");
+            RX_VELOCITY("rx-velocity"),
 
             /**
              * An axis for specifying forward-back angular acceleration data.
              */
-            public static final Axis RY_ACCELERATION = new Axis("ry-acceleration");
+            RY_ACCELERATION("ry-acceleration"),
 
             /**
              * An axis for specifying forward-back angular force (torque) data.
              */
-            public static final Axis RY_FORCE = new Axis("ry-force");
+            RY_FORCE("ry-force"),
 
             /**
              * An axis for specifying forward-back angular velocity data.
              */
-            public static final Axis RY_VELOCITY = new Axis("ry-velocity");
+            RY_VELOCITY("ry-velocity"),
 
             /**
              * An axis for specifying up-down angular acceleration data.
              */
-            public static final Axis RZ_ACCELERATION = new Axis("rz-acceleration");
+            RZ_ACCELERATION("rz-acceleration"),
 
             /**
              * An axis for specifying up-down angular force (torque) data.
              */
-            public static final Axis RZ_FORCE = new Axis("rz-force");
+            RZ_FORCE("rz-force"),
 
             /**
              * An axis for specifying up-down angular velocity data.
              */
-            public static final Axis RZ_VELOCITY = new Axis("rz-velocity");
+            RZ_VELOCITY("rz-velocity"),
 
             /**
              * An axis for a point-of-view control.
              */
-            public static final Axis POV = new Axis("pov");
+            POV("pov"),
 
             /**
              * An unknown axis.
              */
-            public static final Axis UNKNOWN = new Axis("unknown");
+            UNKNOWN("unknown");
 
+            final String name;
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            /**
+             * @param name name of axis
+             */
+            Axis(String name) {
+                this.name = name;
+            }
+
+            static Identifier byName(String name) {
+                return _byName(values(), name);
+            }
         }
 
-        public static class Button extends Identifier {
-
-            public Button(String name) {
-                super(name);
-            }
+        enum Button implements Identifier {
 
             /**
              * First device button
              */
-            public static final Button _0 = new Button("0");
+            _0("0"),
 
             /**
              * Second device button
              */
-            public static final Button _1 = new Button("1");
+            _1("1"),
 
             /**
              * Third device button
              */
-            public static final Button _2 = new Button("2");
+            _2("2"),
 
             /**
              * Fourth device button
              */
-            public static final Button _3 = new Button("3");
+            _3("3"),
 
             /**
              * Fifth device button
              */
-            public static final Button _4 = new Button("4");
+            _4("4"),
 
             /**
              * Sixth device button
              */
-            public static final Button _5 = new Button("5");
+            _5("5"),
 
             /**
              * Seventh device button
              */
-            public static final Button _6 = new Button("6");
+            _6("6"),
 
             /**
              * Eighth device button
              */
-            public static final Button _7 = new Button("7");
+            _7("7"),
 
             /**
              * Ninth device button
              */
-            public static final Button _8 = new Button("8");
+            _8("8"),
 
             /**
              * 10th device button
              */
-            public static final Button _9 = new Button("9");
-            public static final Button _10 = new Button("10");
-            public static final Button _11 = new Button("11");
-            public static final Button _12 = new Button("12");
-            public static final Button _13 = new Button("13");
-            public static final Button _14 = new Button("14");
-            public static final Button _15 = new Button("15");
-            public static final Button _16 = new Button("16");
-            public static final Button _17 = new Button("17");
-            public static final Button _18 = new Button("18");
-            public static final Button _19 = new Button("19");
-            public static final Button _20 = new Button("20");
-            public static final Button _21 = new Button("21");
-            public static final Button _22 = new Button("22");
-            public static final Button _23 = new Button("23");
-            public static final Button _24 = new Button("24");
-            public static final Button _25 = new Button("25");
-            public static final Button _26 = new Button("26");
-            public static final Button _27 = new Button("27");
-            public static final Button _28 = new Button("28");
-            public static final Button _29 = new Button("29");
-            public static final Button _30 = new Button("30");
-            public static final Button _31 = new Button("31");
+            _9("9"),
+            _10("10"),
+            _11("11"),
+            _12("12"),
+            _13("13"),
+            _14("14"),
+            _15("15"),
+            _16("16"),
+            _17("17"),
+            _18("18"),
+            _19("19"),
+            _20("20"),
+            _21("21"),
+            _22("22"),
+            _23("23"),
+            _24("24"),
+            _25("25"),
+            _26("26"),
+            _27("27"),
+            _28("28"),
+            _29("29"),
+            _30("30"),
+            _31("31"),
 
             /**
              * Joystick trigger button
              */
-            public static final Button TRIGGER = new Button("Trigger");
+            TRIGGER("Trigger"),
 
             /**
              * Joystick thumb button
              */
-            public static final Button THUMB = new Button("Thumb");
+            THUMB("Thumb"),
 
             /**
              * Second joystick thumb button
              */
-            public static final Button THUMB2 = new Button("Thumb 2");
+            THUMB2("Thumb 2"),
 
             /**
              * Joystick top button
              */
-            public static final Button TOP = new Button("Top");
+            TOP("Top"),
 
             /**
              * Second joystick top button
              */
-            public static final Button TOP2 = new Button("Top 2");
+            TOP2("Top 2"),
 
             /**
              * The joystick button you play with you little finger (Pinkie on *that* side
              * of the pond :P)
              */
-            public static final Button PINKIE = new Button("Pinkie");
+            PINKIE("Pinkie"),
 
             /**
              * Joystick button on the base of the device
              */
-            public static final Button BASE = new Button("Base");
+            BASE("Base"),
 
             /**
              * Second joystick button on the base of the device
              */
-            public static final Button BASE2 = new Button("Base 2");
+            BASE2("Base 2"),
 
             /**
              * Third joystick button on the base of the device
              */
-            public static final Button BASE3 = new Button("Base 3");
+            BASE3("Base 3"),
 
             /**
              * Fourth joystick button on the base of the device
              */
-            public static final Button BASE4 = new Button("Base 4");
+            BASE4("Base 4"),
 
             /**
              * Fifth joystick button on the base of the device
              */
-            public static final Button BASE5 = new Button("Base 5");
+            BASE5("Base 5"),
 
             /**
              * Sixth joystick button on the base of the device
              */
-            public static final Button BASE6 = new Button("Base 6");
+            BASE6("Base 6"),
 
             /**
              * erm, dunno, but it's in the defines so it might exist.
              */
-            public static final Button DEAD = new Button("Dead");
+            DEAD("Dead"),
 
             /**
              * 'A' button on a gamepad
              */
-            public static final Button A = new Button("A");
+            A("A"),
 
             /**
              * 'B' button on a gamepad
              */
-            public static final Button B = new Button("B");
+            B("B"),
 
             /**
              * 'C' button on a gamepad
              */
-            public static final Button C = new Button("C");
+            C("C"),
 
             /**
              * 'X' button on a gamepad
              */
-            public static final Button X = new Button("X");
+            X("X"),
 
             /**
              * 'Y' button on a gamepad
              */
-            public static final Button Y = new Button("Y");
+            Y("Y"),
 
             /**
              * 'Z' button on a gamepad
              */
-            public static final Button Z = new Button("Z");
+            Z("Z"),
 
             /**
              * Left thumb button on a gamepad
              */
-            public static final Button LEFT_THUMB = new Button("Left Thumb");
+            LEFT_THUMB("Left Thumb"),
 
             /**
              * Right thumb button on a gamepad
              */
-            public static final Button RIGHT_THUMB = new Button("Right Thumb");
+            RIGHT_THUMB("Right Thumb"),
 
             /**
              * Second left thumb button on a gamepad
              */
-            public static final Button LEFT_THUMB2 = new Button("Left Thumb 2");
+            LEFT_THUMB2("Left Thumb 2"),
 
             /**
              * Second right thumb button on a gamepad
              */
-            public static final Button RIGHT_THUMB2 = new Button("Right Thumb 2");
+            RIGHT_THUMB2("Right Thumb 2"),
 
             /**
              * 'Select' button on a gamepad
              */
-            public static final Button SELECT = new Button("Select");
+            SELECT("Select"),
 
             /**
              * 'Start' button on a gamepad
              */
-            public static final Button START = new Button("Start");
+            START("Start"),
 
             /**
              * 'Mode' button on a gamepad
              */
-            public static final Button MODE = new Button("Mode");
+            MODE("Mode"),
 
             /**
              * Another left thumb button on a gamepad (how many thumbs do you have??)
              */
-            public static final Button LEFT_THUMB3 = new Button("Left Thumb 3");
+            LEFT_THUMB3("Left Thumb 3"),
 
             /**
              * Another right thumb button on a gamepad
              */
-            public static final Button RIGHT_THUMB3 = new Button("Right Thumb 3");
+            RIGHT_THUMB3("Right Thumb 3"),
 
             /**
              * Digitiser pen tool button
              */
-            public static final Button TOOL_PEN = new Button("Pen");
+            TOOL_PEN("Pen"),
 
             /**
              * Digitiser rubber (eraser) tool button
              */
-            public static final Button TOOL_RUBBER = new Button("Rubber");
+            TOOL_RUBBER("Rubber"),
 
             /**
              * Digitiser brush tool button
              */
-            public static final Button TOOL_BRUSH = new Button("Brush");
+            TOOL_BRUSH("Brush"),
 
             /**
              * Digitiser pencil tool button
              */
-            public static final Button TOOL_PENCIL = new Button("Pencil");
+            TOOL_PENCIL("Pencil"),
 
             /**
              * Digitiser airbrush tool button
              */
-            public static final Button TOOL_AIRBRUSH = new Button("Airbrush");
+            TOOL_AIRBRUSH("Airbrush"),
 
             /**
              * Digitiser finger tool button
              */
-            public static final Button TOOL_FINGER = new Button("Finger");
+            TOOL_FINGER("Finger"),
 
             /**
              * Digitiser mouse tool button
              */
-            public static final Button TOOL_MOUSE = new Button("Mouse");
+            TOOL_MOUSE("Mouse"),
 
             /**
              * Digitiser lens tool button
              */
-            public static final Button TOOL_LENS = new Button("Lens");
+            TOOL_LENS("Lens"),
 
             /**
              * Digitiser touch button
              */
-            public static final Button TOUCH = new Button("Touch");
+            TOUCH("Touch"),
 
             /**
              * Digitiser stylus button
              */
-            public static final Button STYLUS = new Button("Stylus");
+            STYLUS("Stylus"),
 
             /**
              * Second digitiser stylus button
              */
-            public static final Button STYLUS2 = new Button("Stylus 2");
+            STYLUS2("Stylus 2"),
 
             /**
              * An unknown button
              */
-            public static final Button UNKNOWN = new Button("Unknown");
+            UNKNOWN("Unknown"),
 
             /**
              * Returns the back mouse button.
              */
-            public static final Button BACK = new Button("Back");
+            BACK("Back"),
 
             /**
              * Returns the extra mouse button.
              */
-            public static final Button EXTRA = new Button("Extra");
+            EXTRA("Extra"),
 
             /**
              * Returns the forward mouse button.
              */
-            public static final Button FORWARD = new Button("Forward");
+            FORWARD("Forward"),
 
             /**
              * The primary or leftmost mouse button.
              */
-            public static final Button LEFT = new Button("Left");
+            LEFT("Left"),
 
             /**
              * Returns the middle mouse button, not present if the mouse has fewer than three buttons.
              */
-            public static final Button MIDDLE = new Button("Middle");
+            MIDDLE("Middle"),
 
             /**
              * The secondary or rightmost mouse button, not present if the mouse is a single-button mouse.
              */
-            public static final Button RIGHT = new Button("Right");
+            RIGHT("Right"),
 
             /**
              * Returns the side mouse button.
              */
-            public static final Button SIDE = new Button("Side");
+            SIDE("Side"),
 
             /**
              * Extra, unnamed, buttons
              */
-            public static final Button EXTRA_1 = new Button("Extra 1");
-            public static final Button EXTRA_2 = new Button("Extra 2");
-            public static final Button EXTRA_3 = new Button("Extra 3");
-            public static final Button EXTRA_4 = new Button("Extra 4");
-            public static final Button EXTRA_5 = new Button("Extra 5");
-            public static final Button EXTRA_6 = new Button("Extra 6");
-            public static final Button EXTRA_7 = new Button("Extra 7");
-            public static final Button EXTRA_8 = new Button("Extra 8");
-            public static final Button EXTRA_9 = new Button("Extra 9");
-            public static final Button EXTRA_10 = new Button("Extra 10");
-            public static final Button EXTRA_11 = new Button("Extra 11");
-            public static final Button EXTRA_12 = new Button("Extra 12");
-            public static final Button EXTRA_13 = new Button("Extra 13");
-            public static final Button EXTRA_14 = new Button("Extra 14");
-            public static final Button EXTRA_15 = new Button("Extra 15");
-            public static final Button EXTRA_16 = new Button("Extra 16");
-            public static final Button EXTRA_17 = new Button("Extra 17");
-            public static final Button EXTRA_18 = new Button("Extra 18");
-            public static final Button EXTRA_19 = new Button("Extra 19");
-            public static final Button EXTRA_20 = new Button("Extra 20");
-            public static final Button EXTRA_21 = new Button("Extra 21");
-            public static final Button EXTRA_22 = new Button("Extra 22");
-            public static final Button EXTRA_23 = new Button("Extra 23");
-            public static final Button EXTRA_24 = new Button("Extra 24");
-            public static final Button EXTRA_25 = new Button("Extra 25");
-            public static final Button EXTRA_26 = new Button("Extra 26");
-            public static final Button EXTRA_27 = new Button("Extra 27");
-            public static final Button EXTRA_28 = new Button("Extra 28");
-            public static final Button EXTRA_29 = new Button("Extra 29");
-            public static final Button EXTRA_30 = new Button("Extra 30");
-            public static final Button EXTRA_31 = new Button("Extra 31");
-            public static final Button EXTRA_32 = new Button("Extra 32");
-            public static final Button EXTRA_33 = new Button("Extra 33");
-            public static final Button EXTRA_34 = new Button("Extra 34");
-            public static final Button EXTRA_35 = new Button("Extra 35");
-            public static final Button EXTRA_36 = new Button("Extra 36");
-            public static final Button EXTRA_37 = new Button("Extra 37");
-            public static final Button EXTRA_38 = new Button("Extra 38");
-            public static final Button EXTRA_39 = new Button("Extra 39");
-            public static final Button EXTRA_40 = new Button("Extra 40");
+            EXTRA_1("Extra 1"),
+            EXTRA_2("Extra 2"),
+            EXTRA_3("Extra 3"),
+            EXTRA_4("Extra 4"),
+            EXTRA_5("Extra 5"),
+            EXTRA_6("Extra 6"),
+            EXTRA_7("Extra 7"),
+            EXTRA_8("Extra 8"),
+            EXTRA_9("Extra 9"),
+            EXTRA_10("Extra 10"),
+            EXTRA_11("Extra 11"),
+            EXTRA_12("Extra 12"),
+            EXTRA_13("Extra 13"),
+            EXTRA_14("Extra 14"),
+            EXTRA_15("Extra 15"),
+            EXTRA_16("Extra 16"),
+            EXTRA_17("Extra 17"),
+            EXTRA_18("Extra 18"),
+            EXTRA_19("Extra 19"),
+            EXTRA_20("Extra 20"),
+            EXTRA_21("Extra 21"),
+            EXTRA_22("Extra 22"),
+            EXTRA_23("Extra 23"),
+            EXTRA_24("Extra 24"),
+            EXTRA_25("Extra 25"),
+            EXTRA_26("Extra 26"),
+            EXTRA_27("Extra 27"),
+            EXTRA_28("Extra 28"),
+            EXTRA_29("Extra 29"),
+            EXTRA_30("Extra 30"),
+            EXTRA_31("Extra 31"),
+            EXTRA_32("Extra 32"),
+            EXTRA_33("Extra 33"),
+            EXTRA_34("Extra 34"),
+            EXTRA_35("Extra 35"),
+            EXTRA_36("Extra 36"),
+            EXTRA_37("Extra 37"),
+            EXTRA_38("Extra 38"),
+            EXTRA_39("Extra 39"),
+            EXTRA_40("Extra 40");
+
+            final String name;
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            Button(String name) {
+                this.name = name;
+            }
+
+            static Identifier byName(String name) {
+                return _byName(values(), name);
+            }
         }
 
         /**
          * KeyIDs for standard PC (LATIN-1) keyboards
          */
-        public static class Key extends Identifier {
+        enum Key implements Identifier {
+
+            // Standard keyboard (LATIN-1) keys
+            // UNIX X11 keysym values are listed to the right
+
+            /** MS 0x00 UNIX 0xFFFFFF */
+            VOID("Void"),
+            /** MS 0x01 UNIX 0xFF1B */
+            ESCAPE("Escape"),
+            /** MS 0x02 UNIX 0x031 EXCLAM 0x021 */
+            _1("1"),
+            /** MS 0x03 UNIX 0x032 AT 0x040 */
+            _2("2"),
+            /** MS 0x04 UNIX 0x033 NUMBERSIGN 0x023 */
+            _3("3"),
+            /** MS 0x05 UNIX 0x034 DOLLAR 0x024 */
+            _4("4"),
+            /** MS 0x06 UNIX 0x035 PERCENT 0x025 */
+            _5("5"),
+            /** MS 0x07 UNIX 0x036 CIRCUMFLEX 0x05e */
+            _6("6"),
+            /** MS 0x08 UNIX 0x037 AMPERSAND 0x026 */
+            _7("7"),
+            /** MS 0x09 UNIX 0x038 ASTERISK 0x02a */
+            _8("8"),
+            /** MS 0x0A UNIX 0x039 PARENLEFT 0x028 */
+            _9("9"),
+            /** MS 0x0B UNIX 0x030 PARENRIGHT 0x029 */
+            _0("0"),
+            /** MS 0x0C UNIX 0x02d UNDERSCORE 0x05f */
+            MINUS("-"),
+            /** MS 0x0D UNIX 0x03d PLUS 0x02b */
+            EQUALS("="),
+            /** MS 0x0E UNIX 0xFF08 */
+            BACK("Back"),
+            /** MS 0x0F UNIX 0xFF09 */
+            TAB("Tab"),
+            /** MS 0x10 UNIX 0x071 UPPER 0x051 */
+            Q("Q"),
+            /** MS 0x11 UNIX 0x077 UPPER 0x057 */
+            W("W"),
+            /** MS 0x12 UNIX 0x065 UPPER 0x045 */
+            E("E"),
+            /** MS 0x13 UNIX 0x072 UPPER 0x052 */
+            R("R"),
+            /** MS 0x14 UNIX 0x074 UPPER 0x054 */
+            T("T"),
+            /** MS 0x15 UNIX 0x079 UPPER 0x059 */
+            Y("Y"),
+            /** MS 0x16 UNIX 0x075 UPPER 0x055 */
+            U("U"),
+            /** MS 0x17 UNIX 0x069 UPPER 0x049 */
+            I("I"),
+            /** MS 0x18 UNIX 0x06F UPPER 0x04F */
+            O("O"),
+            /** MS 0x19 UNIX 0x070 UPPER 0x050 */
+            P("P"),
+            /** MS 0x1A UNIX 0x05b BRACE 0x07b */
+            LBRACKET("["),
+            /** MS 0x1B UNIX 0x05d BRACE 0x07d */
+            RBRACKET("]"),
+            /** MS 0x1C UNIX 0xFF0D */
+            RETURN("Return"),
+            /** MS 0x1D UNIX 0xFFE3 */
+            LCONTROL("Left Control"),
+            /** MS 0x1E UNIX 0x061 UPPER 0x041 */
+            A("A"),
+            /** MS 0x1F UNIX 0x073 UPPER 0x053 */
+            S("S"),
+            /** MS 0x20 UNIX 0x064 UPPER 0x044 */
+            D("D"),
+            /** MS 0x21 UNIX 0x066 UPPER 0x046 */
+            F("F"),
+            /** MS 0x22 UNIX 0x067 UPPER 0x047 */
+            G("G"),
+            /** MS 0x23 UNIX 0x068 UPPER 0x048 */
+            H("H"),
+            /** MS 0x24 UNIX 0x06A UPPER 0x04A */
+            J("J"),
+            /** MS 0x25 UNIX 0x06B UPPER 0x04B */
+            K("K"),
+            /** MS 0x26 UNIX 0x06C UPPER 0x04C */
+            L("L"),
+            /** MS 0x27 UNIX 0x03b COLON 0x03a */
+            SEMICOLON(";"),
+            /** MS 0x28 UNIX 0x027 QUOTEDBL 0x022 */
+            APOSTROPHE("'"),
+            /** MS 0x29 UNIX 0x060 TILDE 0x07e */
+            GRAVE("~"),
+            /** MS 0x2A UNIX 0xFFE1 */
+            LSHIFT("Left Shift"),
+            /** MS 0x2B UNIX 0x05c BAR 0x07c */
+            BACKSLASH("\\"),
+            /** MS 0x2C UNIX 0x07A UPPER 0x05A */
+            Z("Z"),
+            /** MS 0x2D UNIX 0x078 UPPER 0x058 */
+            X("X"),
+            /** MS 0x2E UNIX 0x063 UPPER 0x043 */
+            C("C"),
+            /** MS 0x2F UNIX 0x076 UPPER 0x056 */
+            V("V"),
+            /** MS 0x30 UNIX 0x062 UPPER 0x042 */
+            B("B"),
+            /** MS 0x31 UNIX 0x06E UPPER 0x04E */
+            N("N"),
+            /** MS 0x32 UNIX 0x06D UPPER 0x04D */
+            M("M"),
+            /** MS 0x33 UNIX 0x02c LESS 0x03c */
+            COMMA(","),
+            /** MS 0x34 UNIX 0x02e GREATER 0x03e */
+            PERIOD("."),
+            /** MS 0x35 UNIX 0x02f QUESTION 0x03f */
+            SLASH("/"),
+            /** MS 0x36 UNIX 0xFFE2 */
+            RSHIFT("Right Shift"),
+            /** MS 0x37 UNIX 0xFFAA */
+            MULTIPLY("Multiply"),
+            /** MS 0x38 UNIX 0xFFE9 */
+            LALT("Left Alt"),
+            /** MS 0x39 UNIX 0x020 */
+            SPACE(" "),
+            /** MS 0x3A UNIX 0xFFE5 SHIFTLOCK 0xFFE6 */
+            CAPITAL("Caps Lock"),
+            /** MS 0x3B UNIX 0xFFBE */
+            F1("F1"),
+            /** MS 0x3C UNIX 0xFFBF */
+            F2("F2"),
+            /** MS 0x3D UNIX 0xFFC0 */
+            F3("F3"),
+            /** MS 0x3E UNIX 0xFFC1 */
+            F4("F4"),
+            /** MS 0x3F UNIX 0xFFC2 */
+            F5("F5"),
+            /** MS 0x40 UNIX 0xFFC3 */
+            F6("F6"),
+            /** MS 0x41 UNIX 0xFFC4 */
+            F7("F7"),
+            /** MS 0x42 UNIX 0xFFC5 */
+            F8("F8"),
+            /** MS 0x43 UNIX 0xFFC6 */
+            F9("F9"),
+            /** MS 0x44 UNIX 0xFFC7 */
+            F10("F10"),
+            /** MS 0x45 UNIX 0xFF7F */
+            NUMLOCK("Num Lock"),
+            /** MS 0x46 UNIX 0xFF14 */
+            SCROLL("Scroll Lock"),
+            /** MS 0x47 UNIX 0xFFB7 HOME 0xFF95 */
+            NUMPAD7("Num 7"),
+            /** MS 0x48 UNIX 0xFFB8 UP 0xFF97 */
+            NUMPAD8("Num 8"),
+            /** MS 0x49 UNIX 0xFFB9 PRIOR 0xFF9A */
+            NUMPAD9("Num 9"),
+            /** MS 0x4A UNIX 0xFFAD */
+            SUBTRACT("Num -"),
+            /** MS 0x4B UNIX 0xFFB4 LEFT 0xFF96 */
+            NUMPAD4("Num 4"),
+            /** MS 0x4C UNIX 0xFFB5 */
+            NUMPAD5("Num 5"),
+            /** MS 0x4D UNIX 0xFFB6 RIGHT 0xFF98 */
+            NUMPAD6("Num 6"),
+            /** MS 0x4E UNIX 0xFFAB */
+            ADD("Num +"),
+            /** MS 0x4F UNIX 0xFFB1 END 0xFF9C */
+            NUMPAD1("Num 1"),
+            /** MS 0x50 UNIX 0xFFB2 DOWN 0xFF99 */
+            NUMPAD2("Num 2"),
+            /** MS 0x51 UNIX 0xFFB3 NEXT 0xFF9B */
+            NUMPAD3("Num 3"),
+            /** MS 0x52 UNIX 0xFFB0 INSERT 0xFF9E */
+            NUMPAD0("Num 0"),
+            /** MS 0x53 UNIX 0xFFAE DELETE 0xFF9F */
+            DECIMAL("Num ."),
+            /** MS 0x57 UNIX 0xFFC8 */
+            F11("F11"),
+            /** MS 0x58 UNIX 0xFFC9 */
+            F12("F12"),
+            /** MS 0x64 UNIX 0xFFCA */
+            F13("F13"),
+            /** MS 0x65 UNIX 0xFFCB */
+            F14("F14"),
+            /** MS 0x66 UNIX 0xFFCC */
+            F15("F15"),
+            /** MS 0x70 UNIX 0xFF2D */
+            KANA("Kana"),
+            /** MS 0x79 Japanese keyboard */
+            CONVERT("Convert"),
+            /** MS 0x7B Japanese keyboard */
+            NOCONVERT("Noconvert"),
+            /** MS 0x7D UNIX 0x0a5 */
+            YEN("Yen"),
+            /** MS 0x8D UNIX 0xFFBD */
+            NUMPADEQUAL("Num ="),
+            /** MS 0x90 Japanese keyboard */
+            CIRCUMFLEX("Circumflex"),
+            /** MS 0x91 UNIX 0x040 */
+            AT("At"),
+            /** MS 0x92 UNIX 0x03a */
+            COLON("Colon"),
+            /** MS 0x93 NEC PC98 */
+            UNDERLINE("Underline"),
+            /** MS 0x94 UNIX 0xFF21 */
+            KANJI("Kanji"),
+            /** MS 0x95 UNIX 0xFF69 */
+            STOP("Stop"),
+            /** MS 0x96 Japan AX */
+            AX("Ax"),
+            /** MS 0x97 J3100 */
+            UNLABELED("Unlabeled"),
+            /** MS 0x9C UNIX 0xFF8D */
+            NUMPADENTER("Num Enter"),
+            /** MS 0x9D UNIX 0xFFE4 */
+            RCONTROL("Right Control"),
+            /** MS 0xB3 UNIX 0xFFAC */
+            NUMPADCOMMA("Num ,"),
+            /** MS 0xB5 UNIX 0xFFAF */
+            DIVIDE("Num /"),
+            /** MS 0xB7 UNIX 0xFF15 PRINT 0xFF61 */
+            SYSRQ("SysRq"),
+            /** MS 0xB8 UNIX 0xFFEA */
+            RALT("Right Alt"),
+            /** MS 0xC5 UNIX 0xFF13 BREAK 0xFF6B */
+            PAUSE("Pause"),
+            /** MS 0xC7 UNIX 0xFF50 */
+            HOME("Home"),
+            /** MS 0xC8 UNIX 0xFF52 */
+            UP("Up"),
+            /** MS 0xC9 UNIX 0xFF55 */
+            PAGEUP("Pg Up"),
+            /** MS 0xCB UNIX 0xFF51 */
+            LEFT("Left"),
+            /** MS 0xCD UNIX 0xFF53 */
+            RIGHT("Right"),
+            /** MS 0xCF UNIX 0xFF57 */
+            END("End"),
+            /** MS 0xD0 UNIX 0xFF54 */
+            DOWN("Down"),
+            /** MS 0xD1 UNIX 0xFF56 */
+            PAGEDOWN("Pg Down"),
+            /** MS 0xD2 UNIX 0xFF63 */
+            INSERT("Insert"),
+            /** MS 0xD3 UNIX 0xFFFF */
+            DELETE("Delete"),
+            /** MS 0xDB UNIX META 0xFFE7 SUPER 0xFFEB HYPER 0xFFED */
+            LWIN("Left Windows"),
+            /** MS 0xDC UNIX META 0xFFE8 SUPER 0xFFEC HYPER 0xFFEE */
+            RWIN("Right Windows"),
+            /** MS 0xDD UNIX 0xFF67 */
+            APPS("Apps"),
+            /** MS 0xDE Sun 0x1005FF76 SHIFT 0x1005FF7D */
+            POWER("Power"),
+            /** MS 0xDF No UNIX keysym */
+            SLEEP("Sleep"),
+            UNKNOWN("Unknown");
+
+            final String name;
+
+            @Override
+            public String getName() {
+                return name;
+            }
 
             /**
              * Protected constructor
              */
-            protected Key(String name) {
-                super(name);
+            Key(String name) {
+                this.name = name;
             }
 
-            /**
-             * Standard keyboard (LATIN-1) keys
-             * UNIX X11 keysym values are listed to the right
-             */
-            public static final Key VOID = new Key("Void"); // MS 0x00 UNIX 0xFFFFFF
-            public static final Key ESCAPE = new Key("Escape"); // MS 0x01 UNIX 0xFF1B
-            public static final Key _1 = new Key("1"); // MS 0x02 UNIX 0x031 EXCLAM 0x021
-            public static final Key _2 = new Key("2"); // MS 0x03 UNIX 0x032 AT 0x040
-            public static final Key _3 = new Key("3"); // MS 0x04 UNIX 0x033 NUMBERSIGN 0x023
-            public static final Key _4 = new Key("4"); // MS 0x05 UNIX 0x034 DOLLAR 0x024
-            public static final Key _5 = new Key("5"); // MS 0x06 UNIX 0x035 PERCENT 0x025
-            public static final Key _6 = new Key("6"); // MS 0x07 UNIX 0x036 CIRCUMFLEX 0x05e
-            public static final Key _7 = new Key("7"); // MS 0x08 UNIX 0x037 AMPERSAND 0x026
-            public static final Key _8 = new Key("8"); // MS 0x09 UNIX 0x038 ASTERISK 0x02a
-            public static final Key _9 = new Key("9"); // MS 0x0A UNIX 0x039 PARENLEFT 0x028
-            public static final Key _0 = new Key("0"); // MS 0x0B UNIX 0x030 PARENRIGHT 0x029
-            public static final Key MINUS = new Key("-"); // MS 0x0C UNIX 0x02d UNDERSCORE 0x05f
-            public static final Key EQUALS = new Key("="); // MS 0x0D UNIX 0x03d PLUS 0x02b
-            public static final Key BACK = new Key("Back"); // MS 0x0E UNIX 0xFF08
-            public static final Key TAB = new Key("Tab"); // MS 0x0F UNIX 0xFF09
-            public static final Key Q = new Key("Q"); // MS 0x10 UNIX 0x071 UPPER 0x051
-            public static final Key W = new Key("W"); // MS 0x11 UNIX 0x077 UPPER 0x057
-            public static final Key E = new Key("E"); // MS 0x12 UNIX 0x065 UPPER 0x045
-            public static final Key R = new Key("R"); // MS 0x13 UNIX 0x072 UPPER 0x052
-            public static final Key T = new Key("T"); // MS 0x14 UNIX 0x074 UPPER 0x054
-            public static final Key Y = new Key("Y"); // MS 0x15 UNIX 0x079 UPPER 0x059
-            public static final Key U = new Key("U"); // MS 0x16 UNIX 0x075 UPPER 0x055
-            public static final Key I = new Key("I"); // MS 0x17 UNIX 0x069 UPPER 0x049
-            public static final Key O = new Key("O"); // MS 0x18 UNIX 0x06F UPPER 0x04F
-            public static final Key P = new Key("P"); // MS 0x19 UNIX 0x070 UPPER 0x050
-            public static final Key LBRACKET = new Key("["); // MS 0x1A UNIX 0x05b BRACE 0x07b
-            public static final Key RBRACKET = new Key("]"); // MS 0x1B UNIX 0x05d BRACE 0x07d
-            public static final Key RETURN = new Key("Return"); // MS 0x1C UNIX 0xFF0D
-            public static final Key LCONTROL = new Key("Left Control"); // MS 0x1D UNIX 0xFFE3
-            public static final Key A = new Key("A"); // MS 0x1E UNIX 0x061 UPPER 0x041
-            public static final Key S = new Key("S"); // MS 0x1F UNIX 0x073 UPPER 0x053
-            public static final Key D = new Key("D"); // MS 0x20 UNIX 0x064 UPPER 0x044
-            public static final Key F = new Key("F"); // MS 0x21 UNIX 0x066 UPPER 0x046
-            public static final Key G = new Key("G"); // MS 0x22 UNIX 0x067 UPPER 0x047
-            public static final Key H = new Key("H"); // MS 0x23 UNIX 0x068 UPPER 0x048
-            public static final Key J = new Key("J"); // MS 0x24 UNIX 0x06A UPPER 0x04A
-            public static final Key K = new Key("K"); // MS 0x25 UNIX 0x06B UPPER 0x04B
-            public static final Key L = new Key("L"); // MS 0x26 UNIX 0x06C UPPER 0x04C
-            public static final Key SEMICOLON = new Key(";"); // MS 0x27 UNIX 0x03b COLON 0x03a
-            public static final Key APOSTROPHE = new Key("'"); // MS 0x28 UNIX 0x027 QUOTEDBL 0x022
-            public static final Key GRAVE = new Key("~"); // MS 0x29 UNIX 0x060 TILDE 0x07e
-            public static final Key LSHIFT = new Key("Left Shift"); // MS 0x2A UNIX 0xFFE1
-            public static final Key BACKSLASH = new Key("\\"); // MS 0x2B UNIX 0x05c BAR 0x07c
-            public static final Key Z = new Key("Z"); // MS 0x2C UNIX 0x07A UPPER 0x05A
-            public static final Key X = new Key("X"); // MS 0x2D UNIX 0x078 UPPER 0x058
-            public static final Key C = new Key("C"); // MS 0x2E UNIX 0x063 UPPER 0x043
-            public static final Key V = new Key("V"); // MS 0x2F UNIX 0x076 UPPER 0x056
-            public static final Key B = new Key("B"); // MS 0x30 UNIX 0x062 UPPER 0x042
-            public static final Key N = new Key("N"); // MS 0x31 UNIX 0x06E UPPER 0x04E
-            public static final Key M = new Key("M"); // MS 0x32 UNIX 0x06D UPPER 0x04D
-            public static final Key COMMA = new Key(","); // MS 0x33 UNIX 0x02c LESS 0x03c
-            public static final Key PERIOD = new Key("."); // MS 0x34 UNIX 0x02e GREATER 0x03e
-            public static final Key SLASH = new Key("/"); // MS 0x35 UNIX 0x02f QUESTION 0x03f
-            public static final Key RSHIFT = new Key("Right Shift"); // MS 0x36 UNIX 0xFFE2
-            public static final Key MULTIPLY = new Key("Multiply"); // MS 0x37 UNIX 0xFFAA
-            public static final Key LALT = new Key("Left Alt"); // MS 0x38 UNIX 0xFFE9
-            public static final Key SPACE = new Key(" "); // MS 0x39 UNIX 0x020
-            public static final Key CAPITAL = new Key("Caps Lock"); // MS 0x3A UNIX 0xFFE5 SHIFTLOCK 0xFFE6
-            public static final Key F1 = new Key("F1"); // MS 0x3B UNIX 0xFFBE
-            public static final Key F2 = new Key("F2"); // MS 0x3C UNIX 0xFFBF
-            public static final Key F3 = new Key("F3"); // MS 0x3D UNIX 0xFFC0
-            public static final Key F4 = new Key("F4"); // MS 0x3E UNIX 0xFFC1
-            public static final Key F5 = new Key("F5"); // MS 0x3F UNIX 0xFFC2
-            public static final Key F6 = new Key("F6"); // MS 0x40 UNIX 0xFFC3
-            public static final Key F7 = new Key("F7"); // MS 0x41 UNIX 0xFFC4
-            public static final Key F8 = new Key("F8"); // MS 0x42 UNIX 0xFFC5
-            public static final Key F9 = new Key("F9"); // MS 0x43 UNIX 0xFFC6
-            public static final Key F10 = new Key("F10"); // MS 0x44 UNIX 0xFFC7
-            public static final Key NUMLOCK = new Key("Num Lock"); // MS 0x45 UNIX 0xFF7F
-            public static final Key SCROLL = new Key("Scroll Lock"); // MS 0x46 UNIX 0xFF14
-            public static final Key NUMPAD7 = new Key("Num 7"); // MS 0x47 UNIX 0xFFB7 HOME 0xFF95
-            public static final Key NUMPAD8 = new Key("Num 8"); // MS 0x48 UNIX 0xFFB8 UP 0xFF97
-            public static final Key NUMPAD9 = new Key("Num 9"); // MS 0x49 UNIX 0xFFB9 PRIOR 0xFF9A
-            public static final Key SUBTRACT = new Key("Num -"); // MS 0x4A UNIX 0xFFAD
-            public static final Key NUMPAD4 = new Key("Num 4"); // MS 0x4B UNIX 0xFFB4 LEFT 0xFF96
-            public static final Key NUMPAD5 = new Key("Num 5"); // MS 0x4C UNIX 0xFFB5
-            public static final Key NUMPAD6 = new Key("Num 6"); // MS 0x4D UNIX 0xFFB6 RIGHT 0xFF98
-            public static final Key ADD = new Key("Num +"); // MS 0x4E UNIX 0xFFAB
-            public static final Key NUMPAD1 = new Key("Num 1"); // MS 0x4F UNIX 0xFFB1 END 0xFF9C
-            public static final Key NUMPAD2 = new Key("Num 2"); // MS 0x50 UNIX 0xFFB2 DOWN 0xFF99
-            public static final Key NUMPAD3 = new Key("Num 3"); // MS 0x51 UNIX 0xFFB3 NEXT 0xFF9B
-            public static final Key NUMPAD0 = new Key("Num 0"); // MS 0x52 UNIX 0xFFB0 INSERT 0xFF9E
-            public static final Key DECIMAL = new Key("Num ."); // MS 0x53 UNIX 0xFFAE DELETE 0xFF9F
-            public static final Key F11 = new Key("F11"); // MS 0x57 UNIX 0xFFC8
-            public static final Key F12 = new Key("F12"); // MS 0x58 UNIX 0xFFC9
-            public static final Key F13 = new Key("F13"); // MS 0x64 UNIX 0xFFCA
-            public static final Key F14 = new Key("F14"); // MS 0x65 UNIX 0xFFCB
-            public static final Key F15 = new Key("F15"); // MS 0x66 UNIX 0xFFCC
-            public static final Key KANA = new Key("Kana"); // MS 0x70 UNIX 0xFF2D
-            public static final Key CONVERT = new Key("Convert"); // MS 0x79 Japanese keyboard
-            public static final Key NOCONVERT = new Key("Noconvert"); // MS 0x7B Japanese keyboard
-            public static final Key YEN = new Key("Yen"); // MS 0x7D UNIX 0x0a5
-            public static final Key NUMPADEQUAL = new Key("Num ="); // MS 0x8D UNIX 0xFFBD
-            public static final Key CIRCUMFLEX = new Key("Circumflex"); // MS 0x90 Japanese keyboard
-            public static final Key AT = new Key("At"); // MS 0x91 UNIX 0x040
-            public static final Key COLON = new Key("Colon"); // MS 0x92 UNIX 0x03a
-            public static final Key UNDERLINE = new Key("Underline"); // MS 0x93 NEC PC98
-            public static final Key KANJI = new Key("Kanji"); // MS 0x94 UNIX 0xFF21
-            public static final Key STOP = new Key("Stop"); // MS 0x95 UNIX 0xFF69
-            public static final Key AX = new Key("Ax"); // MS 0x96 Japan AX
-            public static final Key UNLABELED = new Key("Unlabeled"); // MS 0x97 J3100
-            public static final Key NUMPADENTER = new Key("Num Enter"); // MS 0x9C UNIX 0xFF8D
-            public static final Key RCONTROL = new Key("Right Control"); // MS 0x9D UNIX 0xFFE4
-            public static final Key NUMPADCOMMA = new Key("Num ,"); // MS 0xB3 UNIX 0xFFAC
-            public static final Key DIVIDE = new Key("Num /"); // MS 0xB5 UNIX 0xFFAF
-            public static final Key SYSRQ = new Key("SysRq"); // MS 0xB7 UNIX 0xFF15 PRINT 0xFF61
-            public static final Key RALT = new Key("Right Alt"); // MS 0xB8 UNIX 0xFFEA
-            public static final Key PAUSE = new Key("Pause"); // MS 0xC5 UNIX 0xFF13 BREAK 0xFF6B
-            public static final Key HOME = new Key("Home"); // MS 0xC7 UNIX 0xFF50
-            public static final Key UP = new Key("Up"); // MS 0xC8 UNIX 0xFF52
-            public static final Key PAGEUP = new Key("Pg Up"); // MS 0xC9 UNIX 0xFF55
-            public static final Key LEFT = new Key("Left"); // MS 0xCB UNIX 0xFF51
-            public static final Key RIGHT = new Key("Right"); // MS 0xCD UNIX 0xFF53
-            public static final Key END = new Key("End"); // MS 0xCF UNIX 0xFF57
-            public static final Key DOWN = new Key("Down"); // MS 0xD0 UNIX 0xFF54
-            public static final Key PAGEDOWN = new Key("Pg Down"); // MS 0xD1 UNIX 0xFF56
-            public static final Key INSERT = new Key("Insert"); // MS 0xD2 UNIX 0xFF63
-            public static final Key DELETE = new Key("Delete"); // MS 0xD3 UNIX 0xFFFF
-            public static final Key LWIN = new Key("Left Windows"); // MS 0xDB UNIX META 0xFFE7 SUPER 0xFFEB HYPER 0xFFED
-            public static final Key RWIN = new Key("Right Windows"); // MS 0xDC UNIX META 0xFFE8 SUPER 0xFFEC HYPER 0xFFEE
-            public static final Key APPS = new Key("Apps"); // MS 0xDD UNIX 0xFF67
-            public static final Key POWER = new Key("Power"); // MS 0xDE Sun 0x1005FF76 SHIFT 0x1005FF7D
-            public static final Key SLEEP = new Key("Sleep"); // MS 0xDF No UNIX keysym
-            public static final Key UNKNOWN = new Key("Unknown");
+            static Identifier byName(String name) {
+                try {
+                    return _byName(values(), name);
+                } catch (NoSuchElementException e) {
+                    return UNKNOWN;
+                }
+            }
         }
     }
 

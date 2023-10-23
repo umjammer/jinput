@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 /**
  * A FIFO queue for input events.
  */

@@ -97,18 +97,18 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
     }
 
     @Override
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         resizeEventQueue(size);
     }
 
     @Override
-    public final synchronized void eventDispatched(AWTEvent event) {
+    public synchronized void eventDispatched(AWTEvent event) {
         if (event instanceof KeyEvent)
             awt_events.add((KeyEvent) event);
     }
 
     @Override
-    public final synchronized void pollDevice() throws IOException {
+    public synchronized void pollDevice() throws IOException {
         for (KeyEvent awtEvent : awt_events) {
             processEvent(awtEvent);
         }
@@ -124,12 +124,12 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
             return;
         long nanos = event.getWhen() * 1000000L;
         if (event.getID() == KeyEvent.KEY_PRESSED) {
-            //the key was pressed
+            // the key was pressed
             addEvent(key, 1, nanos);
         } else if (event.getID() == KeyEvent.KEY_RELEASED) {
             KeyEvent nextPress = (KeyEvent) Toolkit.getDefaultToolkit().getSystemEventQueue().peekEvent(KeyEvent.KEY_PRESSED);
             if ((nextPress == null) || (nextPress.getWhen() != event.getWhen())) {
-                //the key came really came up
+                // the key came really came up
                 addEvent(key, 0, nanos);
             }
         }
@@ -142,7 +142,7 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
     }
 
     @Override
-    protected final synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
         if (processed_events_index == 0)
             return false;
         processed_events_index--;
@@ -153,7 +153,6 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
         return true;
     }
 
-
     private final static class Key extends AbstractComponent {
 
         private float value;
@@ -162,22 +161,17 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
             super(key_id.getName(), key_id);
         }
 
-        public final void setValue(float value) {
+        public void setValue(float value) {
             this.value = value;
         }
 
         @Override
-        protected final float poll() {
+        protected float poll() {
             return value;
         }
 
         @Override
-        public final boolean isAnalog() {
-            return false;
-        }
-
-        @Override
-        public final boolean isRelative() {
+        public boolean isRelative() {
             return false;
         }
     }

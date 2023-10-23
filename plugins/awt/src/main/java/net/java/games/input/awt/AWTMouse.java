@@ -83,9 +83,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
             case MouseEvent.BUTTON1 -> (Button) getLeft();
             case MouseEvent.BUTTON2 -> (Button) getMiddle();
             case MouseEvent.BUTTON3 -> (Button) getRight();
-            default ->
-                // Unknown button
-                    null;
+            default -> null; // Unknown button
         };
     }
 
@@ -112,7 +110,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
     }
 
     @Override
-    public final synchronized void pollDevice() throws IOException {
+    public synchronized void pollDevice() throws IOException {
         Axis wheel = (Axis) getWheel();
         wheel.setValue(0);
         for (AWTEvent event : awt_events) {
@@ -123,7 +121,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
     }
 
     @Override
-    protected final synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
         while (true) {
             if (processed_awt_events.isEmpty())
                 return false;
@@ -168,7 +166,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
     }
 
     @Override
-    public final synchronized void eventDispatched(AWTEvent event) {
+    public synchronized void eventDispatched(AWTEvent event) {
         awt_events.add(event);
     }
 
@@ -181,12 +179,12 @@ final class AWTMouse extends Mouse implements AWTEventListener {
         }
 
         @Override
-        public final boolean isRelative() {
+        public boolean isRelative() {
             return false;
         }
 
         @Override
-        public final boolean isAnalog() {
+        public boolean isAnalog() {
             return true;
         }
 
@@ -195,7 +193,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
         }
 
         @Override
-        protected final float poll() throws IOException {
+        protected float poll() throws IOException {
             return value;
         }
     }
@@ -213,17 +211,12 @@ final class AWTMouse extends Mouse implements AWTEventListener {
         }
 
         @Override
-        protected final float poll() throws IOException {
+        protected float poll() throws IOException {
             return value;
         }
 
         @Override
-        public final boolean isAnalog() {
-            return false;
-        }
-
-        @Override
-        public final boolean isRelative() {
+        public boolean isRelative() {
             return false;
         }
     }

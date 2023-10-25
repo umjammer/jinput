@@ -25,4 +25,5 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
 
 * ~~use proper ServiceLoader instead of proprietary plugin system (backport from vavi-awt-joystick)~~
 * linux not tested
-* windows not implemented
+* ~~windows wip, package name~~ not tested yet
+* ~~at windows, i mistake dword as 2byte~~

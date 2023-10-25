@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS 
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,43 +28,39 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.Component;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
 import net.java.games.input.Controller;
-import net.java.games.input.Event;
-import net.java.games.input.Mouse;
-import net.java.games.input.Rumbler;
 
 
 /**
+ * Java wrapper of RID_DEVICE_INFO
+ *
  * @author elias
  * @version 1.0
  */
-final class DIMouse extends Mouse {
+abstract class RawDeviceInfo {
 
-    private final IDirectInputDevice device;
+    public abstract Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapiDevice) throws IOException;
 
-    protected DIMouse(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
-        super(device.getProductName(), components, children, rumblers);
-        this.device = device;
+    public abstract int getUsage();
+
+    public abstract int getUsagePage();
+
+    public abstract HANDLE getHandle();
+
+    public final boolean equals(Object other) {
+        if (!(other instanceof RawDeviceInfo otherInfo))
+            return false;
+        return otherInfo.getUsage() == getUsage() && otherInfo.getUsagePage() == getUsagePage();
     }
 
-    public final void pollDevice() throws IOException {
-        device.pollAll();
+    public final int hashCode() {
+        return getUsage() ^ getUsagePage();
     }
-
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return DIControllers.getNextDeviceEvent(event, device);
-    }
-
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
-        device.setBufferSize(size);
-    }
-
 }

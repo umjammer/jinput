@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,10 +28,9 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import net.java.games.input.Component;
 
@@ -56,16 +49,12 @@ final class RawIdentifierMap {
     public final static int VK_XBUTTON1 = 0x05;    /* NOT contiguous with L & RBUTTON */
     public final static int VK_XBUTTON2 = 0x06;    /* NOT contiguous with L & RBUTTON */
 
-    /*
-     * 0x07 : unassigned
-     */
+    // 0x07 : unassigned
 
     public final static int VK_BACK = 0x08;
     public final static int VK_TAB = 0x09;
 
-    /*
-     * 0x0A - 0x0B : reserved
-     */
+    // 0x0A - 0x0B : reserved
 
     public final static int VK_CLEAR = 0x0C;
     public final static int VK_RETURN = 0x0D;
@@ -107,11 +96,9 @@ final class RawIdentifierMap {
     public final static int VK_INSERT = 0x2D;
     public final static int VK_DELETE = 0x2E;
     public final static int VK_HELP = 0x2F;
-    /*
-     * VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
-     * 0x40 : unassigned
-     * VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
-     */
+    // VK_0 - VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+    // 0x40 : unassigned
+    // VK_A - VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
     public final static int VK_0 = 0x30;
     public final static int VK_1 = 0x31;
     public final static int VK_2 = 0x32;
@@ -153,9 +140,7 @@ final class RawIdentifierMap {
     public final static int VK_LWIN = 0x5B;
     public final static int VK_RWIN = 0x5C;
     public final static int VK_APPS = 0x5D;
-    /*
-     * 0x5E : reserved;
-     */
+    // 0x5E : reserved;
 
     public final static int VK_SLEEP = 0x5F;
 
@@ -200,35 +185,25 @@ final class RawIdentifierMap {
     public final static int VK_F23 = 0x86;
     public final static int VK_F24 = 0x87;
 
-    /*
-     * 0x88 - 0x8F : unassigned;
-     */
+    // 0x88 - 0x8F : unassigned;
 
     public final static int VK_NUMLOCK = 0x90;
     public final static int VK_SCROLL = 0x91;
 
-    /*
-     * NEC PC-9800 kbd definitions
-     */
+    // NEC PC-9800 kbd definitions
     public final static int VK_OEM_NEC_EQUAL = 0x92;   // '=' key on numpad
-    /*
-     * Fujitsu/OASYS kbd definitions
-     */
+    // Fujitsu/OASYS kbd definitions
     public final static int VK_OEM_FJ_JISHO = 0x92;   // 'Dictionary' key
     public final static int VK_OEM_FJ_MASSHOU = 0x93;   // 'Unregister word' key
     public final static int VK_OEM_FJ_TOUROKU = 0x94;   // 'Register word' key
     public final static int VK_OEM_FJ_LOYA = 0x95;   // 'Left OYAYUBI' key
     public final static int VK_OEM_FJ_ROYA = 0x96;   // 'Right OYAYUBI' key
 
-    /*
-     * 0x97 - 0x9F : unassigned
-     */
+    // 0x97 - 0x9F : unassigned
 
-    /*
-     * VK_L* & VK_R* - left and right Alt, Ctrl and Shift virtual keys.
-     * Used only as parameters to GetAsyncKeyState() and GetKeyState().
-     * No other API or message will distinguish left and right keys in this way.
-     */
+    // VK_L* & VK_R* - left and right Alt, Ctrl and Shift virtual keys.
+    // Used only as parameters to GetAsyncKeyState() and GetKeyState().
+    // No other API or message will distinguish left and right keys in this way.
     public final static int VK_LSHIFT = 0xA0;
     public final static int VK_RSHIFT = 0xA1;
     public final static int VK_LCONTROL = 0xA2;
@@ -256,9 +231,7 @@ final class RawIdentifierMap {
     public final static int VK_LAUNCH_APP1 = 0xB6;
     public final static int VK_LAUNCH_APP2 = 0xB7;
 
-    /*
-     * 0xB8 - 0xB9 : reserved
-     */
+    // 0xB8 - 0xB9 : reserved
 
     public final static int VK_OEM_1 = 0xBA;   // ';:' for US
     public final static int VK_OEM_PLUS = 0xBB;   // '+' any country
@@ -268,13 +241,9 @@ final class RawIdentifierMap {
     public final static int VK_OEM_2 = 0xBF;   // '/?' for US
     public final static int VK_OEM_3 = 0xC0;   // '`~' for US
 
-    /*
-     * 0xC1 - 0xD7 : reserved
-     */
+    // 0xC1 - 0xD7 : reserved
 
-    /*
-     * 0xD8 - 0xDA : unassigned
-     */
+    // 0xD8 - 0xDA : unassigned
 
     public final static int VK_OEM_4 = 0xDB;  //  '[{' for US
     public final static int VK_OEM_5 = 0xDC;  //  '\|' for US
@@ -282,13 +251,9 @@ final class RawIdentifierMap {
     public final static int VK_OEM_7 = 0xDE;  //  ''"' for US
     public final static int VK_OEM_8 = 0xDF;
 
-    /*
-     * 0xE0 : reserved
-     */
+    // 0xE0 : reserved
 
-    /*
-     * Various extended or enhanced keyboards
-     */
+    // Various extended or enhanced keyboards
     public final static int VK_OEM_AX = 0xE1;  //  'AX' key on Japanese AX kbd
     public final static int VK_OEM_102 = 0xE2;  //  "<>" or "\|" on RT 102-key kbd.
     public final static int VK_ICO_HELP = 0xE3;  //  Help key on ICO
@@ -301,13 +266,9 @@ final class RawIdentifierMap {
 
     public final static int VK_PACKET = 0xE7;
 
-    /*
-     * 0xE8 : unassigned
-     */
+    // 0xE8 : unassigned
 
-    /*
-     * Nokia/Ericsson definitions
-     */
+    // Nokia/Ericsson definitions
     public final static int VK_OEM_RESET = 0xE9;
     public final static int VK_OEM_JUMP = 0xEA;
     public final static int VK_OEM_PA1 = 0xEB;
@@ -332,227 +293,116 @@ final class RawIdentifierMap {
     public final static int VK_PA1 = 0xFD;
     public final static int VK_OEM_CLEAR = 0xFE;
 
-    public final static Component.Identifier.Key mapVKey(int vkey) {
-        switch (vkey) {
-        case VK_ESCAPE:
-            return Component.Identifier.Key.ESCAPE;
-        case VK_1:
-            return Component.Identifier.Key._1;
-        case VK_2:
-            return Component.Identifier.Key._2;
-        case VK_3:
-            return Component.Identifier.Key._3;
-        case VK_4:
-            return Component.Identifier.Key._4;
-        case VK_5:
-            return Component.Identifier.Key._5;
-        case VK_6:
-            return Component.Identifier.Key._6;
-        case VK_7:
-            return Component.Identifier.Key._7;
-        case VK_8:
-            return Component.Identifier.Key._8;
-        case VK_9:
-            return Component.Identifier.Key._9;
-        case VK_0:
-            return Component.Identifier.Key._0;
-        case VK_OEM_NEC_EQUAL:
-            return Component.Identifier.Key.NUMPADEQUAL;
-        case VK_BACK:
-            return Component.Identifier.Key.BACK;
-        case VK_TAB:
-            return Component.Identifier.Key.TAB;
-        case VK_Q:
-            return Component.Identifier.Key.Q;
-        case VK_W:
-            return Component.Identifier.Key.W;
-        case VK_E:
-            return Component.Identifier.Key.E;
-        case VK_R:
-            return Component.Identifier.Key.R;
-        case VK_T:
-            return Component.Identifier.Key.T;
-        case VK_Y:
-            return Component.Identifier.Key.Y;
-        case VK_U:
-            return Component.Identifier.Key.U;
-        case VK_I:
-            return Component.Identifier.Key.I;
-        case VK_O:
-            return Component.Identifier.Key.O;
-        case VK_P:
-            return Component.Identifier.Key.P;
-        case VK_OEM_4:
-            return Component.Identifier.Key.LBRACKET;
-        case VK_OEM_6:
-            return Component.Identifier.Key.RBRACKET;
-        case VK_RETURN:
-            return Component.Identifier.Key.RETURN;
-        case VK_CONTROL:
-        case VK_LCONTROL:
-            return Component.Identifier.Key.LCONTROL;
-        case VK_A:
-            return Component.Identifier.Key.A;
-        case VK_S:
-            return Component.Identifier.Key.S;
-        case VK_D:
-            return Component.Identifier.Key.D;
-        case VK_F:
-            return Component.Identifier.Key.F;
-        case VK_G:
-            return Component.Identifier.Key.G;
-        case VK_H:
-            return Component.Identifier.Key.H;
-        case VK_J:
-            return Component.Identifier.Key.J;
-        case VK_K:
-            return Component.Identifier.Key.K;
-        case VK_L:
-            return Component.Identifier.Key.L;
-        case VK_OEM_3:
-            return Component.Identifier.Key.GRAVE;
-        case VK_SHIFT:
-        case VK_LSHIFT:
-            return Component.Identifier.Key.LSHIFT;
-        case VK_Z:
-            return Component.Identifier.Key.Z;
-        case VK_X:
-            return Component.Identifier.Key.X;
-        case VK_C:
-            return Component.Identifier.Key.C;
-        case VK_V:
-            return Component.Identifier.Key.V;
-        case VK_B:
-            return Component.Identifier.Key.B;
-        case VK_N:
-            return Component.Identifier.Key.N;
-        case VK_M:
-            return Component.Identifier.Key.M;
-        case VK_OEM_COMMA:
-            return Component.Identifier.Key.COMMA;
-        case VK_OEM_PERIOD:
-            return Component.Identifier.Key.PERIOD;
-        case VK_RSHIFT:
-            return Component.Identifier.Key.RSHIFT;
-        case VK_MULTIPLY:
-            return Component.Identifier.Key.MULTIPLY;
-        case VK_MENU:
-        case VK_LMENU:
-            return Component.Identifier.Key.LALT;
-        case VK_SPACE:
-            return Component.Identifier.Key.SPACE;
-        case VK_CAPITAL:
-            return Component.Identifier.Key.CAPITAL;
-        case VK_F1:
-            return Component.Identifier.Key.F1;
-        case VK_F2:
-            return Component.Identifier.Key.F2;
-        case VK_F3:
-            return Component.Identifier.Key.F3;
-        case VK_F4:
-            return Component.Identifier.Key.F4;
-        case VK_F5:
-            return Component.Identifier.Key.F5;
-        case VK_F6:
-            return Component.Identifier.Key.F6;
-        case VK_F7:
-            return Component.Identifier.Key.F7;
-        case VK_F8:
-            return Component.Identifier.Key.F8;
-        case VK_F9:
-            return Component.Identifier.Key.F9;
-        case VK_F10:
-            return Component.Identifier.Key.F10;
-        case VK_NUMLOCK:
-            return Component.Identifier.Key.NUMLOCK;
-        case VK_SCROLL:
-            return Component.Identifier.Key.SCROLL;
-        case VK_NUMPAD7:
-            return Component.Identifier.Key.NUMPAD7;
-        case VK_NUMPAD8:
-            return Component.Identifier.Key.NUMPAD8;
-        case VK_NUMPAD9:
-            return Component.Identifier.Key.NUMPAD9;
-        case VK_SUBTRACT:
-            return Component.Identifier.Key.SUBTRACT;
-        case VK_NUMPAD4:
-            return Component.Identifier.Key.NUMPAD4;
-        case VK_NUMPAD5:
-            return Component.Identifier.Key.NUMPAD5;
-        case VK_NUMPAD6:
-            return Component.Identifier.Key.NUMPAD6;
-        case VK_ADD:
-            return Component.Identifier.Key.ADD;
-        case VK_NUMPAD1:
-            return Component.Identifier.Key.NUMPAD1;
-        case VK_NUMPAD2:
-            return Component.Identifier.Key.NUMPAD2;
-        case VK_NUMPAD3:
-            return Component.Identifier.Key.NUMPAD3;
-        case VK_NUMPAD0:
-            return Component.Identifier.Key.NUMPAD0;
-        case VK_DECIMAL:
-            return Component.Identifier.Key.DECIMAL;
-        case VK_F11:
-            return Component.Identifier.Key.F11;
-        case VK_F12:
-            return Component.Identifier.Key.F12;
-        case VK_F13:
-            return Component.Identifier.Key.F13;
-        case VK_F14:
-            return Component.Identifier.Key.F14;
-        case VK_F15:
-            return Component.Identifier.Key.F15;
-        case VK_KANA:
-            return Component.Identifier.Key.KANA;
-        case VK_CONVERT:
-            return Component.Identifier.Key.CONVERT;
-        case VK_KANJI:
-            return Component.Identifier.Key.KANJI;
-        case VK_OEM_AX:
-            return Component.Identifier.Key.AX;
-        case VK_RCONTROL:
-            return Component.Identifier.Key.RCONTROL;
-        case VK_SEPARATOR:
-            return Component.Identifier.Key.NUMPADCOMMA;
-        case VK_DIVIDE:
-            return Component.Identifier.Key.DIVIDE;
-        case VK_SNAPSHOT:
-            return Component.Identifier.Key.SYSRQ;
-        case VK_RMENU:
-            return Component.Identifier.Key.RALT;
-        case VK_PAUSE:
-            return Component.Identifier.Key.PAUSE;
-        case VK_HOME:
-            return Component.Identifier.Key.HOME;
-        case VK_UP:
-            return Component.Identifier.Key.UP;
-        case VK_PRIOR:
-            return Component.Identifier.Key.PAGEUP;
-        case VK_LEFT:
-            return Component.Identifier.Key.LEFT;
-        case VK_RIGHT:
-            return Component.Identifier.Key.RIGHT;
-        case VK_END:
-            return Component.Identifier.Key.END;
-        case VK_DOWN:
-            return Component.Identifier.Key.DOWN;
-        case VK_NEXT:
-            return Component.Identifier.Key.PAGEDOWN;
-        case VK_INSERT:
-            return Component.Identifier.Key.INSERT;
-        case VK_DELETE:
-            return Component.Identifier.Key.DELETE;
-        case VK_LWIN:
-            return Component.Identifier.Key.LWIN;
-        case VK_RWIN:
-            return Component.Identifier.Key.RWIN;
-        case VK_APPS:
-            return Component.Identifier.Key.APPS;
-        case VK_SLEEP:
-            return Component.Identifier.Key.SLEEP;
-        default:
-            return Component.Identifier.Key.UNKNOWN;
-        }
+    public static Component.Identifier.Key mapVKey(int vkey) {
+        return switch (vkey) {
+            case VK_ESCAPE -> Component.Identifier.Key.ESCAPE;
+            case VK_1 -> Component.Identifier.Key._1;
+            case VK_2 -> Component.Identifier.Key._2;
+            case VK_3 -> Component.Identifier.Key._3;
+            case VK_4 -> Component.Identifier.Key._4;
+            case VK_5 -> Component.Identifier.Key._5;
+            case VK_6 -> Component.Identifier.Key._6;
+            case VK_7 -> Component.Identifier.Key._7;
+            case VK_8 -> Component.Identifier.Key._8;
+            case VK_9 -> Component.Identifier.Key._9;
+            case VK_0 -> Component.Identifier.Key._0;
+            case VK_OEM_NEC_EQUAL -> Component.Identifier.Key.NUMPADEQUAL;
+            case VK_BACK -> Component.Identifier.Key.BACK;
+            case VK_TAB -> Component.Identifier.Key.TAB;
+            case VK_Q -> Component.Identifier.Key.Q;
+            case VK_W -> Component.Identifier.Key.W;
+            case VK_E -> Component.Identifier.Key.E;
+            case VK_R -> Component.Identifier.Key.R;
+            case VK_T -> Component.Identifier.Key.T;
+            case VK_Y -> Component.Identifier.Key.Y;
+            case VK_U -> Component.Identifier.Key.U;
+            case VK_I -> Component.Identifier.Key.I;
+            case VK_O -> Component.Identifier.Key.O;
+            case VK_P -> Component.Identifier.Key.P;
+            case VK_OEM_4 -> Component.Identifier.Key.LBRACKET;
+            case VK_OEM_6 -> Component.Identifier.Key.RBRACKET;
+            case VK_RETURN -> Component.Identifier.Key.RETURN;
+            case VK_CONTROL, VK_LCONTROL -> Component.Identifier.Key.LCONTROL;
+            case VK_A -> Component.Identifier.Key.A;
+            case VK_S -> Component.Identifier.Key.S;
+            case VK_D -> Component.Identifier.Key.D;
+            case VK_F -> Component.Identifier.Key.F;
+            case VK_G -> Component.Identifier.Key.G;
+            case VK_H -> Component.Identifier.Key.H;
+            case VK_J -> Component.Identifier.Key.J;
+            case VK_K -> Component.Identifier.Key.K;
+            case VK_L -> Component.Identifier.Key.L;
+            case VK_OEM_3 -> Component.Identifier.Key.GRAVE;
+            case VK_SHIFT, VK_LSHIFT -> Component.Identifier.Key.LSHIFT;
+            case VK_Z -> Component.Identifier.Key.Z;
+            case VK_X -> Component.Identifier.Key.X;
+            case VK_C -> Component.Identifier.Key.C;
+            case VK_V -> Component.Identifier.Key.V;
+            case VK_B -> Component.Identifier.Key.B;
+            case VK_N -> Component.Identifier.Key.N;
+            case VK_M -> Component.Identifier.Key.M;
+            case VK_OEM_COMMA -> Component.Identifier.Key.COMMA;
+            case VK_OEM_PERIOD -> Component.Identifier.Key.PERIOD;
+            case VK_RSHIFT -> Component.Identifier.Key.RSHIFT;
+            case VK_MULTIPLY -> Component.Identifier.Key.MULTIPLY;
+            case VK_MENU, VK_LMENU -> Component.Identifier.Key.LALT;
+            case VK_SPACE -> Component.Identifier.Key.SPACE;
+            case VK_CAPITAL -> Component.Identifier.Key.CAPITAL;
+            case VK_F1 -> Component.Identifier.Key.F1;
+            case VK_F2 -> Component.Identifier.Key.F2;
+            case VK_F3 -> Component.Identifier.Key.F3;
+            case VK_F4 -> Component.Identifier.Key.F4;
+            case VK_F5 -> Component.Identifier.Key.F5;
+            case VK_F6 -> Component.Identifier.Key.F6;
+            case VK_F7 -> Component.Identifier.Key.F7;
+            case VK_F8 -> Component.Identifier.Key.F8;
+            case VK_F9 -> Component.Identifier.Key.F9;
+            case VK_F10 -> Component.Identifier.Key.F10;
+            case VK_NUMLOCK -> Component.Identifier.Key.NUMLOCK;
+            case VK_SCROLL -> Component.Identifier.Key.SCROLL;
+            case VK_NUMPAD7 -> Component.Identifier.Key.NUMPAD7;
+            case VK_NUMPAD8 -> Component.Identifier.Key.NUMPAD8;
+            case VK_NUMPAD9 -> Component.Identifier.Key.NUMPAD9;
+            case VK_SUBTRACT -> Component.Identifier.Key.SUBTRACT;
+            case VK_NUMPAD4 -> Component.Identifier.Key.NUMPAD4;
+            case VK_NUMPAD5 -> Component.Identifier.Key.NUMPAD5;
+            case VK_NUMPAD6 -> Component.Identifier.Key.NUMPAD6;
+            case VK_ADD -> Component.Identifier.Key.ADD;
+            case VK_NUMPAD1 -> Component.Identifier.Key.NUMPAD1;
+            case VK_NUMPAD2 -> Component.Identifier.Key.NUMPAD2;
+            case VK_NUMPAD3 -> Component.Identifier.Key.NUMPAD3;
+            case VK_NUMPAD0 -> Component.Identifier.Key.NUMPAD0;
+            case VK_DECIMAL -> Component.Identifier.Key.DECIMAL;
+            case VK_F11 -> Component.Identifier.Key.F11;
+            case VK_F12 -> Component.Identifier.Key.F12;
+            case VK_F13 -> Component.Identifier.Key.F13;
+            case VK_F14 -> Component.Identifier.Key.F14;
+            case VK_F15 -> Component.Identifier.Key.F15;
+            case VK_KANA -> Component.Identifier.Key.KANA;
+            case VK_CONVERT -> Component.Identifier.Key.CONVERT;
+            case VK_KANJI -> Component.Identifier.Key.KANJI;
+            case VK_OEM_AX -> Component.Identifier.Key.AX;
+            case VK_RCONTROL -> Component.Identifier.Key.RCONTROL;
+            case VK_SEPARATOR -> Component.Identifier.Key.NUMPADCOMMA;
+            case VK_DIVIDE -> Component.Identifier.Key.DIVIDE;
+            case VK_SNAPSHOT -> Component.Identifier.Key.SYSRQ;
+            case VK_RMENU -> Component.Identifier.Key.RALT;
+            case VK_PAUSE -> Component.Identifier.Key.PAUSE;
+            case VK_HOME -> Component.Identifier.Key.HOME;
+            case VK_UP -> Component.Identifier.Key.UP;
+            case VK_PRIOR -> Component.Identifier.Key.PAGEUP;
+            case VK_LEFT -> Component.Identifier.Key.LEFT;
+            case VK_RIGHT -> Component.Identifier.Key.RIGHT;
+            case VK_END -> Component.Identifier.Key.END;
+            case VK_DOWN -> Component.Identifier.Key.DOWN;
+            case VK_NEXT -> Component.Identifier.Key.PAGEDOWN;
+            case VK_INSERT -> Component.Identifier.Key.INSERT;
+            case VK_DELETE -> Component.Identifier.Key.DELETE;
+            case VK_LWIN -> Component.Identifier.Key.LWIN;
+            case VK_RWIN -> Component.Identifier.Key.RWIN;
+            case VK_APPS -> Component.Identifier.Key.APPS;
+            case VK_SLEEP -> Component.Identifier.Key.SLEEP;
+            default -> Component.Identifier.Key.UNKNOWN;
+        };
     }
 }

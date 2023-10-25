@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,64 +28,58 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.Component;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
 import net.java.games.input.Controller;
-import net.java.games.input.Rumbler;
 
 
 /**
- * Java wrapper of RID_DEVICE_INFO_MOUSE
+ * Java wrapper of RID_DEVICE_INFO_HID
  *
  * @author elias
  * @version 1.0
  */
-class RawMouseInfo extends RawDeviceInfo {
+class RawHIDInfo extends RawDeviceInfo {
 
     private final RawDevice device;
-    private final int id;
-    private final int num_buttons;
-    private final int sample_rate;
 
-    public RawMouseInfo(RawDevice device, int id, int num_buttons, int sample_rate) {
+    private final int vendorId;
+    private final int productId;
+    private final int version;
+    private final int page;
+    private final int usage;
+
+    public RawHIDInfo(RawDevice device, int vendorId, int productId, int version, int page, int usage) {
         this.device = device;
-        this.id = id;
-        this.num_buttons = num_buttons;
-        this.sample_rate = sample_rate;
+        this.vendorId = vendorId;
+        this.productId = productId;
+        this.version = version;
+        this.page = page;
+        this.usage = usage;
     }
 
+    @Override
     public final int getUsage() {
-        return 2;
+        return usage;
     }
 
+    @Override
     public final int getUsagePage() {
-        return 1;
+        return page;
     }
 
-    public final long getHandle() {
+    @Override
+    public final HANDLE getHandle() {
         return device.getHandle();
     }
 
-    public final Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException {
-        if (num_buttons == 0)
-            return null;
-        // A raw mouse contains the x and y and z axis and the buttons
-        Component[] components = new Component[3 + num_buttons];
-        int index = 0;
-        components[index++] = new RawMouse.Axis(device, Component.Identifier.Axis.X);
-        components[index++] = new RawMouse.Axis(device, Component.Identifier.Axis.Y);
-        components[index++] = new RawMouse.Axis(device, Component.Identifier.Axis.Z);
-        for (int i = 0; i < num_buttons; i++) {
-            Component.Identifier.Button id = DIIdentifierMap.mapMouseButtonIdentifier(DIIdentifierMap.getButtonIdentifier(i));
-            components[index++] = new RawMouse.Button(device, id, i);
-        }
-        Controller mouse = new RawMouse(setupapi_device.getName(), device, components, new Controller[] {}, new Rumbler[] {});
-        return mouse;
+    @Override
+    public final Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapiDevice) throws IOException {
+        return null;
     }
 }

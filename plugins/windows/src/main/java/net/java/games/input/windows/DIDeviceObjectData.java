@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,35 +28,56 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 
 /**
- * Java wrapper of a SetupAPI device
+ * Java wrapper for DIDEVICEOBJECTDATA
  *
  * @author elias
  * @version 1.0
  */
-final class SetupAPIDevice {
+final class DIDeviceObjectData extends Structure {
 
-    private final String device_instance_id;
-    private final String device_name;
+    public int dwOfs;
+    public int dwData;
+    public int dwTimeStamp;
+    public int dwSequence;
+    public Pointer uAppData;
 
-    public SetupAPIDevice(String device_instance_id, String device_name) {
-        this.device_instance_id = device_instance_id;
-        this.device_name = device_name;
+    public void set(int formatOffset, int data, int millis, int sequence) {
+        this.dwOfs = formatOffset;
+        this.dwData = data;
+        this.dwTimeStamp = millis;
+        this.dwSequence = sequence;
+        write();
     }
 
-    public final String getName() {
-        return device_name;
+    public void set(DIDeviceObjectData other) {
+        set(other.dwOfs, other.dwData, other.dwTimeStamp, other.dwSequence);
     }
 
-    public final String getInstanceId() {
-        return device_instance_id;
+    public int getData() {
+        return dwData;
+    }
+
+    public int getFormatOffset() {
+        return dwOfs;
+    }
+
+    public long getNanos() {
+        return dwTimeStamp * 1000000L;
+    }
+
+    @Override protected List<String> getFieldOrder() {
+        return Arrays.asList("dwOfs", "dwData", "dwTimeStamp", "dwSequence", "uAppData");
     }
 }

@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
  */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +51,7 @@ public class DirectAndRawInputEnvironmentPlugin extends ControllerEnvironment {
         rawPlugin = new RawInputEnvironmentPlugin();
     }
 
-    /**
-     * @see net.java.games.input.ControllerEnvironment#getControllers()
-     */
+    @Override
     public Controller[] getControllers() {
         if (controllers == null) {
             boolean rawKeyboardFound = false;
@@ -61,25 +59,25 @@ public class DirectAndRawInputEnvironmentPlugin extends ControllerEnvironment {
             List<Controller> tempControllers = new ArrayList<>();
             Controller[] dinputControllers = dinputPlugin.getControllers();
             Controller[] rawControllers = rawPlugin.getControllers();
-            for (int i = 0; i < rawControllers.length; i++) {
-                tempControllers.add(rawControllers[i]);
-                if (rawControllers[i].getType() == Controller.Type.KEYBOARD) {
+            for (Controller rawController : rawControllers) {
+                tempControllers.add(rawController);
+                if (rawController.getType() == Controller.Type.KEYBOARD) {
                     rawKeyboardFound = true;
-                } else if (rawControllers[i].getType() == Controller.Type.MOUSE) {
+                } else if (rawController.getType() == Controller.Type.MOUSE) {
                     rawMouseFound = true;
                 }
             }
-            for (int i = 0; i < dinputControllers.length; i++) {
-                if (dinputControllers[i].getType() == Controller.Type.KEYBOARD) {
+            for (Controller dinputController : dinputControllers) {
+                if (dinputController.getType() == Controller.Type.KEYBOARD) {
                     if (!rawKeyboardFound) {
-                        tempControllers.add(dinputControllers[i]);
+                        tempControllers.add(dinputController);
                     }
-                } else if (dinputControllers[i].getType() == Controller.Type.MOUSE) {
+                } else if (dinputController.getType() == Controller.Type.MOUSE) {
                     if (!rawMouseFound) {
-                        tempControllers.add(dinputControllers[i]);
+                        tempControllers.add(dinputController);
                     }
                 } else {
-                    tempControllers.add(dinputControllers[i]);
+                    tempControllers.add(dinputController);
                 }
             }
 
@@ -89,11 +87,8 @@ public class DirectAndRawInputEnvironmentPlugin extends ControllerEnvironment {
         return controllers;
     }
 
-    /**
-     * @see net.java.games.input.ControllerEnvironment#isSupported()
-     */
+    @Override
     public boolean isSupported() {
         return rawPlugin.isSupported() || dinputPlugin.isSupported();
     }
-
 }

@@ -30,13 +30,17 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import com.sun.jna.Pointer;
 import net.java.games.input.Component;
 import net.java.games.input.Rumbler;
+import net.java.games.input.windows.User32Ex.DIEFFECT;
+
+import static net.java.games.input.windows.IDirectInputDevice.DIEP_GAIN;
 
 
 /**
@@ -49,21 +53,22 @@ final class IDirectInputEffect implements Rumbler {
 
     private static final Logger log = Logger.getLogger(IDirectInputEffect.class.getName());
 
-    private final long address;
+    private final Pointer address;
     private final DIEffectInfo info;
     private boolean released;
 
-    public IDirectInputEffect(long address, DIEffectInfo info) {
+    public IDirectInputEffect(Pointer address, DIEffectInfo info) {
         this.address = address;
         this.info = info;
     }
 
+    @Override
     public synchronized void rumble(float intensity) {
         try {
             checkReleased();
             if (intensity > 0) {
-                int int_gain = Math.round(intensity * IDirectInputDevice.DI_FFNOMINALMAX);
-                setGain(int_gain);
+                int intGain = Math.round(intensity * IDirectInputDevice.DI_FFNOMINALMAX);
+                setGain(intGain);
                 start(1, 0);
             } else
                 stop();
@@ -72,10 +77,12 @@ final class IDirectInputEffect implements Rumbler {
         }
     }
 
+    @Override
     public Component.Identifier getAxisIdentifier() {
         return null;
     }
 
+    @Override
     public String getAxisName() {
         return null;
     }
@@ -83,11 +90,11 @@ final class IDirectInputEffect implements Rumbler {
     public synchronized void release() {
         if (!released) {
             released = true;
-            nRelease(address);
+
+            User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+            effect.Release.apply(address);
         }
     }
-
-    private static native void nRelease(long address);
 
     private void checkReleased() throws IOException {
         if (released)
@@ -95,7 +102,13 @@ final class IDirectInputEffect implements Rumbler {
     }
 
     private void setGain(int gain) throws IOException {
-        int res = nSetGain(address, gain);
+        User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+
+        DIEFFECT params = new DIEFFECT();
+        params.dwSize = params.size();
+        params.dwGain = gain;
+
+        int res = effect.SetParameters.apply(params, DIEP_GAIN);
         if (res != IDirectInputDevice.DI_DOWNLOADSKIPPED &&
                 res != IDirectInputDevice.DI_EFFECTRESTARTED &&
                 res != IDirectInputDevice.DI_OK &&
@@ -105,23 +118,21 @@ final class IDirectInputEffect implements Rumbler {
         }
     }
 
-    private static native int nSetGain(long address, int gain);
-
     private void start(int iterations, int flags) throws IOException {
-        int res = nStart(address, iterations, flags);
+        User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+
+        int res = effect.Start.apply(iterations, flags);
         if (res != IDirectInputDevice.DI_OK)
             throw new IOException("Failed to start effect (0x" + Integer.toHexString(res) + ")");
     }
 
-    private static native int nStart(long address, int iterations, int flags);
-
     private void stop() throws IOException {
-        int res = nStop(address);
+        User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+
+        int res = effect.Stop.apply();
         if (res != IDirectInputDevice.DI_OK)
             throw new IOException("Failed to stop effect (0x" + Integer.toHexString(res) + ")");
     }
-
-    private static native int nStop(long address);
 
     @Override
     @SuppressWarnings("deprecation")

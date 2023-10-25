@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS 
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,48 +28,68 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractController;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
-import net.java.games.input.Event;
 import net.java.games.input.Rumbler;
 
 
 /**
+ * Java wrapper of RID_DEVICE_INFO_MOUSE
+ *
  * @author elias
  * @version 1.0
  */
-final class DIAbstractController extends AbstractController {
+class RawMouseInfo extends RawDeviceInfo {
 
-    private final IDirectInputDevice device;
-    private final Type type;
+    private final RawDevice device;
+    private final int id;
+    private final int numButtons;
+    private final int sampleRate;
 
-    protected DIAbstractController(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Controller.Type type) {
-        super(device.getProductName(), components, children, rumblers);
+    public RawMouseInfo(RawDevice device, int id, int numButtons, int sampleRate) {
         this.device = device;
-        this.type = type;
+        this.id = id;
+        this.numButtons = numButtons;
+        this.sampleRate = sampleRate;
     }
 
-    public final void pollDevice() throws IOException {
-        device.pollAll();
+    @Override
+    public final int getUsage() {
+        return 2;
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return DIControllers.getNextDeviceEvent(event, device);
+    @Override
+    public final int getUsagePage() {
+        return 1;
     }
 
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
-        device.setBufferSize(size);
+    @Override
+    public final HANDLE getHandle() {
+        return device.getHandle();
     }
 
-    public final Controller.Type getType() {
-        return type;
+    @Override
+    public final Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapiDevice) throws IOException {
+        if (numButtons == 0)
+            return null;
+        // A raw mouse contains the x and y and z axis and the buttons
+        Component[] components = new Component[3 + numButtons];
+        int index = 0;
+        components[index++] = new RawMouse.Axis(device, Component.Identifier.Axis.X);
+        components[index++] = new RawMouse.Axis(device, Component.Identifier.Axis.Y);
+        components[index++] = new RawMouse.Axis(device, Component.Identifier.Axis.Z);
+        for (int i = 0; i < numButtons; i++) {
+            Component.Identifier.Button id = DIIdentifierMap.mapMouseButtonIdentifier(DIIdentifierMap.getButtonIdentifier(i));
+            components[index++] = new RawMouse.Button(device, id, i);
+        }
+        Controller mouse = new RawMouse(setupapiDevice.getName(), device, components, new Controller[0], new Rumbler[0]);
+        return mouse;
     }
 }

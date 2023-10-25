@@ -37,51 +37,58 @@
  *
  *****************************************************************************/
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
+import com.sun.jna.platform.win32.WinNT.HANDLE;
 import net.java.games.input.Controller;
+import net.java.games.input.Rumbler;
 
 
 /**
- * Java wrapper of RID_DEVICE_INFO_HID
+ * Java wrapper of RID_DEVICE_INFO_KEYBOARD
  *
  * @author elias
  * @version 1.0
  */
-class RawHIDInfo extends RawDeviceInfo {
+class RawKeyboardInfo extends RawDeviceInfo {
 
     private final RawDevice device;
+    private final int type;
+    private final int subType;
+    private final int keyboardMode;
+    private final int numFunctionKeys;
+    private final int numIndicators;
+    private final int numKeysTotal;
 
-    private final int vendor_id;
-    private final int product_id;
-    private final int version;
-    private final int page;
-    private final int usage;
-
-    public RawHIDInfo(RawDevice device, int vendor_id, int product_id, int version, int page, int usage) {
+    public RawKeyboardInfo(RawDevice device, int type, int subType, int keyboardMode, int numFunctionKeys, int numIndicators, int numKeysTotal) {
         this.device = device;
-        this.vendor_id = vendor_id;
-        this.product_id = product_id;
-        this.version = version;
-        this.page = page;
-        this.usage = usage;
+        this.type = type;
+        this.subType = subType;
+        this.keyboardMode = keyboardMode;
+        this.numFunctionKeys = numFunctionKeys;
+        this.numIndicators = numIndicators;
+        this.numKeysTotal = numKeysTotal;
     }
 
+    @Override
     public final int getUsage() {
-        return usage;
+        return 6;
     }
 
+    @Override
     public final int getUsagePage() {
-        return page;
+        return 1;
     }
 
-    public final long getHandle() {
+    @Override
+    public final HANDLE getHandle() {
         return device.getHandle();
     }
 
-    public final Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException {
-        return null;
+    @Override
+    public final Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapiDevice) throws IOException {
+        return new RawKeyboard(setupapiDevice.getName(), device, new Controller[] {}, new Rumbler[] {});
     }
 }

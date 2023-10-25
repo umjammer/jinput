@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,38 +28,32 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
-
-import java.io.IOException;
+package net.java.games.input.windows;
 
 
 /**
- * Java wrapper for a (dummy) window
+ * Java wrapper of a SetupAPI device
  *
- * @author martak
  * @author elias
  * @version 1.0
  */
-final class DummyWindow {
+final class SetupAPIDevice {
 
-    private final long hwnd_address;
+    private final String deviceInstanceId;
+    private final String deviceName;
 
-    public DummyWindow() throws IOException {
-        this.hwnd_address = createWindow();
+    public SetupAPIDevice(String deviceInstanceId, String deviceName) {
+        this.deviceInstanceId = deviceInstanceId;
+        this.deviceName = deviceName;
     }
 
-    private final static native long createWindow() throws IOException;
-
-    public final void destroy() throws IOException {
-        nDestroy(hwnd_address);
+    public String getName() {
+        return deviceName;
     }
 
-    private final static native void nDestroy(long hwnd_address) throws IOException;
-
-    public final long getHwnd() {
-        return hwnd_address;
+    public String getInstanceId() {
+        return deviceInstanceId;
     }
 }

@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS 
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,46 +28,67 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
-import net.java.games.input.AbstractComponent;
+import com.sun.jna.Structure;
+import com.sun.jna.platform.win32.Guid.GUID;
+
+import static net.java.games.input.windows.User32Ex.MAX_PATH;
 
 
 /**
+ * Java wrapper for DIEFFECTINFO
+ *
  * @author elias
  * @version 1.0
  */
-final class DIComponent extends AbstractComponent {
+final class DIEffectInfo extends Structure {
 
-    private final DIDeviceObject object;
+    public int dwSize;
+    public GUID guid;
+    private final int guidId;
+    public int dwEffType;
+    public int dwStaticParams;
+    public int dwDynamicParams;
+    public byte[] tszName = new byte[MAX_PATH];
 
-    public DIComponent(Identifier identifier, DIDeviceObject object) {
-        super(object.getName(), identifier);
-        this.object = object;
+    public DIEffectInfo(byte[] guid, int guidId, int dwEffType, int dwStaticParams, int dwDynamicParams, String name) {
+        this.guid = GUID.fromBinary(guid);
+        this.guidId = guidId;
+        this.dwEffType = dwEffType;
+        this.dwStaticParams = dwStaticParams;
+        this.dwDynamicParams = dwDynamicParams;
+        byte[] bytes = name.getBytes();
+        System.arraycopy(bytes, 0, this.tszName, 0, Math.min(bytes.length, MAX_PATH));
+        write();
     }
 
-    public final boolean isRelative() {
-        return object.isRelative();
+    public byte[] getGUID() {
+        return guid.toByteArray();
     }
 
-    public final boolean isAnalog() {
-        return object.isAnalog();
+    public int getGUIDId() {
+        return guidId;
     }
 
-    public final float getDeadZone() {
-        return object.getDeadzone();
+    public int getDynamicParams() {
+        return dwDynamicParams;
     }
 
-    public final DIDeviceObject getDeviceObject() {
-        return object;
+    public int getEffectType() {
+        return dwEffType;
     }
 
-    protected final float poll() throws IOException {
-        return DIControllers.poll(this, object);
+    public String getName() {
+        return new String(tszName).replace("\u0000", "");
+    }
+
+    @Override protected List<String> getFieldOrder() {
+        return Arrays.asList("dwSize", "guid", "dwEffType", "dwStaticParams", "dwDynamicParams", "tszName");
     }
 }

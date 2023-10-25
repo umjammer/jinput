@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,51 +28,44 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
 import net.java.games.input.Component;
+import net.java.games.input.Controller;
 import net.java.games.input.Event;
+import net.java.games.input.Mouse;
+import net.java.games.input.Rumbler;
 
 
 /**
  * @author elias
  * @version 1.0
  */
-final class DIControllers {
+final class DIMouse extends Mouse {
 
-    private final static DIDeviceObjectData di_event = new DIDeviceObjectData();
+    private final IDirectInputDevice device;
 
-    /* synchronized to protect di_event */
-    public final static synchronized boolean getNextDeviceEvent(Event event, IDirectInputDevice device) throws IOException {
-        if (!device.getNextEvent(di_event))
-            return false;
-        DIDeviceObject object = device.mapEvent(di_event);
-        DIComponent component = device.mapObject(object);
-        if (component == null)
-            return false;
-        int event_value;
-        if (object.isRelative()) {
-            event_value = object.getRelativeEventValue(di_event.getData());
-        } else {
-            event_value = di_event.getData();
-        }
-        event.set(component, component.getDeviceObject().convertValue(event_value), di_event.getNanos());
-        return true;
+    DIMouse(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
+        super(device.getProductName(), components, children, rumblers);
+        this.device = device;
     }
 
-    public final static float poll(Component component, DIDeviceObject object) throws IOException {
-        int poll_data = object.getDevice().getPollData(object);
-        float result;
-        if (object.isRelative()) {
-            result = object.getRelativePollValue(poll_data);
-        } else {
-            result = poll_data;
-        }
-        return object.convertValue(result);
+    @Override
+    public void pollDevice() throws IOException {
+        device.pollAll();
+    }
+
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
+        return DIControllers.getNextDeviceEvent(event, device);
+    }
+
+    @Override
+    protected void setDeviceEventQueueSize(int size) throws IOException {
+        device.setBufferSize(size);
     }
 }

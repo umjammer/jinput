@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,12 +28,9 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
-
-import java.io.IOException;
+package net.java.games.input.windows;
 
 import net.java.games.input.Component;
 
@@ -52,7 +43,7 @@ import net.java.games.input.Component;
  */
 final class DIDeviceObject {
 
-    //DirectInput scales wheel deltas by 120
+    // DirectInput scales wheel deltas by 120
     private final static int WHEEL_SCALE = 120;
 
     private final IDirectInputDevice device;
@@ -60,34 +51,34 @@ final class DIDeviceObject {
     private final int identifier;
     private final int type;
     private final int instance;
-    private final int guid_type;
+    private final int guidType;
     private final int flags;
     private final String name;
     private final Component.Identifier id;
-    private final int format_offset;
-    private final long min;
-    private final long max;
+    private final int formatOffset;
+    private final int min;
+    private final int max;
     private final int deadzone;
 
-    /* These are used for emulating relative axes */
-    private int last_poll_value;
-    private int last_event_value;
+    // These are used for emulating relative axes
+    private int lastPollValue;
+    private int lastEventValue;
 
-    public DIDeviceObject(IDirectInputDevice device, Component.Identifier id, byte[] guid, int guid_type, int identifier, int type, int instance, int flags, String name, int format_offset) throws IOException {
+    public DIDeviceObject(IDirectInputDevice device, Component.Identifier id, byte[] guid, int guidType, int identifier, int type, int instance, int flags, String name, int formatOffset) {
         this.device = device;
         this.id = id;
         this.guid = guid;
         this.identifier = identifier;
         this.type = type;
         this.instance = instance;
-        this.guid_type = guid_type;
+        this.guidType = guidType;
         this.flags = flags;
         this.name = name;
-        this.format_offset = format_offset;
+        this.formatOffset = formatOffset;
         if (isAxis() && !isRelative()) {
             long[] range = device.getRangeProperty(identifier);
-            this.min = range[0];
-            this.max = range[1];
+            this.min = (int) range[0];
+            this.max = (int) range[1];
             this.deadzone = device.getDeadzoneProperty(identifier);
         } else {
             this.min = IDirectInputDevice.DIPROPRANGE_NOMIN;
@@ -96,116 +87,116 @@ final class DIDeviceObject {
         }
     }
 
-    public final synchronized int getRelativePollValue(int current_abs_value) {
+    public synchronized int getRelativePollValue(int currentAbsValue) {
         if (device.areAxesRelative())
-            return current_abs_value;
-        int rel_value = current_abs_value - last_poll_value;
-        last_poll_value = current_abs_value;
-        return rel_value;
+            return currentAbsValue;
+        int relValue = currentAbsValue - lastPollValue;
+        lastPollValue = currentAbsValue;
+        return relValue;
     }
 
-    public final synchronized int getRelativeEventValue(int current_abs_value) {
+    public synchronized int getRelativeEventValue(int currentAbsValue) {
         if (device.areAxesRelative())
-            return current_abs_value;
-        int rel_value = current_abs_value - last_event_value;
-        last_event_value = current_abs_value;
-        return rel_value;
+            return currentAbsValue;
+        int relValue = currentAbsValue - lastEventValue;
+        lastEventValue = currentAbsValue;
+        return relValue;
     }
 
-    public final int getGUIDType() {
-        return guid_type;
+    public int getGUIDType() {
+        return guidType;
     }
 
-    public final int getFormatOffset() {
-        return format_offset;
+    public int getFormatOffset() {
+        return formatOffset;
     }
 
-    public final IDirectInputDevice getDevice() {
+    public IDirectInputDevice getDevice() {
         return device;
     }
 
-    public final int getDIIdentifier() {
+    public int getDIIdentifier() {
         return identifier;
     }
 
-    public final Component.Identifier getIdentifier() {
+    public Component.Identifier getIdentifier() {
         return id;
     }
 
-    public final String getName() {
+    public String getTszName() {
         return name;
     }
 
-    public final int getInstance() {
+    public int getInstance() {
         return instance;
     }
 
-    public final int getType() {
+    public int getType() {
         return type;
     }
 
-    public final byte[] getGUID() {
+    public byte[] getGUID() {
         return guid;
     }
 
-    public final int getFlags() {
+    public int getFlags() {
         return flags;
     }
 
-    public final long getMin() {
+    public long getMin() {
         return min;
     }
 
-    public final long getMax() {
+    public long getMax() {
         return max;
     }
 
-    public final float getDeadzone() {
+    public float getDeadzone() {
         return deadzone;
     }
 
-    public final boolean isButton() {
+    public boolean isButton() {
         return (type & IDirectInputDevice.DIDFT_BUTTON) != 0;
     }
 
-    public final boolean isAxis() {
+    public boolean isAxis() {
         return (type & IDirectInputDevice.DIDFT_AXIS) != 0;
     }
 
-    public final boolean isRelative() {
+    public boolean isRelative() {
         return isAxis() && (type & IDirectInputDevice.DIDFT_RELAXIS) != 0;
     }
 
-    public final boolean isAnalog() {
+    public boolean isAnalog() {
         return isAxis() && id != Component.Identifier.Axis.POV;
     }
 
-    public final float convertValue(float value) {
+    public float convertValue(float value) {
         if (getDevice().getType() == IDirectInputDevice.DI8DEVTYPE_MOUSE && id == Component.Identifier.Axis.Z) {
             return value / WHEEL_SCALE;
         } else if (isButton()) {
             return (((int) value) & 0x80) != 0 ? 1 : 0;
         } else if (id == Component.Identifier.Axis.POV) {
-            int int_value = (int) value;
-            if ((int_value & 0xFFFF) == 0xFFFF)
+            int intValue = (int) value;
+            if ((intValue & 0xFFFF) == 0xFFFF)
                 return Component.POV.OFF;
             // DirectInput returns POV directions in hundredths of degree clockwise from north
             int slice = 360 * 100 / 16;
-            if (int_value >= 0 && int_value < slice)
+            if (intValue >= 0 && intValue < slice)
                 return Component.POV.UP;
-            else if (int_value < 3 * slice)
+            else if (intValue < 3 * slice)
                 return Component.POV.UP_RIGHT;
-            else if (int_value < 5 * slice)
+            else if (intValue < 5 * slice)
                 return Component.POV.RIGHT;
-            else if (int_value < 7 * slice)
+            else if (intValue < 7 * slice)
                 return Component.POV.DOWN_RIGHT;
-            else if (int_value < 9 * slice)
+            else if (intValue < 9 * slice)
                 return Component.POV.DOWN;
-            else if (int_value < 11 * slice)
+            else if (intValue < 11 * slice)
                 return Component.POV.DOWN_LEFT;
-            else if (int_value < 13 * slice)
+            else if (intValue < 13 * slice)
                 return Component.POV.LEFT;
-            else if (int_value < 15 * slice)
+            else if (intValue < 15 * slice)
                 return Component.POV.UP_LEFT;
             else
                 return Component.POV.UP;
@@ -214,5 +205,4 @@ final class DIDeviceObject {
         } else
             return value;
     }
-
 }

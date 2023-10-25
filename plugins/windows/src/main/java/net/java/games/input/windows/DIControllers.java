@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,49 +28,48 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
+
+import net.java.games.input.Component;
+import net.java.games.input.Event;
 
 
 /**
- * Java wrapper of RAWKEYBOARD
- *
  * @author elias
  * @version 1.0
  */
-final class RawKeyboardEvent {
+final class DIControllers {
 
-    private long millis;
-    private int make_code;
-    private int flags;
-    private int vkey;
-    private int message;
-    private long extra_information;
+    private final static DIDeviceObjectData diEvent = new DIDeviceObjectData();
 
-    public final void set(long millis, int make_code, int flags, int vkey, int message, long extra_information) {
-        this.millis = millis;
-        this.make_code = make_code;
-        this.flags = flags;
-        this.vkey = vkey;
-        this.message = message;
-        this.extra_information = extra_information;
+    /** synchronized to protect diEvent */
+    public static synchronized boolean getNextDeviceEvent(Event event, IDirectInputDevice device) {
+        if (!device.getNextEvent(diEvent))
+            return false;
+        DIDeviceObject object = device.mapEvent(diEvent);
+        DIComponent component = device.mapObject(object);
+        if (component == null)
+            return false;
+        int eventValue;
+        if (object.isRelative()) {
+            eventValue = object.getRelativeEventValue(diEvent.getData());
+        } else {
+            eventValue = diEvent.getData();
+        }
+        event.set(component, component.getDeviceObject().convertValue(eventValue), diEvent.getNanos());
+        return true;
     }
 
-    public final void set(RawKeyboardEvent event) {
-        set(event.millis, event.make_code, event.flags, event.vkey, event.message, event.extra_information);
-    }
-
-    public final int getVKey() {
-        return vkey;
-    }
-
-    public final int getMessage() {
-        return message;
-    }
-
-    public final long getNanos() {
-        return millis * 1000000L;
+    public static float poll(Component component, DIDeviceObject object) {
+        int pollData = object.getDevice().getPollData(object);
+        float result;
+        if (object.isRelative()) {
+            result = object.getRelativePollValue(pollData);
+        } else {
+            result = pollData;
+        }
+        return object.convertValue(result);
     }
 }

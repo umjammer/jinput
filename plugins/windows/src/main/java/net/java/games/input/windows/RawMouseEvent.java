@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,41 +28,78 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
-
-import java.io.IOException;
-
-import net.java.games.input.Controller;
+package net.java.games.input.windows;
 
 
 /**
- * Java wrapper of RID_DEVICE_INFO
+ * Java wrapper of RAWMOUSE
  *
  * @author elias
  * @version 1.0
  */
-abstract class RawDeviceInfo {
+final class RawMouseEvent {
 
-    public abstract Controller createControllerFromDevice(RawDevice device, SetupAPIDevice setupapi_device) throws IOException;
+    /**
+     * It seems that raw input scales wheel
+     * the same way as direcinput
+     */
+    private final static int WHEEL_SCALE = 120;
 
-    public abstract int getUsage();
+    private long millis;
+    private int flags;
+    private int buttonFlags;
+    private int buttonData;
+    private long rawButtons;
+    private long lastX;
+    private long lastY;
+    private long extraInformation;
 
-    public abstract int getUsagePage();
-
-    public abstract long getHandle();
-
-    public final boolean equals(Object other) {
-        if (!(other instanceof RawDeviceInfo))
-            return false;
-        RawDeviceInfo other_info = (RawDeviceInfo) other;
-        return other_info.getUsage() == getUsage() &&
-                other_info.getUsagePage() == getUsagePage();
+    public void set(long millis, int flags, int buttonFlags, int buttonData, long rawButtons, long lastX, long lastY, long extraInformation) {
+        this.millis = millis;
+        this.flags = flags;
+        this.buttonFlags = buttonFlags;
+        this.buttonData = buttonData;
+        this.rawButtons = rawButtons;
+        this.lastX = lastX;
+        this.lastY = lastY;
+        this.extraInformation = extraInformation;
     }
 
-    public final int hashCode() {
-        return getUsage() ^ getUsagePage();
+    public void set(RawMouseEvent event) {
+        set(event.millis, event.flags, event.buttonFlags, event.buttonData, event.rawButtons, event.lastX, event.lastY, event.extraInformation);
+    }
+
+    public int getWheelDelta() {
+        return buttonData / WHEEL_SCALE;
+    }
+
+    private int getButtonData() {
+        return buttonData;
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public int getButtonFlags() {
+        return buttonFlags;
+    }
+
+    public int getLastX() {
+        return (int) lastX;
+    }
+
+    public int getLastY() {
+        return (int) lastY;
+    }
+
+    public long getRawButtons() {
+        return rawButtons;
+    }
+
+    public long getNanos() {
+        return millis * 1000000L;
     }
 }

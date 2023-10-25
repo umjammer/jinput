@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -25,7 +19,7 @@
  * ANY IMPLIED WARRANT OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
  * NON-INFRINGEMENT, ARE HEREBY EXCLUDED.  SUN MICROSYSTEMS, INC. ("SUN") AND
  * ITS LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS
- * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS 
+ * A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
  * DERIVATIVES.  IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST
  * REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL,
  * INCIDENTAL OR PUNITIVE DAMAGES.  HOWEVER CAUSED AND REGARDLESS OF THE THEORY
@@ -34,54 +28,44 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
+
+import java.io.IOException;
+
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+import net.java.games.input.Event;
+import net.java.games.input.Keyboard;
+import net.java.games.input.Rumbler;
+
 
 /**
- * Java wrapper for DIEFFECTINFO
- *
  * @author elias
  * @version 1.0
  */
-final class DIEffectInfo {
+final class DIKeyboard extends Keyboard {
 
     private final IDirectInputDevice device;
-    private final byte[] guid;
-    private final int guid_id;
-    private final int effect_type;
-    private final int static_params;
-    private final int dynamic_params;
-    private final String name;
 
-    public DIEffectInfo(IDirectInputDevice device, byte[] guid, int guid_id, int effect_type, int static_params, int dynamic_params, String name) {
+    DIKeyboard(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
+        super(device.getProductName(), components, children, rumblers);
         this.device = device;
-        this.guid = guid;
-        this.guid_id = guid_id;
-        this.effect_type = effect_type;
-        this.static_params = static_params;
-        this.dynamic_params = dynamic_params;
-        this.name = name;
     }
 
-    public final byte[] getGUID() {
-        return guid;
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
+        return DIControllers.getNextDeviceEvent(event, device);
     }
 
-    public final int getGUIDId() {
-        return guid_id;
+    @Override
+    public void pollDevice() throws IOException {
+        device.pollAll();
     }
 
-    public final int getDynamicParams() {
-        return dynamic_params;
-    }
-
-    public final int getEffectType() {
-        return effect_type;
-    }
-
-    public final String getName() {
-        return name;
+    @Override
+    protected void setDeviceEventQueueSize(int size) throws IOException {
+        device.setBufferSize(size);
     }
 }

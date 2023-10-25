@@ -30,7 +30,7 @@
  * the design, construction, operation or maintenance of any nuclear facility
  */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
     }
 
     private final Controller[] controllers;
-    private final List<IDirectInputDevice> active_devices = new ArrayList<>();
+    private final List<IDirectInputDevice> activeDevices = new ArrayList<>();
     private final DummyWindow window;
 
     /** Creates new DirectInputEnvironment */
@@ -97,26 +97,26 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
     }
 
     @Override
-    public final Controller[] getControllers() {
+    public Controller[] getControllers() {
         return controllers;
     }
 
-    private Component[] createComponents(IDirectInputDevice device, boolean map_mouse_buttons) {
-        List<DIDeviceObject> device_objects = device.getObjects();
-        List<DIComponent> controller_components = new ArrayList<>();
-        for (DIDeviceObject device_object : device_objects) {
-            Component.Identifier identifier = device_object.getIdentifier();
+    private Component[] createComponents(IDirectInputDevice device, boolean mapMouseButtons) {
+        List<DIDeviceObject> deviceObjects = device.getObjects();
+        List<DIComponent> controllerComponents = new ArrayList<>();
+        for (DIDeviceObject deviceObject : deviceObjects) {
+            Component.Identifier identifier = deviceObject.getIdentifier();
             if (identifier == null)
                 continue;
-            if (map_mouse_buttons && identifier instanceof Component.Identifier.Button) {
+            if (mapMouseButtons && identifier instanceof Component.Identifier.Button) {
                 identifier = DIIdentifierMap.mapMouseButtonIdentifier((Component.Identifier.Button) identifier);
             }
-            DIComponent component = new DIComponent(identifier, device_object);
-            controller_components.add(component);
-            device.registerComponent(device_object, component);
+            DIComponent component = new DIComponent(identifier, deviceObject);
+            controllerComponents.add(component);
+            device.registerComponent(deviceObject, component);
         }
-        Component[] components = new Component[controller_components.size()];
-        controller_components.toArray(components);
+        Component[] components = new Component[controllerComponents.size()];
+        controllerComponents.toArray(components);
         return components;
     }
 
@@ -152,7 +152,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
         };
     }
 
-    private final Controller[] enumControllers(DummyWindow window) throws IOException {
+    private Controller[] enumControllers(DummyWindow window) throws IOException {
         List<Controller> controllers = new ArrayList<>();
         IDirectInput dinput = new IDirectInput(window);
         try {
@@ -161,21 +161,21 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
                 Controller controller = createControllerFromDevice(device);
                 if (controller != null) {
                     controllers.add(controller);
-                    active_devices.add(device);
+                    activeDevices.add(device);
                 } else
                     device.release();
             }
         } finally {
             dinput.release();
         }
-        Controller[] controllers_array = new Controller[controllers.size()];
-        controllers.toArray(controllers_array);
-        return controllers_array;
+        Controller[] controllersArray = new Controller[controllers.size()];
+        controllers.toArray(controllersArray);
+        return controllersArray;
     }
 
     private void shutdownHook() {
         // Release the devices to kill off active force feedback effects
-        for (IDirectInputDevice device : active_devices) {
+        for (IDirectInputDevice device : activeDevices) {
             device.release();
         }
         // We won't release the window since it is

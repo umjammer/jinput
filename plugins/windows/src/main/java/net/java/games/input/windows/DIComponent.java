@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,42 +28,49 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.Component;
-import net.java.games.input.Controller;
-import net.java.games.input.Event;
-import net.java.games.input.Keyboard;
-import net.java.games.input.Rumbler;
+import net.java.games.input.AbstractComponent;
 
 
 /**
  * @author elias
  * @version 1.0
  */
-final class DIKeyboard extends Keyboard {
+final class DIComponent extends AbstractComponent {
 
-    private final IDirectInputDevice device;
+    private final DIDeviceObject object;
 
-    protected DIKeyboard(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
-        super(device.getProductName(), components, children, rumblers);
-        this.device = device;
+    public DIComponent(Identifier identifier, DIDeviceObject object) {
+        super(object.getTszName(), identifier);
+        this.object = object;
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return DIControllers.getNextDeviceEvent(event, device);
+    @Override
+    public boolean isRelative() {
+        return object.isRelative();
     }
 
-    public final void pollDevice() throws IOException {
-        device.pollAll();
+    @Override
+    public boolean isAnalog() {
+        return object.isAnalog();
     }
 
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
-        device.setBufferSize(size);
+    @Override
+    public float getDeadZone() {
+        return object.getDeadzone();
+    }
+
+    public DIDeviceObject getDeviceObject() {
+        return object;
+    }
+
+    @Override
+    protected float poll() throws IOException {
+        return DIControllers.poll(this, object);
     }
 }

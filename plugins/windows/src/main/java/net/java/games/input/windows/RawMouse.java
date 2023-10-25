@@ -37,7 +37,7 @@
  *
  *****************************************************************************/
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 
@@ -54,119 +54,122 @@ import net.java.games.input.Rumbler;
  * @version 1.0
  */
 final class RawMouse extends Mouse {
-    /* Because one raw event can contain multiple
-     * changes, we'll make a simple state machine
-     * to keep track of which change to  report next
-     */
 
-    // Another event should be read
+    // Because one raw event can contain multiple
+    // changes, we'll make a simple state machine
+    // to keep track of which change to  report next
+
+    /** Another event should be read */
     private final static int EVENT_DONE = 1;
-    // The X axis should be reported next
+    /** The X axis should be reported next */
     private final static int EVENT_X = 2;
-    // The Y axis should be reported next
+    /** The Y axis should be reported next */
     private final static int EVENT_Y = 3;
-    // The Z axis should be reported next
+    /** The Z axis should be reported next */
     private final static int EVENT_Z = 4;
-    // Button 0 should be reported next
+    /** Button 0 should be reported next */
     private final static int EVENT_BUTTON_0 = 5;
-    // Button 1 should be reported next
+    /** Button 1 should be reported next */
     private final static int EVENT_BUTTON_1 = 6;
-    // Button 2 should be reported next
+    /** Button 2 should be reported next */
     private final static int EVENT_BUTTON_2 = 7;
-    // Button 3 should be reported next
+    /** Button 3 should be reported next */
     private final static int EVENT_BUTTON_3 = 8;
-    // Button 4 should be reported next
+    /** Button 4 should be reported next */
     private final static int EVENT_BUTTON_4 = 9;
 
     private final RawDevice device;
 
-    private final RawMouseEvent current_event = new RawMouseEvent();
-    private int event_state = EVENT_DONE;
+    private final RawMouseEvent currentEvent = new RawMouseEvent();
+    private int eventState = EVENT_DONE;
 
-    protected RawMouse(String name, RawDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) throws IOException {
+    RawMouse(String name, RawDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) throws IOException {
         super(name, components, children, rumblers);
         this.device = device;
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.pollMouse();
     }
 
-    private final static boolean makeButtonEvent(RawMouseEvent mouse_event, Event event, Component button_component, int down_flag, int up_flag) {
-        if ((mouse_event.getButtonFlags() & down_flag) != 0) {
-            event.set(button_component, 1, mouse_event.getNanos());
+    private static boolean makeButtonEvent(RawMouseEvent mouseEvent, Event event, Component buttonComponent, int downFlag, int upFlag) {
+        if ((mouseEvent.getButtonFlags() & downFlag) != 0) {
+            event.set(buttonComponent, 1, mouseEvent.getNanos());
             return true;
-        } else if ((mouse_event.getButtonFlags() & up_flag) != 0) {
-            event.set(button_component, 0, mouse_event.getNanos());
+        } else if ((mouseEvent.getButtonFlags() & upFlag) != 0) {
+            event.set(buttonComponent, 0, mouseEvent.getNanos());
             return true;
         } else
             return false;
     }
 
-    protected final synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+    @Override
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
         while (true) {
-            switch (event_state) {
+            switch (eventState) {
             case EVENT_DONE:
-                if (!device.getNextMouseEvent(current_event))
+                if (!device.getNextMouseEvent(currentEvent))
                     return false;
-                event_state = EVENT_X;
+                eventState = EVENT_X;
                 break;
             case EVENT_X:
-                int rel_x = device.getEventRelativeX();
-                event_state = EVENT_Y;
-                if (rel_x != 0) {
-                    event.set(getX(), rel_x, current_event.getNanos());
+                int relX = device.getEventRelativeX();
+                eventState = EVENT_Y;
+                if (relX != 0) {
+                    event.set(getX(), relX, currentEvent.getNanos());
                     return true;
                 }
                 break;
             case EVENT_Y:
-                int rel_y = device.getEventRelativeY();
-                event_state = EVENT_Z;
-                if (rel_y != 0) {
-                    event.set(getY(), rel_y, current_event.getNanos());
+                int relY = device.getEventRelativeY();
+                eventState = EVENT_Z;
+                if (relY != 0) {
+                    event.set(getY(), relY, currentEvent.getNanos());
                     return true;
                 }
                 break;
             case EVENT_Z:
-                int wheel = current_event.getWheelDelta();
-                event_state = EVENT_BUTTON_0;
+                int wheel = currentEvent.getWheelDelta();
+                eventState = EVENT_BUTTON_0;
                 if (wheel != 0) {
-                    event.set(getWheel(), wheel, current_event.getNanos());
+                    event.set(getWheel(), wheel, currentEvent.getNanos());
                     return true;
                 }
                 break;
             case EVENT_BUTTON_0:
-                event_state = EVENT_BUTTON_1;
-                if (makeButtonEvent(current_event, event, getPrimaryButton(), RawDevice.RI_MOUSE_BUTTON_1_DOWN, RawDevice.RI_MOUSE_BUTTON_1_UP))
+                eventState = EVENT_BUTTON_1;
+                if (makeButtonEvent(currentEvent, event, getPrimaryButton(), RawDevice.RI_MOUSE_BUTTON_1_DOWN, RawDevice.RI_MOUSE_BUTTON_1_UP))
                     return true;
                 break;
             case EVENT_BUTTON_1:
-                event_state = EVENT_BUTTON_2;
-                if (makeButtonEvent(current_event, event, getSecondaryButton(), RawDevice.RI_MOUSE_BUTTON_2_DOWN, RawDevice.RI_MOUSE_BUTTON_2_UP))
+                eventState = EVENT_BUTTON_2;
+                if (makeButtonEvent(currentEvent, event, getSecondaryButton(), RawDevice.RI_MOUSE_BUTTON_2_DOWN, RawDevice.RI_MOUSE_BUTTON_2_UP))
                     return true;
                 break;
             case EVENT_BUTTON_2:
-                event_state = EVENT_BUTTON_3;
-                if (makeButtonEvent(current_event, event, getTertiaryButton(), RawDevice.RI_MOUSE_BUTTON_3_DOWN, RawDevice.RI_MOUSE_BUTTON_3_UP))
+                eventState = EVENT_BUTTON_3;
+                if (makeButtonEvent(currentEvent, event, getTertiaryButton(), RawDevice.RI_MOUSE_BUTTON_3_DOWN, RawDevice.RI_MOUSE_BUTTON_3_UP))
                     return true;
                 break;
             case EVENT_BUTTON_3:
-                event_state = EVENT_BUTTON_4;
-                if (makeButtonEvent(current_event, event, getButton3(), RawDevice.RI_MOUSE_BUTTON_4_DOWN, RawDevice.RI_MOUSE_BUTTON_4_UP))
+                eventState = EVENT_BUTTON_4;
+                if (makeButtonEvent(currentEvent, event, getButton3(), RawDevice.RI_MOUSE_BUTTON_4_DOWN, RawDevice.RI_MOUSE_BUTTON_4_UP))
                     return true;
                 break;
             case EVENT_BUTTON_4:
-                event_state = EVENT_DONE;
-                if (makeButtonEvent(current_event, event, getButton4(), RawDevice.RI_MOUSE_BUTTON_5_DOWN, RawDevice.RI_MOUSE_BUTTON_5_UP))
+                eventState = EVENT_DONE;
+                if (makeButtonEvent(currentEvent, event, getButton4(), RawDevice.RI_MOUSE_BUTTON_5_DOWN, RawDevice.RI_MOUSE_BUTTON_5_UP))
                     return true;
                 break;
             default:
-                throw new RuntimeException("Unknown event state: " + event_state);
+                throw new RuntimeException("Unknown event state: " + eventState);
             }
         }
     }
 
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    @Override
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         device.setBufferSize(size);
     }
 
@@ -179,15 +182,18 @@ final class RawMouse extends Mouse {
             this.device = device;
         }
 
-        public final boolean isRelative() {
+        @Override
+        public boolean isRelative() {
             return true;
         }
 
-        public final boolean isAnalog() {
+        @Override
+        public boolean isAnalog() {
             return true;
         }
 
-        protected final float poll() throws IOException {
+        @Override
+        protected float poll() throws IOException {
             if (getIdentifier() == Component.Identifier.Axis.X) {
                 return device.getRelativeX();
             } else if (getIdentifier() == Component.Identifier.Axis.Y) {
@@ -202,23 +208,21 @@ final class RawMouse extends Mouse {
     final static class Button extends AbstractComponent {
 
         private final RawDevice device;
-        private final int button_id;
+        private final int buttonId;
 
-        public Button(RawDevice device, Component.Identifier.Button id, int button_id) {
+        public Button(RawDevice device, Component.Identifier.Button id, int buttonId) {
             super(id.getName(), id);
             this.device = device;
-            this.button_id = button_id;
+            this.buttonId = buttonId;
         }
 
-        protected final float poll() throws IOException {
-            return device.getButtonState(button_id) ? 1 : 0;
+        @Override
+        protected float poll() throws IOException {
+            return device.getButtonState(buttonId) ? 1 : 0;
         }
 
-        public final boolean isAnalog() {
-            return false;
-        }
-
-        public final boolean isRelative() {
+        @Override
+        public boolean isRelative() {
             return false;
         }
     }

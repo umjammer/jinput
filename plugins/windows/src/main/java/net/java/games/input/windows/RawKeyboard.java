@@ -31,7 +31,7 @@
  *
  */
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,25 +54,24 @@ import net.java.games.input.Rumbler;
  */
 final class RawKeyboard extends Keyboard {
 
-    private final RawKeyboardEvent raw_event = new RawKeyboardEvent();
+    private final RawKeyboardEvent rawEvent = new RawKeyboardEvent();
     private final RawDevice device;
 
-    protected RawKeyboard(String name, RawDevice device, Controller[] children, Rumbler[] rumblers) throws IOException {
+    RawKeyboard(String name, RawDevice device, Controller[] children, Rumbler[] rumblers) throws IOException {
         super(name, createKeyboardComponents(device), children, rumblers);
         this.device = device;
     }
 
-    private final static Component[] createKeyboardComponents(RawDevice device) {
+    private static Component[] createKeyboardComponents(RawDevice device) {
         List<Component> components = new ArrayList<>();
-        Field[] vkey_fields = RawIdentifierMap.class.getFields();
-        for (int i = 0; i < vkey_fields.length; i++) {
-            Field vkey_field = vkey_fields[i];
+        Field[] vkeyFields = RawIdentifierMap.class.getFields();
+        for (Field vkeyField : vkeyFields) {
             try {
-                if (Modifier.isStatic(vkey_field.getModifiers()) && vkey_field.getType() == int.class) {
-                    int vkey_code = vkey_field.getInt(null);
-                    Component.Identifier.Key key_id = RawIdentifierMap.mapVKey(vkey_code);
-                    if (key_id != Component.Identifier.Key.UNKNOWN)
-                        components.add(new Key(device, vkey_code, key_id));
+                if (Modifier.isStatic(vkeyField.getModifiers()) && vkeyField.getType() == int.class) {
+                    int vkeyCode = vkeyField.getInt(null);
+                    Component.Identifier.Key keyId = RawIdentifierMap.mapVKey(vkeyCode);
+                    if (keyId != Component.Identifier.Key.UNKNOWN)
+                        components.add(new Key(device, vkeyCode, keyId));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -81,54 +80,55 @@ final class RawKeyboard extends Keyboard {
         return components.toArray(new Component[] {});
     }
 
-    protected final synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+    @Override
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
         while (true) {
-            if (!device.getNextKeyboardEvent(raw_event))
+            if (!device.getNextKeyboardEvent(rawEvent))
                 return false;
-            int vkey = raw_event.getVKey();
-            Component.Identifier.Key key_id = RawIdentifierMap.mapVKey(vkey);
-            Component key = getComponent(key_id);
+            int vkey = rawEvent.getVKey();
+            Component.Identifier.Key keyId = RawIdentifierMap.mapVKey(vkey);
+            Component key = getComponent(keyId);
             if (key == null)
                 continue;
-            int message = raw_event.getMessage();
+            int message = rawEvent.getMessage();
             if (message == RawDevice.WM_KEYDOWN || message == RawDevice.WM_SYSKEYDOWN) {
-                event.set(key, 1, raw_event.getNanos());
+                event.set(key, 1, rawEvent.getNanos());
                 return true;
             } else if (message == RawDevice.WM_KEYUP || message == RawDevice.WM_SYSKEYUP) {
-                event.set(key, 0, raw_event.getNanos());
+                event.set(key, 0, rawEvent.getNanos());
                 return true;
             }
         }
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.pollKeyboard();
     }
 
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    @Override
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         device.setBufferSize(size);
     }
 
     final static class Key extends AbstractComponent {
 
         private final RawDevice device;
-        private final int vkey_code;
+        private final int vkeyCode;
 
-        public Key(RawDevice device, int vkey_code, Component.Identifier.Key key_id) {
-            super(key_id.getName(), key_id);
+        public Key(RawDevice device, int vkeyCode, Component.Identifier.Key keyId) {
+            super(keyId.getName(), keyId);
             this.device = device;
-            this.vkey_code = vkey_code;
+            this.vkeyCode = vkeyCode;
         }
 
-        protected final float poll() throws IOException {
-            return device.isKeyDown(vkey_code) ? 1f : 0f;
+        @Override
+        protected float poll() throws IOException {
+            return device.isKeyDown(vkeyCode) ? 1f : 0f;
         }
 
-        public final boolean isAnalog() {
-            return false;
-        }
-
-        public final boolean isRelative() {
+        @Override
+        public boolean isRelative() {
             return false;
         }
     }

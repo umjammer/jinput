@@ -31,7 +31,7 @@
  *
  *****************************************************************************/
 
-package net.java.games.windows;
+package net.java.games.input.windows;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -48,11 +48,11 @@ final class DataQueue<T> {
     private int limit;
 
     @SuppressWarnings("unchecked")
-    public DataQueue(int size, Class<T> element_type) {
-        this.elements = (T[]) Array.newInstance(element_type, size);
+    public DataQueue(int size, Class<T> elementType) {
+        this.elements = (T[]) Array.newInstance(elementType, size);
         for (int i = 0; i < elements.length; i++) {
             try {
-                elements[i] = element_type.getDeclaredConstructor().newInstance();
+                elements[i] = elementType.getDeclaredConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
                      InvocationTargetException e) {
                 throw new RuntimeException(e);
@@ -61,31 +61,31 @@ final class DataQueue<T> {
         clear();
     }
 
-    public final void clear() {
+    public void clear() {
         position = 0;
         limit = elements.length;
     }
 
-    public final int position() {
+    public int position() {
         return position;
     }
 
-    public final int limit() {
+    public int limit() {
         return limit;
     }
 
-    public final T get(int index) {
+    public T get(int index) {
         assert index < limit;
         return elements[index];
     }
 
-    public final T get() {
+    public T get() {
         if (!hasRemaining())
             return null;
         return get(position++);
     }
 
-    public final void compact() {
+    public void compact() {
         int index = 0;
         while (hasRemaining()) {
             swap(position, index);
@@ -96,30 +96,30 @@ final class DataQueue<T> {
         limit = elements.length;
     }
 
-    private final void swap(int index1, int index2) {
+    private void swap(int index1, int index2) {
         T temp = elements[index1];
         elements[index1] = elements[index2];
         elements[index2] = temp;
     }
 
-    public final void flip() {
+    public void flip() {
         limit = position;
         position = 0;
     }
 
-    public final boolean hasRemaining() {
+    public boolean hasRemaining() {
         return remaining() > 0;
     }
 
-    public final int remaining() {
+    public int remaining() {
         return limit - position;
     }
 
-    public final void position(int position) {
+    public void position(int position) {
         this.position = position;
     }
 
-    public final T[] getElements() {
+    public T[] getElements() {
         return elements;
     }
 }

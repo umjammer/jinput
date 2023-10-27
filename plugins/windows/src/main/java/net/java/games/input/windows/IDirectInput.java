@@ -47,13 +47,14 @@ import com.sun.jna.platform.win32.WinDef.LPVOID;
 import com.sun.jna.ptr.PointerByReference;
 import net.java.games.input.windows.User32Ex.DIDEVICEINSTANCE;
 import net.java.games.input.windows.User32Ex.IDirectInput8;
+import net.java.games.input.windows.User32Ex.DirectInput8Interface;
 
 import static net.java.games.input.windows.User32Ex.DI8DEVCLASS_ALL;
 import static net.java.games.input.windows.User32Ex.DIEDFL_ATTACHEDONLY;
 import static net.java.games.input.windows.User32Ex.DIENUM_CONTINUE;
 import static net.java.games.input.windows.User32Ex.DIENUM_STOP;
+import static net.java.games.input.windows.User32Ex.DIRECTINPUT_VERSION;
 import static net.java.games.input.windows.User32Ex.IID_IDirectInput8;
-import static net.java.games.input.windows.User32Ex.User32ExTrait.DIRECTINPUT_VERSION;
 
 
 /**
@@ -68,12 +69,12 @@ final class IDirectInput {
     private static final Logger log = Logger.getLogger(IDirectInput.class.getName());
 
     private final List<IDirectInputDevice> devices = new ArrayList<>();
-    private final Pointer idirectInputAddress;
+    private final Pointer directInputAddress;
     private final DummyWindow window;
 
     public IDirectInput(DummyWindow window) throws IOException {
         this.window = window;
-        this.idirectInputAddress = createIDirectInput();
+        this.directInputAddress = createIDirectInput();
         try {
             enumDevices();
         } catch (IOException e) {
@@ -85,7 +86,7 @@ final class IDirectInput {
 
     private static Pointer createIDirectInput() throws IOException {
         PointerByReference pDirectInput = new PointerByReference();
-        int /* HRESULT */ res = User32Ex.INSTANCE.DirectInput8Create(
+        int /* HRESULT */ res = DirectInput8Interface.INSTANCE.DirectInput8Create(
                 User32Ex.INSTANCE.GetModuleHandle(null), DIRECTINPUT_VERSION,
                 new Guid.GUID.ByValue(IID_IDirectInput8), pDirectInput, null);
         if (res < 0) {
@@ -99,7 +100,7 @@ final class IDirectInput {
     }
 
     private void enumDevices() throws IOException {
-        nEnumDevices(idirectInputAddress);
+        nEnumDevices(directInputAddress);
     }
 
     static class EnumContext extends Structure {
@@ -116,25 +117,25 @@ final class IDirectInput {
         static Map<Integer, IDirectInput> map = new HashMap<>();
     }
 
-    private static boolean enumerateDevicesCallback(DIDEVICEINSTANCE lpddi, LPVOID context) {
+    private static boolean enumerateDevicesCallback(DIDEVICEINSTANCE device, LPVOID context) {
         EnumContext enumContext = new EnumContext(context.getPointer());
         IDirectInput _this = EnumContext.map.get(enumContext.id);
         PointerByReference /* LPDIRECTINPUTDEVICE8 */ pDevice = new PointerByReference();
 
-        byte[] instanceGuid = NativeUtil.wrapGUID(lpddi.guidInstance);
-        byte[] productGuid = NativeUtil.wrapGUID(lpddi.guidProduct);
-        String instanceName = new String(lpddi.tszInstanceName, StandardCharsets.UTF_8);
-        String productName = new String(lpddi.tszProductName, StandardCharsets.UTF_8);
+        byte[] instanceGuid = NativeUtil.wrapGUID(device.guidInstance);
+        byte[] productGuid = NativeUtil.wrapGUID(device.guidProduct);
+        String instanceName = new String(device.tszInstanceName, StandardCharsets.UTF_8);
+        String productName = new String(device.tszProductName, StandardCharsets.UTF_8);
 
-        IDirectInput8 directInput8 = new IDirectInput8(_this.idirectInputAddress);
-        int /* HRESULT */ res = directInput8.CreateDevice.apply(new Guid.GUID.ByValue(lpddi.guidInstance), pDevice, null);
+        IDirectInput8 directInput8 = new IDirectInput8(_this.directInputAddress);
+        int /* HRESULT */ res = directInput8.CreateDevice.apply(new Guid.GUID.ByValue(device.guidInstance), pDevice, null);
         if (res < 0) {
             log.warning(String.format("Failed to create device (%d)", res));
             return DIENUM_STOP;
         }
 
-        int deviceType = lpddi.dwDevType & 0xff; // GET_DIDEVICE_TYPE
-        int deviceSubtype = (lpddi.dwDevType >> 8) & 0xff; // GET_DIDEVICE_SUBTYPE
+        int deviceType = device.dwDevType & 0xff; // GET_DIDEVICE_TYPE
+        int deviceSubtype = (device.dwDevType >> 8) & 0xff; // GET_DIDEVICE_SUBTYPE
 
         _this.addDevice(pDevice.getValue(), instanceGuid, productGuid, deviceType, deviceSubtype, instanceName, productName);
 
@@ -173,7 +174,7 @@ final class IDirectInput {
     }
 
     public void release() {
-        nRelease(idirectInputAddress);
+        nRelease(directInputAddress);
     }
 
     private static void nRelease(Pointer address) {

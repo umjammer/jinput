@@ -45,8 +45,8 @@ import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO_HID;
 import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO_KEYBOARD;
 import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO_MOUSE;
 
-import static net.java.games.input.windows.User32Ex.User32ExTrait.RIDI_DEVICEINFO;
-import static net.java.games.input.windows.User32Ex.User32ExTrait.RIDI_DEVICENAME;
+import static net.java.games.input.windows.User32Ex.RIDI_DEVICEINFO;
+import static net.java.games.input.windows.User32Ex.RIDI_DEVICENAME;
 
 
 /**

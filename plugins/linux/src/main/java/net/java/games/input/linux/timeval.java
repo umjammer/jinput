@@ -19,7 +19,7 @@ import com.sun.jna.Structure;
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-10-18 nsano initial version <br>
  */
-class timeval extends Structure {
+public class timeval extends Structure {
 
     public long tv_sec;
     public long tv_usec;

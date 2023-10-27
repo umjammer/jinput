@@ -37,17 +37,19 @@ public class CFRange extends Structure {
     public NativeLong length;
 
     public CFRange() {
-        super();
     }
 
-
     public CFRange(NativeLong location, NativeLong length) {
-        super();
         this.location = location;
         this.length = length;
     }
 
-    protected ByReference newByReference() {
+    public CFRange(int location, int length) {
+        this.location = new NativeLong(location);
+        this.length = new NativeLong(length);
+    }
+
+    public ByReference newByReference() {
         ByReference s = new ByReference();
         s.useMemory(getPointer());
         write();
@@ -55,7 +57,7 @@ public class CFRange extends Structure {
         return s;
     }
 
-    protected ByValue newByValue() {
+    public ByValue newByValue() {
         ByValue s = new ByValue();
         s.useMemory(getPointer());
         write();
@@ -72,11 +74,9 @@ public class CFRange extends Structure {
     }
 
     public static class ByReference extends CFRange implements Structure.ByReference {
-
     }
 
     public static class ByValue extends CFRange implements Structure.ByValue {
-
     }
 
     @Override

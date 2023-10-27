@@ -111,6 +111,8 @@ public class CFDictionary extends CFType {
         return new CFDate(getValue(key).getPointer());
     }
 
+//#region utility
+
     public static class DictContext extends Structure {
 
         public int mapId;
@@ -306,4 +308,6 @@ log.warning("no map for id: " + dictContext.mapId);
 log.finer("MAP(" + dictContext.mapId + "): " + map.size());
         return map;
     }
+
+//#endregion
 }

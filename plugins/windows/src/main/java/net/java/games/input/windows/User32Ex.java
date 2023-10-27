@@ -21,12 +21,13 @@ import com.sun.jna.platform.win32.Guid.GUID;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.SetupApi.SP_DEVINFO_DATA;
 import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.LPVOID;
 import com.sun.jna.platform.win32.WinDef.HINSTANCE;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinDef.LPVOID;
 import com.sun.jna.platform.win32.WinDef.LRESULT;
 import com.sun.jna.platform.win32.WinDef.WPARAM;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.platform.win32.WinReg.HKEY;
 import com.sun.jna.platform.win32.WinUser.HOOKPROC;
 import com.sun.jna.platform.win32.WinUser.MSLLHOOKSTRUCT;
 import com.sun.jna.ptr.ByReference;
@@ -41,12 +42,106 @@ import com.sun.jna.win32.W32APIOptions;
  */
 public interface User32Ex {
 
-    int DIPH_DEVICE = 32;
+    int MAX_PATH = 260;
 
     int CS_VREDRAW = 0x0001;
     int CS_HREDRAW = 0x0002;
 
     int COLOR_WINDOW = 5;
+
+//#region multimedia
+
+    int MAXPNAMELEN = 32;
+    int MAX_JOYSTICKOEMVXDNAME = 260;
+
+    int JOYSTICKID1 = 0;
+
+    int JOYCAPS_HASZ = 1;
+    int JOYCAPS_HASR = 2;
+    int JOYCAPS_HASU = 4;
+    int JOYCAPS_HASV = 8;
+    int JOYCAPS_HASPOV = 16;
+
+    int JOYERR_NOERROR = 0;
+
+    int JOYERR_BASE = 160;
+    int JOYERR_UNPLUGGED = JOYERR_BASE + 7;
+
+    int JOY_RETURNALL = 0x0FF;
+
+    int JOY_POVCENTERED = -1;
+    int JOY_POVFORWARD = 0;
+    int JOY_POVRIGHT = 9000;
+    int JOY_POVBACKWARD = 18000;
+    int JOY_POVLEFT = 27000;
+
+    String REGSTR_PATH_JOYCONFIG = "\\Joystick";
+    String REGSTR_KEY_JOYCURR = "CurrentJoystickSettings";
+    String REGSTR_VAL_JOYOEMNAME = "OEMName";
+    String REGSTR_PATH_JOYOEM = "\\Joystick\\OEM";
+
+    class JOYINFOEX extends Structure {
+        public int dwSize;
+        public int dwFlags;
+        public int dwXpos;
+        public int dwYpos;
+        public int dwZpos;
+        public int dwRpos;
+        public int dwUpos;
+        public int dwVpos;
+        public int dwButtons;
+        public int dwButtonNumber;
+        public int dwPOV;
+        public int dwReserved1;
+        public int dwReserved2;
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("dwSize", "dwFlags", "dwXpos", "dwYpos", "dwZpos", "dwRpos", "dwUpos", "dwVpos",
+                    "dwButtons", "dwButtonNumber", "dwPOV", "dwReserved1", "dwReserved2");
+        }
+    }
+
+    class JOYCAPS extends Structure {
+        public short wMid;
+        public short wPid;
+        public byte[] szPname = new byte[MAXPNAMELEN];
+        public int wXmin;
+        public int wXmax;
+        public int wYmin;
+        public int wYmax;
+        public int wZmin;
+        public int wZmax;
+        public int wNumButtons;
+        public int wPeriodMin;
+        public int wPeriodMax;
+        public int wRmin;
+        public int wRmax;
+        public int wUmin;
+        public int wUmax;
+        public int wVmin;
+        public int wVmax;
+        public int wCaps;
+        public int wMaxAxes;
+        public int wNumAxes;
+        public int wMaxButtons;
+        public byte[] szRegKey = new byte[MAXPNAMELEN];
+        public byte[] szOEMVxD = new byte[MAX_JOYSTICKOEMVXDNAME];
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("wMid", "wPid", "szPname", "wXmin", "wXmax", "wYmin", "wYmax", "wZmin", "wZmax",
+                    "wNumButtons", "wPeriodMin", "wPeriodMax", "wRmin", "wRmax", "wUmin", "wUmax", "wVmin", "wVmax",
+                    "wCaps", "wMaxAxes", "wNumAxes", "wMaxButtons");
+        }
+    }
+
+//#endregion
+
+//#region rawInput
+
+    int RIDI_DEVICENAME = 0x20000007;
+    int RIDI_DEVICEINFO = 0x2000000b;
 
     /** @see "https://msdn.microsoft.com/library/windows/desktop/ms645565.aspx" */
     class RAWINPUTDEVICE extends Structure {
@@ -200,6 +295,25 @@ public interface User32Ex {
         }
     }
 
+//#endregion
+
+//#region directInput
+
+    int DIPH_BYID = 2;
+    int DIPH_DEVICE = 32;
+
+    boolean DIENUM_CONTINUE = true;
+    boolean DIENUM_STOP = false;
+
+    int DI8DEVCLASS_ALL = 0;
+    int DIEDFL_ATTACHEDONLY = 0x00000001;
+
+    static GUID MAKEDIPROP(int prop) { return GUID.fromBinary(new byte[prop]); }
+
+    GUID DIPROP_BUFFERSIZE = MAKEDIPROP(1);
+    GUID DIPROP_RANGE = MAKEDIPROP(4);
+    GUID DIPROP_DEADZONE = MAKEDIPROP(5);
+
     class DIOBJECTDATAFORMAT extends Structure  {
         public GUID pguid;
         public int dwOfs;
@@ -232,8 +346,6 @@ public interface User32Ex {
         }
     }
 
-    int DIPH_BYID = 2;
-
     class DIPROPDWORD extends Structure {
         public DIPROPHEADER diph;
         public int dwData;
@@ -241,8 +353,6 @@ public interface User32Ex {
             return Arrays.asList("diph", "dwData");
         }
     }
-
-    int MAX_PATH = 260;
 
     class DIDEVICEINSTANCE extends Structure {
         public int dwSize;
@@ -451,6 +561,14 @@ public interface User32Ex {
                     "SetParameters", "Start", "Stop", "Unload");
         }
     }
+
+//#endregion
+
+//#region directInput8
+
+    GUID IID_IDirectInput8 = GUID.fromString("{59c18ef56d3d33b98e319e8c0cd30c24fc363e4e}"); // TODO
+
+    int DIRECTINPUT_VERSION = 0x0800;
 
     class IDirectInput8 extends Structure {
 
@@ -783,8 +901,16 @@ public interface User32Ex {
         }
     }
 
-    boolean DIENUM_CONTINUE = true;
-    boolean DIENUM_STOP = false;
+    interface DirectInput8Interface extends Library {
+
+        DirectInput8Interface INSTANCE = Native.load("dinput8", DirectInput8Interface.class,
+                W32APIOptions.UNICODE_OPTIONS);
+
+        /** Creates a DirectInput object and returns an IDirectInput8 Interface or later interface. */
+        int /* HRESULT */ DirectInput8Create(HINSTANCE hinst, int dwVersion, GUID.ByValue riidltf, PointerByReference ppvOut, Pointer /* LPUNKNOWN */ punkOuter);
+    }
+
+//#endregion
 
     interface LowLevelMouseProc extends HOOKPROC {
 
@@ -916,17 +1042,6 @@ public interface User32Ex {
     GUID GUID_Friction           = GUID.fromString("{13541C2A-8E33-11D0-9AD0-00A0C9A06E35}");
     GUID GUID_CustomForce        = GUID.fromString("{13541C2B-8E33-11D0-9AD0-00A0C9A06E35}");
 
-    int DI8DEVCLASS_ALL = 0;
-    int DIEDFL_ATTACHEDONLY = 0x00000001;
-
-    GUID IID_IDirectInput8 = GUID.fromString("{59c18ef56d3d33b98e319e8c0cd30c24fc363e4e}"); // TODO
-
-    static GUID MAKEDIPROP(int prop) { return GUID.fromBinary(new byte[prop]); }
-
-    GUID DIPROP_BUFFERSIZE = MAKEDIPROP(1);
-    GUID DIPROP_RANGE = MAKEDIPROP(4);
-    GUID DIPROP_DEADZONE = MAKEDIPROP(5);
-
     interface User32ExTrait extends User32 {
 
         short GetKeyState(int vKey);
@@ -936,27 +1051,48 @@ public interface User32Ex {
 
         Pointer LoadCursorW(HINSTANCE hInstance, Pointer lpCursorName);
 
-        Boolean SystemParametersInfoW(int uiAction, int uiParam, Pointer pvParam, int fWinIni);
+        boolean SystemParametersInfoW(int uiAction, int uiParam, Pointer pvParam, int fWinIni);
 
-        Boolean SetSystemCursor(Pointer hcur, int id);
+        boolean SetSystemCursor(Pointer hcur, int id);
 
         HMONITOR MonitorFromPoint(POINT pt, int dwFlags);
 
-        Boolean ChangeWindowMessageFilterEx(HWND hWnd, int msg, int action, Pointer pcfs);
+        boolean ChangeWindowMessageFilterEx(HWND hWnd, int msg, int action, Pointer pcfs);
 
         boolean RegisterRawInputDevices(RAWINPUTDEVICE[] pRawInputDevices, int uiNumDevices, int cbSize);
 
         int GetRawInputData(Pointer hRawInput, int uiCommand, RAWINPUT[] pData, ByReference pcbSize, int cbSizeHeader);
-        int RIDI_DEVICENAME = 0x20000007;
-        int RIDI_DEVICEINFO = 0x2000000b;
         int GetRawInputDeviceInfoA(HANDLE hDevice, int uiCommand, Pointer pData, IntByReference pcbSize);
 
         HMODULE GetModuleHandle(byte[] lpModuleName);
 
-        int DIRECTINPUT_VERSION = 0x0800;
-        /** Creates a DirectInput object and returns an IDirectInput8 Interface or later interface. */
-        int /* HRESULT */ DirectInput8Create(HINSTANCE hinst, int dwVersion, GUID.ByValue riidltf, PointerByReference ppvOut, Pointer /* LPUNKNOWN */ punkOuter
-        );
+        /**
+         * Retrieves the frequency of the performance counter. The frequency of the performance counter is
+         * fixed at system boot and is consistent across all processors. Therefore, the frequency need only be
+         * queried upon application initialization, and the result can be cached.
+         */
+        boolean QueryPerformanceFrequency(LARGE_INTEGER lpFrequency);
+
+        /**
+         * Retrieves the current value of the performance counter, which is a high resolution (<1us) time stamp
+         * that can be used for time-interval measurements.
+         */
+        boolean QueryPerformanceCounter(LARGE_INTEGER lpPerformanceCount);
+
+        /** The joyGetPosEx function queries a joystick for its position and button status. */
+         int /* MMRESULT */ joyGetPosEx(int uJoyID, JOYINFOEX pji);
+
+        /** The joyGetNumDevs function queries the joystick driver for the number of joysticks it supports. */
+        int joyGetNumDevs();
+
+        /** The joyGetDevCaps function queries a joystick to determine its capabilities. */
+        int /* MMRESULT */ joyGetDevCaps(int uJoyID, JOYCAPS pjc, int cbjc);
+
+        long /* LSTATUS */ RegOpenKeyEx(HKEY hKey, byte[] lpSubKey, int ulOptions, int /* REGSAM */ samDesired, HKEY phkResult);
+
+        long /* LSTATUS */ RegQueryValueEx(HKEY hKey, byte[] lpValueName, IntByReference lpReserved, IntByReference lpType, byte[] lpData, IntByReference lpcbData);
+
+        long /* LSTATUS */ RegCloseKey(HKEY hKey);
     }
 
     interface Kernel32Ex extends Library {

@@ -6,10 +6,15 @@
 
 package net.java.games.input.linux;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 
 /**
@@ -21,6 +26,8 @@ import com.sun.jna.Pointer;
 public interface LinuxIO extends Library {
 
     LinuxIO INSTANCE = Native.load("c", LinuxIO.class);
+
+    int PATH_MAX = 4096;
 
     int O_RDONLY = 0;
     int O_RDWR = 2;
@@ -72,15 +79,137 @@ public interface LinuxIO extends Library {
     NativeLong JSIOCGVERSION = _IOR('j', 0x01, Integer.BYTES);
     static NativeLong JSIOCGNAME(int len) { return _IOC(_IOC_READ, 'j', 0x13, len); }
 
+    class dirent extends Structure {
+        public int d_fileno;
+        public short d_reclen;
+        public byte d_type;
+        public byte d_namlen;
+        public byte[] d_name = new byte[255 + 1];
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("d_fileno", "d_reclen", "d_type", "d_namlen", "d_name");
+        }
+    }
+
+    class stat extends Structure {
+
+        /** ID of device containing file */
+        public NativeLong st_dev;
+
+        /** Inode number */
+        public NativeLong st_ino;
+
+        /** File type and mode */
+        public NativeLong st_mode;
+
+        /** Number of hard links */
+        public NativeLong st_nlink;
+        /** User ID of owner */
+        public int st_uid;
+        /** Group ID of owner */
+        public int st_gid;
+        /** Device ID (if special file) */
+        public NativeLong st_rdev;
+        /** Total size, in bytes */
+        public NativeLong st_size;
+        /** Block size for filesystem I/O */
+        public NativeLong st_blksize;
+        /** Number of 512B blocks allocated */
+        public NativeLong st_blocks;
+
+        // Since Linux 2.6, the kernel supports nanosecond
+        // precision for the following timestamp fields.
+        // For the details before Linux 2.6, see NOTES.
+
+        /** Time of last access */
+        public timeval st_atim;
+        /** Time of last modification */
+        public timeval st_mtim;
+        /** Time of last status change */
+        public timeval st_ctim;
+
+        /**
+         * C type : __syscall_slong_t[3]
+         */
+        public NativeLong[] __unused = new NativeLong[3];
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList(
+                    "st_dev", "st_ino",  "st_nlink", "st_mode", "st_uid", "st_gid", "st_rdev", "st_size", "st_blksize",
+                    "st_blocks", "st_atim", "st_mtim", "st_ctim", "__unused"
+            );
+        }
+
+        public static class ByReference extends stat implements Structure.ByReference {
+        }
+
+        public static class ByValue extends stat implements Structure.ByValue {
+        }
+    }
+
+    class input_event extends Structure {
+        public timeval time;
+        public short type;
+        public short code;
+        public int value;
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("time", "type", "code", "value");
+        }
+    }
+
+    class input_id extends Structure {
+        public short bustype;
+        public short vendor;
+        public short product;
+        public short version;
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("bustype", "vendor", "product", "version");
+        }
+    }
+
+    class input_absinfo extends Structure {
+        public int value;
+        public int minimum;
+        public int maximum;
+        public int fuzz;
+        public int flat;
+        public int resolution;
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("value", "minimum", "maximum", "fuzz", "flat", "resolution");
+        }
+    }
+
     int open64(String path, int flags);
 
     NativeLong read(int fd, Pointer buffer, NativeLong size);
 
     NativeLong write(int fd, Pointer buffer, NativeLong size);
 
+    int open(String pathname, int flags, int /* mode_t */ mode);
+
     int close(int fd);
 
     int ioctl(int fd, NativeLong request, Pointer arg);
 
     int ioctl(int fd, NativeLong request, int arg);
+
+    int ioctl(int fd, NativeLong request, int[] arg);
+
+    int ioctl(int fd, NativeLong request, byte[] arg);
+
+    Pointer /* DIR */ opendir(String name);
+
+    dirent readdir(Pointer /* DIR */ dirp);
+
+    int closedir(Pointer /* DIR */ dirp);
+
+    int stat(String pathname, stat buf);
+
+    int sscanf(byte[] str, String fotmat, Object...args);
+
+    NativeLong strlen(byte[] string);
 }

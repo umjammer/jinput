@@ -102,7 +102,38 @@ final class RawInputEventQueue {
     }
 
     private void poll(DummyWindow window) throws IOException {
-        nPoll(window.getHwnd());
+        HWND hwnd = window.getHwnd();
+        MSG msg = new MSG();
+
+        if (User32.INSTANCE.GetMessage(msg, hwnd, 0, 0) != 0) {
+            if (msg.message != User32Ex.WM_INPUT) {
+                User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
+                return; // ignore it
+            }
+            long time = msg.time;
+            IntByReference inputSize = new IntByReference();
+            User32Ex.RAWINPUT[] inputData = new User32Ex.RAWINPUT[inputSize.getValue()];
+            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), User32Ex.RID_INPUT, null, inputSize, inputData[0].size()) == -1) {
+                User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
+                throw new IOException(String.format("Failed to get raw input data size (%d)", Native.getLastError()));
+            }
+            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), User32Ex.RID_INPUT, inputData, inputSize, inputData[0].size()) == -1) {
+                User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
+                throw new IOException(String.format("Failed to get raw input data (%d)", Native.getLastError()));
+            }
+            switch (inputData[0].header.dwType) {
+            case RIM_TYPEMOUSE:
+                handleMouseEvent(time, inputData[0]);
+                break;
+            case RIM_TYPEKEYBOARD:
+                handleKeyboardEvent(time, inputData[0]);
+                break;
+            default:
+                // ignore other types of message
+                break;
+            }
+            User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
+        }
     }
 
     private void handleMouseEvent(long time, User32Ex.RAWINPUT data) {
@@ -137,70 +168,30 @@ final class RawInputEventQueue {
         );
     }
 
-    private void nPoll(HWND hwnd) throws IOException {
-        MSG msg = new MSG();
-
-        if (User32.INSTANCE.GetMessage(msg, hwnd, 0, 0) != 0) {
-            if (msg.message != User32Ex.WM_INPUT) {
-                User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
-                return; // ignore it
-            }
-            long time = msg.time;
-            IntByReference inputSize = new IntByReference();
-            User32Ex.RAWINPUT[] inputData = new User32Ex.RAWINPUT[inputSize.getValue()];
-            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), User32Ex.RID_INPUT, null, inputSize, inputData[0].size()) == - 1) {
-                User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
-                throw new IOException(String.format("Failed to get raw input data size (%d)", Native.getLastError()));
-            }
-            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), User32Ex.RID_INPUT, inputData, inputSize, inputData[0].size()) == -1) {
-                User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
-                throw new IOException(String.format("Failed to get raw input data (%d)", Native.getLastError()));
-            }
-            switch (inputData[0].header.dwType) {
-            case RIM_TYPEMOUSE:
-                handleMouseEvent(time, inputData[0]);
-                break;
-            case RIM_TYPEKEYBOARD:
-                handleKeyboardEvent(time, inputData[0]);
-                break;
-            default:
-                // ignore other types of message
-                break;
-            }
-            User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
-        }
-    }
-
-    private static void registerDevices(DummyWindow window, RawDeviceInfo[] devices) throws IOException {
-        nRegisterDevices(0, window.getHwnd(), devices);
-    }
-
-    private static void nRegisterDevices(int flags, HWND hwnd, RawDeviceInfo[] deviceInfos) throws IOException {
-
+    private static void registerDevices(DummyWindow window, RawDeviceInfo[] deviceInfos) throws IOException {
         int numDevices = deviceInfos.length;
 
 //        res = GetRegisteredRawInputDevices(null, numDevices, sizeof(RAWINPUTDEVICE));
 //        if (numDevices > 0) {
-//            devices = (RAWINPUTDEVICE *) malloc(numDevices * sizeof(RAWINPUTDEVICE));
+//            devices = new RAWINPUTDEVICE[numDevices];
 //            res = GetRegisteredRawInputDevices(devices, numDevices, sizeof(RAWINPUTDEVICE));
 //            if (res == -1) {
 //                throw new IOException(String.format("Failed to get registered raw devices (%d)", Native.getLastError()));
-//                return;
 //            }
 //            for (i = 0; i < numDevices; i++) {
-//                printfJava(env, "from windows: registered: %d %d %p (of %d)", devices[i].usUsagePage, devices[i].usUsage, devices[i].hwndTarget, numDevices);
+//                System.err.printf("from windows: registered: %d %d %s (of %d)", devices[i].usUsagePage, devices[i].usUsage, devices[i].hwndTarget, numDevices);
 //            }
-//            free(devices);
 //        }
         User32Ex.RAWINPUTDEVICE[] devices = new User32Ex.RAWINPUTDEVICE[numDevices];
         for (int i = 0; i < deviceInfos.length; i++) {
             RawDeviceInfo deviceObj = deviceInfos[i];
             int usage = deviceObj.getUsage();
             int usagePage = deviceObj.getUsagePage();
+            devices[i] = new User32Ex.RAWINPUTDEVICE();
             devices[i].usUsagePage = (short) (usagePage & 0xffff);
             devices[i].usUsage = (short) (usage & 0xffff);
-            devices[i].dwFlags = flags;
-            devices[i].hwndTarget = hwnd;
+            devices[i].dwFlags = 0;
+            devices[i].hwndTarget = window.getHwnd();
         }
         boolean res = User32Ex.INSTANCE.RegisterRawInputDevices(devices, numDevices, devices[0].size());
         if (!res)
@@ -228,6 +219,7 @@ final class RawInputEventQueue {
         @Override
         public void run() {
             // We have to create the window in the (private) queue thread
+            // TODO so it's easy to change event listener system?
             try {
                 window = new DummyWindow();
             } catch (IOException e) {

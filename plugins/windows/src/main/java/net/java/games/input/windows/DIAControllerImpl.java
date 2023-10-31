@@ -45,12 +45,12 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class DIAbstractController extends AbstractController {
+final class DIAControllerImpl extends AbstractController implements DIController {
 
     private final IDirectInputDevice device;
     private final Type type;
 
-    DIAbstractController(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Controller.Type type) {
+    DIAControllerImpl(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Controller.Type type) {
         super(device.getProductName(), components, children, rumblers);
         this.device = device;
         this.type = type;
@@ -62,8 +62,8 @@ final class DIAbstractController extends AbstractController {
     }
 
     @Override
-    protected boolean getNextDeviceEvent(Event event) throws IOException {
-        return DIControllers.getNextDeviceEvent(event, device);
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+        return getNextDeviceEvent(event, device);
     }
 
     @Override

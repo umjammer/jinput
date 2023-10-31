@@ -71,6 +71,13 @@ final class DIComponent extends AbstractComponent {
 
     @Override
     protected float poll() throws IOException {
-        return DIControllers.poll(this, object);
+        int pollData = object.getDevice().getPollData(object);
+        float result;
+        if (object.isRelative()) {
+            result = object.getRelativePollValue(pollData);
+        } else {
+            result = pollData;
+        }
+        return object.convertValue(result);
     }
 }

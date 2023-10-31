@@ -247,6 +247,8 @@ final class IDirectInputDevice {
     private int buttonCounter;
     private int currentFormatOffset;
 
+    final DIDeviceObjectData diEvent = new DIDeviceObjectData();
+
     public IDirectInputDevice(DummyWindow window, Pointer address, byte[] instanceGuid, byte[] productGuid,
                               int devType, int devSubtype, String instanceName, String productName) throws IOException {
         this.window = window;

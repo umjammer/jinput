@@ -45,14 +45,14 @@ public class WinTabEnvironmentPlugin extends ControllerEnvironment implements Pl
      * the net.java.games.input.librarypath property
      * or through System.loadLibrary().
      */
-    static void loadLibrary(final String lib_name) {
+    static void loadLibrary(final String libName) {
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             try {
-                String lib_path = System.getProperty("net.java.games.input.librarypath");
-                if (lib_path != null)
-                    System.load(lib_path + File.separator + System.mapLibraryName(lib_name));
+                String libPath = System.getProperty("net.java.games.input.librarypath");
+                if (libPath != null)
+                    System.load(libPath + File.separator + System.mapLibraryName(libName));
                 else
-                    System.loadLibrary(lib_name);
+                    System.loadLibrary(libName);
             } catch (UnsatisfiedLinkError e) {
                 e.printStackTrace();
                 supported = false;
@@ -66,8 +66,8 @@ public class WinTabEnvironmentPlugin extends ControllerEnvironment implements Pl
     }
 
 
-    static String getPrivilegedProperty(final String property, final String default_value) {
-        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, default_value));
+    static String getPrivilegedProperty(final String property, final String defaultValue) {
+        return AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty(property, defaultValue));
     }
 
     static {
@@ -79,7 +79,7 @@ public class WinTabEnvironmentPlugin extends ControllerEnvironment implements Pl
     }
 
     private final Controller[] controllers;
-    private final List<WinTabDevice> active_devices = new ArrayList<>();
+    private final List<WinTabDevice> activeDevices = new ArrayList<>();
     private final WinTabContext winTabContext;
 
     /** Creates new DirectInputEnvironment */
@@ -126,7 +126,7 @@ public class WinTabEnvironmentPlugin extends ControllerEnvironment implements Pl
 
         public final void run() {
             /* Release the devices to kill off active force feedback effects */
-            for (int i = 0; i < active_devices.size(); i++) {
+            for (int i = 0; i < activeDevices.size(); i++) {
                 // TODO free the devices
             }
             //Close the context

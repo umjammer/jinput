@@ -45,7 +45,7 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class DIMouse extends Mouse {
+final class DIMouse extends Mouse implements DIController {
 
     private final IDirectInputDevice device;
 
@@ -60,8 +60,8 @@ final class DIMouse extends Mouse {
     }
 
     @Override
-    protected boolean getNextDeviceEvent(Event event) throws IOException {
-        return DIControllers.getNextDeviceEvent(event, device);
+    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+        return getNextDeviceEvent(event, device);
     }
 
     @Override

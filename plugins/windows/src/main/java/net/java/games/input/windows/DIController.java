@@ -34,38 +34,29 @@ package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.Component;
-import net.java.games.input.Controller;
 import net.java.games.input.Event;
-import net.java.games.input.Keyboard;
-import net.java.games.input.Rumbler;
 
 
 /**
  * @author elias
  * @version 1.0
  */
-final class DIKeyboard extends Keyboard implements DIController {
+interface DIController {
 
-    private final IDirectInputDevice device;
-
-    DIKeyboard(IDirectInputDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
-        super(device.getProductName(), components, children, rumblers);
-        this.device = device;
-    }
-
-    @Override
-    protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
-        return getNextDeviceEvent(event, device);
-    }
-
-    @Override
-    public void pollDevice() throws IOException {
-        device.pollAll();
-    }
-
-    @Override
-    protected void setDeviceEventQueueSize(int size) throws IOException {
-        device.setBufferSize(size);
+    default boolean getNextDeviceEvent(Event event, IDirectInputDevice device) throws IOException {
+        if (!device.getNextEvent(device.diEvent))
+            return false;
+        DIDeviceObject object = device.mapEvent(device.diEvent);
+        DIComponent component = device.mapObject(object);
+        if (component == null)
+            return false;
+        int eventValue;
+        if (object.isRelative()) {
+            eventValue = object.getRelativeEventValue(device.diEvent.getData());
+        } else {
+            eventValue = device.diEvent.getData();
+        }
+        event.set(component, component.getDeviceObject().convertValue(eventValue), device.diEvent.getNanos());
+        return true;
     }
 }

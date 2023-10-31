@@ -8,10 +8,10 @@ import net.java.games.input.Event;
 
 public class LinuxCombinedController extends AbstractController {
 
-    private LinuxAbstractController eventController;
+    private LinuxControllerImpl eventController;
     private LinuxJoystickAbstractController joystickController;
 
-    LinuxCombinedController(LinuxAbstractController eventController, LinuxJoystickAbstractController joystickController) {
+    LinuxCombinedController(LinuxControllerImpl eventController, LinuxJoystickAbstractController joystickController) {
         super(eventController.getName(), joystickController.getComponents(), eventController.getControllers(), eventController.getRumblers());
         this.eventController = eventController;
         this.joystickController = joystickController;

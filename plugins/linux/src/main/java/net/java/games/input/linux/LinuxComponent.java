@@ -64,7 +64,23 @@ class LinuxComponent extends AbstractComponent {
 
     @Override
     protected float poll() throws IOException {
-        return convertValue(LinuxControllers.poll(component), component.getDescriptor());
+        return convertValue(poll(component), component.getDescriptor());
+    }
+
+    /** Declared synchronized to protect absInfo */
+    protected float poll(LinuxEventComponent eventComponent) throws IOException {
+        int nativeType = eventComponent.getDescriptor().getType();
+        switch (nativeType) {
+        case NativeDefinitions.EV_KEY:
+            int nativeCode = eventComponent.getDescriptor().getCode();
+            float state = eventComponent.getDevice().isKeySet(nativeCode) ? 1f : 0f;
+            return state;
+        case NativeDefinitions.EV_ABS:
+            eventComponent.getAbsInfo(eventComponent.absInfo);
+            return eventComponent.absInfo.getValue();
+        default:
+            throw new RuntimeException("Unknown nativeType: " + nativeType);
+        }
     }
 
     float convertValue(float value, LinuxAxisDescriptor descriptor) {

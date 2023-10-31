@@ -41,13 +41,13 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
     private static final Logger log = Logger.getLogger(LinuxForceFeedbackEffect.class.getName());
 
     private final LinuxEventDevice device;
-    private final int ff_id;
-    private final WriteTask write_task = new WriteTask();
-    private final UploadTask upload_task = new UploadTask();
+    private final int ffId;
+    private final WriteTask writeTask = new WriteTask();
+    private final UploadTask uploadTask = new UploadTask();
 
     public LinuxForceFeedbackEffect(LinuxEventDevice device) throws IOException {
         this.device = device;
-        this.ff_id = upload_task.doUpload(-1, 0);
+        this.ffId = uploadTask.doUpload(-1, 0);
     }
 
     protected abstract int upload(int id, float intensity) throws IOException;
@@ -60,10 +60,10 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
     public synchronized final void rumble(float intensity) {
         try {
             if (intensity > 0) {
-                upload_task.doUpload(ff_id, intensity);
-                write_task.write(1);
+                uploadTask.doUpload(ffId, intensity);
+                writeTask.write(1);
             } else {
-                write_task.write(0);
+                writeTask.write(0);
             }
         } catch (IOException e) {
             log.fine("Failed to rumble: " + e);
@@ -75,7 +75,7 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
 //     * so we'll rely on the kernel cleaning up on device close
 //     */
 //    public final void erase() throws IOException {
-//        device.eraseEffect(ff_id);
+//        device.eraseEffect(ffId);
 //    }
 
     @Override
@@ -118,7 +118,7 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
 
         @Override
         protected Object execute() throws IOException {
-            device.writeEvent(NativeDefinitions.EV_FF, ff_id, value);
+            device.writeEvent(NativeDefinitions.EV_FF, ffId, value);
             return null;
         }
     }

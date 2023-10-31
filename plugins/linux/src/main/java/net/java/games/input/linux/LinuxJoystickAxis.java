@@ -55,12 +55,12 @@ class LinuxJoystickAxis extends AbstractComponent {
     private float value;
     private boolean analog;
 
-    public LinuxJoystickAxis(Identifier.Axis axis_id) {
-        this(axis_id, true);
+    public LinuxJoystickAxis(Identifier.Axis axisId) {
+        this(axisId, true);
     }
 
-    public LinuxJoystickAxis(Identifier.Axis axis_id, boolean analog) {
-        super(axis_id.getName(), axis_id);
+    public LinuxJoystickAxis(Identifier.Axis axisId, boolean analog) {
+        super(axisId.getName(), axisId);
         this.analog = analog;
     }
 

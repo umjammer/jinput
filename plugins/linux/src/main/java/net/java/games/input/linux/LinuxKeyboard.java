@@ -54,7 +54,7 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class LinuxKeyboard extends Keyboard {
+final class LinuxKeyboard extends Keyboard implements LinuxController {
 
     private final PortType port;
     private final LinuxEventDevice device;
@@ -72,7 +72,7 @@ final class LinuxKeyboard extends Keyboard {
 
     @Override
     protected boolean getNextDeviceEvent(Event event) throws IOException {
-        return LinuxControllers.getNextDeviceEvent(event, device);
+        return getNextDeviceEvent(event, device);
     }
 
     @Override

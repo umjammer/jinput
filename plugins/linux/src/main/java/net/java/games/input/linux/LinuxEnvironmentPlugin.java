@@ -60,7 +60,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
 
     private final Controller[] controllers;
     private final List<LinuxDevice> devices = new ArrayList<>();
-    private final static LinuxDeviceThread device_thread = new LinuxDeviceThread();
+    private final static LinuxDeviceThread deviceThread = new LinuxDeviceThread();
 
     static {
         String osName = System.getProperty("os.name", "").trim();
@@ -70,7 +70,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
     }
 
     public static Object execute(LinuxDeviceTask task) throws IOException {
-        return device_thread.execute(task);
+        return deviceThread.execute(task);
     }
 
     public LinuxEnvironmentPlugin() {
@@ -95,62 +95,62 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         return controllers;
     }
 
-    private static Component[] createComponents(List<LinuxEventComponent> event_components, LinuxEventDevice device) {
+    private static Component[] createComponents(List<LinuxEventComponent> eventComponents, LinuxEventDevice device) {
         LinuxEventComponent[][] povs = new LinuxEventComponent[4][2];
         List<LinuxComponent> components = new ArrayList<>();
-        for (LinuxEventComponent event_component : event_components) {
-            Component.Identifier identifier = event_component.getIdentifier();
+        for (LinuxEventComponent eventComponent : eventComponents) {
+            Component.Identifier identifier = eventComponent.getIdentifier();
 
             if (identifier == Component.Identifier.Axis.POV) {
-                int native_code = event_component.getDescriptor().getCode();
-                switch (native_code) {
+                int nativeCode = eventComponent.getDescriptor().getCode();
+                switch (nativeCode) {
                 case NativeDefinitions.ABS_HAT0X:
-                    povs[0][0] = event_component;
+                    povs[0][0] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT0Y:
-                    povs[0][1] = event_component;
+                    povs[0][1] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT1X:
-                    povs[1][0] = event_component;
+                    povs[1][0] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT1Y:
-                    povs[1][1] = event_component;
+                    povs[1][1] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT2X:
-                    povs[2][0] = event_component;
+                    povs[2][0] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT2Y:
-                    povs[2][1] = event_component;
+                    povs[2][1] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT3X:
-                    povs[3][0] = event_component;
+                    povs[3][0] = eventComponent;
                     break;
                 case NativeDefinitions.ABS_HAT3Y:
-                    povs[3][1] = event_component;
+                    povs[3][1] = eventComponent;
                     break;
                 default:
-                    log.fine("Unknown POV instance: " + native_code);
+                    log.fine("Unknown POV instance: " + nativeCode);
                     break;
                 }
             } else if (identifier != null) {
-                LinuxComponent component = new LinuxComponent(event_component);
+                LinuxComponent component = new LinuxComponent(eventComponent);
                 components.add(component);
-                device.registerComponent(event_component.getDescriptor(), component);
+                device.registerComponent(eventComponent.getDescriptor(), component);
             }
         }
         for (LinuxEventComponent[] pov : povs) {
             LinuxEventComponent x = pov[0];
             LinuxEventComponent y = pov[1];
             if (x != null && y != null) {
-                LinuxComponent controller_component = new LinuxPOV(x, y);
-                components.add(controller_component);
-                device.registerComponent(x.getDescriptor(), controller_component);
-                device.registerComponent(y.getDescriptor(), controller_component);
+                LinuxComponent controllerComponent = new LinuxPOV(x, y);
+                components.add(controllerComponent);
+                device.registerComponent(x.getDescriptor(), controllerComponent);
+                device.registerComponent(y.getDescriptor(), controllerComponent);
             }
         }
-        Component[] components_array = new Component[components.size()];
-        components.toArray(components_array);
-        return components_array;
+        Component[] componentsArray = new Component[components.size()];
+        components.toArray(componentsArray);
+        return componentsArray;
     }
 
     private static Mouse createMouseFromDevice(LinuxEventDevice device, Component[] components) throws IOException {
@@ -167,13 +167,13 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
     }
 
     private static Controller createJoystickFromDevice(LinuxEventDevice device, Component[] components, Controller.Type type) throws IOException {
-        Controller joystick = new LinuxAbstractController(device, components, new Controller[] {}, device.getRumblers(), type);
+        Controller joystick = new LinuxControllerImpl(device, components, new Controller[] {}, device.getRumblers(), type);
         return joystick;
     }
 
     private static Controller createControllerFromDevice(LinuxEventDevice device) throws IOException {
-        List<LinuxEventComponent> event_components = device.getComponents();
-        Component[] components = createComponents(event_components, device);
+        List<LinuxEventComponent> eventComponents = device.getComponents();
+        Component[] components = createComponents(eventComponents, device);
         Controller.Type type = device.getType();
 
         if (type == Controller.Type.MOUSE) {
@@ -215,7 +215,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
                         }
 
                         if (!foundADifference) {
-                            controllers.add(new LinuxCombinedController((LinuxAbstractController) eventControllers.remove(i), (LinuxJoystickAbstractController) jsControllers.remove(j)));
+                            controllers.add(new LinuxCombinedController((LinuxControllerImpl) eventControllers.remove(i), (LinuxJoystickAbstractController) jsControllers.remove(j)));
                             i--;
                             j--;
                             break;
@@ -227,9 +227,9 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         controllers.addAll(eventControllers);
         controllers.addAll(jsControllers);
 
-        Controller[] controllers_array = new Controller[controllers.size()];
-        controllers.toArray(controllers_array);
-        return controllers_array;
+        Controller[] controllersArray = new Controller[controllers.size()];
+        controllers.toArray(controllersArray);
+        return controllersArray;
     }
 
     private static Component.Identifier.Button getButtonIdentifier(int index) {
@@ -277,17 +277,17 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         LinuxJoystickAxis[] hatBits = new LinuxJoystickAxis[6];
 
         for (int i = 0; i < device.getNumButtons(); i++) {
-            Component.Identifier button_id = LinuxNativeTypesMap.getButtonID(buttonMap[i]);
-            if (button_id != null) {
-                LinuxJoystickButton button = new LinuxJoystickButton(button_id);
+            Component.Identifier buttonId = LinuxNativeTypesMap.getButtonID(buttonMap[i]);
+            if (buttonId != null) {
+                LinuxJoystickButton button = new LinuxJoystickButton(buttonId);
                 device.registerButton(i, button);
                 components.add(button);
             }
         }
         for (int i = 0; i < device.getNumAxes(); i++) {
-            Component.Identifier.Axis axis_id;
-            axis_id = (Component.Identifier.Axis) LinuxNativeTypesMap.getAbsAxisID(axisMap[i]);
-            LinuxJoystickAxis axis = new LinuxJoystickAxis(axis_id);
+            Component.Identifier.Axis axisId;
+            axisId = (Component.Identifier.Axis) LinuxNativeTypesMap.getAbsAxisID(axisMap[i]);
+            LinuxJoystickAxis axis = new LinuxJoystickAxis(axisId);
 
             device.registerAxis(i, axis);
 
@@ -321,15 +321,15 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
     }
 
     private void enumerateJoystickControllers(List<Controller> controllers) {
-        File[] joystick_device_files = enumerateJoystickDeviceFiles("/dev/input");
-        if (joystick_device_files == null || joystick_device_files.length == 0) {
-            joystick_device_files = enumerateJoystickDeviceFiles("/dev");
-            if (joystick_device_files == null)
+        File[] joystickDeviceFiles = enumerateJoystickDeviceFiles("/dev/input");
+        if (joystickDeviceFiles == null || joystickDeviceFiles.length == 0) {
+            joystickDeviceFiles = enumerateJoystickDeviceFiles("/dev");
+            if (joystickDeviceFiles == null)
                 return;
         }
-        for (File event_file : joystick_device_files) {
+        for (File eventFile : joystickDeviceFiles) {
             try {
-                String path = getAbsolutePathPrivileged(event_file);
+                String path = getAbsolutePathPrivileged(eventFile);
                 LinuxJoystickDevice device = new LinuxJoystickDevice(path);
                 Controller controller = createJoystickFromJoystickDevice(device);
                 if (controller != null) {
@@ -338,13 +338,13 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
                 } else
                     device.close();
             } catch (IOException e) {
-                log.fine("Failed to open device (" + event_file + "): " + e.getMessage());
+                log.fine("Failed to open device (" + eventFile + "): " + e.getMessage());
             }
         }
     }
 
-    private static File[] enumerateJoystickDeviceFiles(String dev_path) {
-        File dev = new File(dev_path);
+    private static File[] enumerateJoystickDeviceFiles(String devPath) {
+        File dev = new File(devPath);
         return listFilesPrivileged(dev, (dir, name) -> name.startsWith("js"));
     }
 
@@ -365,13 +365,13 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
 
     private void enumerateEventControllers(List<Controller> controllers) {
         File dev = new File("/dev/input");
-        File[] event_device_files = listFilesPrivileged(dev, (File dir, String name) -> name.startsWith("event"));
+        File[] eventDeviceFiles = listFilesPrivileged(dev, (File dir, String name) -> name.startsWith("event"));
 
-        if (event_device_files == null)
+        if (eventDeviceFiles == null)
             return;
-        for (File event_file : event_device_files) {
+        for (File eventFile : eventDeviceFiles) {
             try {
-                String path = getAbsolutePathPrivileged(event_file);
+                String path = getAbsolutePathPrivileged(eventFile);
                 LinuxEventDevice device = new LinuxEventDevice(path);
                 try {
                     Controller controller = createControllerFromDevice(device);
@@ -385,7 +385,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
                     device.close();
                 }
             } catch (IOException e) {
-                log.fine("Failed to open device (" + event_file + "): " + e.getMessage());
+                log.fine("Failed to open device (" + eventFile + "): " + e.getMessage());
             }
         }
     }

@@ -54,8 +54,8 @@ final class LinuxJoystickButton extends AbstractComponent {
 
     private float value;
 
-    public LinuxJoystickButton(Identifier button_id) {
-        super(button_id.getName(), button_id);
+    public LinuxJoystickButton(Identifier buttonId) {
+        super(buttonId.getName(), buttonId);
     }
 
     @Override

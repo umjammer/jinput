@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,8 +28,7 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
 package net.java.games.input.linux;
 
@@ -50,25 +43,19 @@ import net.java.games.input.Event;
  * @author elias
  * @version 1.0
  */
-final class LinuxControllers {
+interface LinuxController {
 
-
-
-    private final static LinuxAbsInfo absInfo = new LinuxAbsInfo();
-
-    /* Declared synchronized to protect absInfo */
-    public static synchronized float poll(LinuxEventComponent eventComponent) throws IOException {
-        int nativeType = eventComponent.getDescriptor().getType();
-        switch (nativeType) {
-        case NativeDefinitions.EV_KEY:
-            int nativeCode = eventComponent.getDescriptor().getCode();
-            float state = eventComponent.getDevice().isKeySet(nativeCode) ? 1f : 0f;
-            return state;
-        case NativeDefinitions.EV_ABS:
-            eventComponent.getAbsInfo(absInfo);
-            return absInfo.getValue();
-        default:
-            throw new RuntimeException("Unknown nativeType: " + nativeType);
+    /** Declared synchronized to protect linuxEvent */
+    default boolean getNextDeviceEvent(Event event, LinuxEventDevice device) throws IOException {
+        while (device.getNextEvent(device.linuxEvent)) {
+            LinuxAxisDescriptor descriptor = device.linuxEvent.getDescriptor();
+            LinuxComponent component = device.mapDescriptor(descriptor);
+            if (component != null) {
+                float value = component.convertValue(device.linuxEvent.getValue(), descriptor);
+                event.set(component, value, device.linuxEvent.getNanos());
+                return true;
+            }
         }
+        return false;
     }
 }

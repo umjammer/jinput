@@ -40,19 +40,19 @@ final class LinuxRumbleFF extends LinuxForceFeedbackEffect {
 
     @Override
     protected int upload(int id, float intensity) throws IOException {
-        int weak_magnitude;
-        int strong_magnitude;
+        int weakMagnitude;
+        int strongMagnitude;
         if (intensity > 0.666666f) {
-            strong_magnitude = (int) (0x8000 * intensity);
-            weak_magnitude = (int) (0xc000 * intensity);
+            strongMagnitude = (int) (0x8000 * intensity);
+            weakMagnitude = (int) (0xc000 * intensity);
         } else if (intensity > 0.3333333f) {
-            strong_magnitude = (int) (0x8000 * intensity);
-            weak_magnitude = 0;
+            strongMagnitude = (int) (0x8000 * intensity);
+            weakMagnitude = 0;
         } else {
-            strong_magnitude = 0;
-            weak_magnitude = (int) (0xc000 * intensity);
+            strongMagnitude = 0;
+            weakMagnitude = (int) (0xc000 * intensity);
         }
 
-        return getDevice().uploadRumbleEffect(id, 0, 0, 0, -1, 0, strong_magnitude, weak_magnitude);
+        return getDevice().uploadRumbleEffect(id, 0, 0, 0, -1, 0, strongMagnitude, weakMagnitude);
     }
 }

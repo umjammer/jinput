@@ -27,10 +27,10 @@ class ffeffect extends Structure {
 
     /** 8 */
     static class ff_envelope extends Structure {
-        public short attack_length;
-        public short attack_level;
-        public short fade_length;
-        public short fade_level;
+        public short attackLength;
+        public short attackLevel;
+        public short fadeLength;
+        public short fadeLevel;
 
         public ff_envelope() {
         }
@@ -47,7 +47,7 @@ class ffeffect extends Structure {
 
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList("attack_length", "attack_level", "fade_length", "fade_level");
+            return Arrays.asList("attackLength", "attackLevel", "fadeLength", "fadeLevel");
         }
     }
 
@@ -218,8 +218,8 @@ class ffeffect extends Structure {
     /** 4 */
     static class ff_rumble_effect extends Structure {
 
-        public short strong_magnitude;
-        public short weak_magnitude;
+        public short strongMagnitude;
+        public short weakMagnitude;
 
         public ff_rumble_effect() {
         }
@@ -236,7 +236,7 @@ class ffeffect extends Structure {
 
         @Override
         protected List<String> getFieldOrder() {
-            return Arrays.asList("strong_magnitude", "weak_magnitude");
+            return Arrays.asList("strongMagnitude", "weakMagnitude");
         }
     }
 

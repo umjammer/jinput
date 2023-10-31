@@ -410,8 +410,8 @@ class LinuxNativeTypesMap {
         absAxesIDs[NativeDefinitions.ABS_MISC] = null;
     }
 
-    public static Controller.Type guessButtonTrait(int button_code) {
-        return switch (button_code) {
+    public static Controller.Type guessButtonTrait(int buttonCode) {
+        return switch (buttonCode) {
             case NativeDefinitions.BTN_TRIGGER, NativeDefinitions.BTN_THUMB, NativeDefinitions.BTN_THUMB2, NativeDefinitions.BTN_TOP, NativeDefinitions.BTN_TOP2, NativeDefinitions.BTN_PINKIE, NativeDefinitions.BTN_BASE, NativeDefinitions.BTN_BASE2, NativeDefinitions.BTN_BASE3, NativeDefinitions.BTN_BASE4, NativeDefinitions.BTN_BASE5, NativeDefinitions.BTN_BASE6, NativeDefinitions.BTN_DEAD ->
                     Controller.Type.STICK;
             case NativeDefinitions.BTN_A, NativeDefinitions.BTN_B, NativeDefinitions.BTN_C, NativeDefinitions.BTN_X, NativeDefinitions.BTN_Y, NativeDefinitions.BTN_Z, NativeDefinitions.BTN_TL, NativeDefinitions.BTN_TR, NativeDefinitions.BTN_TL2, NativeDefinitions.BTN_TR2, NativeDefinitions.BTN_SELECT, NativeDefinitions.BTN_START, NativeDefinitions.BTN_MODE, NativeDefinitions.BTN_THUMBL, NativeDefinitions.BTN_THUMBR ->

@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,8 +28,7 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
 package net.java.games.input.linux;
 
@@ -54,13 +47,13 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class LinuxAbstractController extends AbstractController {
+final class LinuxControllerImpl extends AbstractController implements LinuxController {
 
     private final PortType port;
     private final LinuxEventDevice device;
     private final Type type;
 
-    LinuxAbstractController(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) throws IOException {
+    LinuxControllerImpl(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers, Type type) throws IOException {
         super(device.getName(), components, children, rumblers);
         this.device = device;
         this.port = device.getPortType();
@@ -79,7 +72,7 @@ final class LinuxAbstractController extends AbstractController {
 
     @Override
     protected boolean getNextDeviceEvent(Event event) throws IOException {
-        return LinuxControllers.getNextDeviceEvent(event, device);
+        return getNextDeviceEvent(event, device);
     }
 
     @Override

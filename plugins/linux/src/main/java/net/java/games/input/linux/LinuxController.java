@@ -52,37 +52,23 @@ import net.java.games.input.Event;
  */
 final class LinuxControllers {
 
-    private final static LinuxEvent linux_event = new LinuxEvent();
 
-    /* Declared synchronized to protect linux_event */
-    public static synchronized boolean getNextDeviceEvent(Event event, LinuxEventDevice device) throws IOException {
-        while (device.getNextEvent(linux_event)) {
-            LinuxAxisDescriptor descriptor = linux_event.getDescriptor();
-            LinuxComponent component = device.mapDescriptor(descriptor);
-            if (component != null) {
-                float value = component.convertValue(linux_event.getValue(), descriptor);
-                event.set(component, value, linux_event.getNanos());
-                return true;
-            }
-        }
-        return false;
-    }
 
-    private final static LinuxAbsInfo abs_info = new LinuxAbsInfo();
+    private final static LinuxAbsInfo absInfo = new LinuxAbsInfo();
 
-    /* Declared synchronized to protect abs_info */
-    public static synchronized float poll(LinuxEventComponent event_component) throws IOException {
-        int native_type = event_component.getDescriptor().getType();
-        switch (native_type) {
+    /* Declared synchronized to protect absInfo */
+    public static synchronized float poll(LinuxEventComponent eventComponent) throws IOException {
+        int nativeType = eventComponent.getDescriptor().getType();
+        switch (nativeType) {
         case NativeDefinitions.EV_KEY:
-            int native_code = event_component.getDescriptor().getCode();
-            float state = event_component.getDevice().isKeySet(native_code) ? 1f : 0f;
+            int nativeCode = eventComponent.getDescriptor().getCode();
+            float state = eventComponent.getDevice().isKeySet(nativeCode) ? 1f : 0f;
             return state;
         case NativeDefinitions.EV_ABS:
-            event_component.getAbsInfo(abs_info);
-            return abs_info.getValue();
+            eventComponent.getAbsInfo(absInfo);
+            return absInfo.getValue();
         default:
-            throw new RuntimeException("Unkown native_type: " + native_type);
+            throw new RuntimeException("Unknown nativeType: " + nativeType);
         }
     }
 }

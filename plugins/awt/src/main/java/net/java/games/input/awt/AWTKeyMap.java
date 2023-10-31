@@ -37,8 +37,8 @@ import net.java.games.input.Component;
  */
 final class AWTKeyMap {
 
-    public static Component.Identifier.Key mapKeyCode(int key_code) {
-        return switch (key_code) {
+    public static Component.Identifier.Key mapKeyCode(int keyCode) {
+        return switch (keyCode) {
             case KeyEvent.VK_0 -> Component.Identifier.Key._0;
             case KeyEvent.VK_1 -> Component.Identifier.Key._1;
             case KeyEvent.VK_2 -> Component.Identifier.Key._2;
@@ -144,42 +144,42 @@ final class AWTKeyMap {
     }
 
     public static Component.Identifier.Key map(KeyEvent event) {
-        int key_code = event.getKeyCode();
-        int key_location = event.getKeyLocation();
-        switch (key_code) {
+        int keyCode = event.getKeyCode();
+        int keyLocation = event.getKeyLocation();
+        switch (keyCode) {
         case KeyEvent.VK_CONTROL:
-            if (key_location == KeyEvent.KEY_LOCATION_RIGHT)
+            if (keyLocation == KeyEvent.KEY_LOCATION_RIGHT)
                 return Component.Identifier.Key.RCONTROL;
             else
                 return Component.Identifier.Key.LCONTROL;
         case KeyEvent.VK_SHIFT:
-            if (key_location == KeyEvent.KEY_LOCATION_RIGHT)
+            if (keyLocation == KeyEvent.KEY_LOCATION_RIGHT)
                 return Component.Identifier.Key.RSHIFT;
             else
                 return Component.Identifier.Key.LSHIFT;
         case KeyEvent.VK_ALT:
-            if (key_location == KeyEvent.KEY_LOCATION_RIGHT)
+            if (keyLocation == KeyEvent.KEY_LOCATION_RIGHT)
                 return Component.Identifier.Key.RALT;
             else
                 return Component.Identifier.Key.LALT;
 //        //this is 1.5 only
 //        case KeyEvent.VK_WINDOWS:
-//            if (key_location == KeyEvent.KEY_LOCATION_RIGHT)
+//            if (keyLocation == KeyEvent.KEY_LOCATION_RIGHT)
 //                return Component.Identifier.Key.RWIN;
 //            else
 //                return Component.Identifier.Key.LWIN;
         case KeyEvent.VK_ENTER:
-            if (key_location == KeyEvent.KEY_LOCATION_NUMPAD)
+            if (keyLocation == KeyEvent.KEY_LOCATION_NUMPAD)
                 return Component.Identifier.Key.NUMPADENTER;
             else
                 return Component.Identifier.Key.RETURN;
         case KeyEvent.VK_COMMA:
-            if (key_location == KeyEvent.KEY_LOCATION_NUMPAD)
+            if (keyLocation == KeyEvent.KEY_LOCATION_NUMPAD)
                 return Component.Identifier.Key.NUMPADCOMMA;
             else
                 return Component.Identifier.Key.COMMA;
         default:
-            return mapKeyCode(key_code);
+            return mapKeyCode(keyCode);
         }
     }
 }

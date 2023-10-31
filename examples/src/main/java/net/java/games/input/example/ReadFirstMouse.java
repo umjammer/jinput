@@ -15,15 +15,12 @@ import net.java.games.input.ControllerEnvironment;
  */
 public class ReadFirstMouse {
 
-    public ReadFirstMouse() {
-        /* Get the available controllers */
-        Controller[] controllers = ControllerEnvironment
-                .getDefaultEnvironment().getControllers();
+    public void exec() {
+        // Get the available controllers
+        Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
-        /*
-         * Loop through the controllers, check the type of each one, and save
-         * the first mouse we find.
-         */
+        // Loop through the controllers, check the type of each one, and save
+        // the first mouse we find.
         Controller firstMouse = null;
         for (int i = 0; i < controllers.length && firstMouse == null; i++) {
             if (controllers[i].getType() == Controller.Type.MOUSE) {
@@ -40,14 +37,14 @@ public class ReadFirstMouse {
         System.out.println("First mouse is: " + firstMouse.getName());
 
         while (true) {
-            /* Poll the controller */
+            // Poll the controller
             firstMouse.poll();
 
-            /* Get all the axis and buttons */
+            // Get all the axis and buttons
             Component[] components = firstMouse.getComponents();
             StringBuilder buffer = new StringBuilder();
 
-            /* For each component, get it's name, and it's current value */
+            // For each component, get it's name, and it's current value
             for (int i = 0; i < components.length; i++) {
                 if (i > 0) {
                     buffer.append(", ");
@@ -55,7 +52,7 @@ public class ReadFirstMouse {
                 buffer.append(components[i].getName());
                 buffer.append(": ");
                 if (components[i].isAnalog()) {
-                    /* Get the value at the last poll of this component */
+                    // Get the value at the last poll of this component
                     buffer.append(components[i].getPollData());
                 } else {
                     if (components[i].getPollData() == 1.0f) {
@@ -67,10 +64,8 @@ public class ReadFirstMouse {
             }
             System.out.println(buffer);
 
-            /*
-             * Sleep for 20 millis, this is just so the example doesn't thrash
-             * the system.
-             */
+            // Sleep for 20 millis, this is just so the example doesn't thrash
+            // the system.
             try {
                 Thread.sleep(20);
             } catch (InterruptedException ignore) {
@@ -79,6 +74,7 @@ public class ReadFirstMouse {
     }
 
     public static void main(String[] args) {
-        new ReadFirstMouse();
+        ReadFirstMouse app = new ReadFirstMouse();
+        app.exec();
     }
 }

@@ -54,23 +54,23 @@ import com.sun.jna.ptr.PointerByReference;
 import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Rumbler;
-import net.java.games.input.windows.User32Ex.DIEFFECT;
-import net.java.games.input.windows.User32Ex.DIENVELOPE;
-import net.java.games.input.windows.User32Ex.DIOBJECTDATAFORMAT;
-import net.java.games.input.windows.User32Ex.DIPERIODIC;
-import net.java.games.input.windows.User32Ex.DIPROPRANGE;
-import net.java.games.input.windows.User32Ex.DIDEVICEOBJECTINSTANCE;
-import net.java.games.input.windows.User32Ex.DIDATAFORMAT;
-import net.java.games.input.windows.User32Ex.DIPROPDWORD;
-import net.java.games.input.windows.User32Ex.IDirectInputDevice8;
+import net.java.games.input.windows.WinAPI.DIEFFECT;
+import net.java.games.input.windows.WinAPI.DIENVELOPE;
+import net.java.games.input.windows.WinAPI.DIOBJECTDATAFORMAT;
+import net.java.games.input.windows.WinAPI.DIPERIODIC;
+import net.java.games.input.windows.WinAPI.DIPROPRANGE;
+import net.java.games.input.windows.WinAPI.DIDEVICEOBJECTINSTANCE;
+import net.java.games.input.windows.WinAPI.DIDATAFORMAT;
+import net.java.games.input.windows.WinAPI.DIPROPDWORD;
+import net.java.games.input.windows.WinAPI.IDirectInputDevice8;
 
 import static com.sun.jna.platform.win32.COM.COMUtils.S_FALSE;
-import static net.java.games.input.windows.User32Ex.DIENUM_CONTINUE;
-import static net.java.games.input.windows.User32Ex.DIPH_BYID;
-import static net.java.games.input.windows.User32Ex.DIPH_DEVICE;
-import static net.java.games.input.windows.User32Ex.DIPROP_BUFFERSIZE;
-import static net.java.games.input.windows.User32Ex.DIPROP_DEADZONE;
-import static net.java.games.input.windows.User32Ex.DIPROP_RANGE;
+import static net.java.games.input.windows.WinAPI.DIENUM_CONTINUE;
+import static net.java.games.input.windows.WinAPI.DIPH_BYID;
+import static net.java.games.input.windows.WinAPI.DIPH_DEVICE;
+import static net.java.games.input.windows.WinAPI.DIPROP_BUFFERSIZE;
+import static net.java.games.input.windows.WinAPI.DIPROP_DEADZONE;
+import static net.java.games.input.windows.WinAPI.DIPROP_RANGE;
 
 
 /**
@@ -348,49 +348,49 @@ final class IDirectInputDevice {
     }
 
     private static int mapGUIDType(GUID guid) {
-        if (guid.equals(User32Ex.GUID_XAxis)) {
+        if (guid.equals(WinAPI.GUID_XAxis)) {
             return GUID_XAxis;
-        } else if (guid.equals(User32Ex.GUID_YAxis)) {
+        } else if (guid.equals(WinAPI.GUID_YAxis)) {
             return GUID_YAxis;
-        } else if (guid.equals(User32Ex.GUID_ZAxis)) {
+        } else if (guid.equals(WinAPI.GUID_ZAxis)) {
             return GUID_ZAxis;
-        } else if (guid.equals(User32Ex.GUID_RxAxis)) {
+        } else if (guid.equals(WinAPI.GUID_RxAxis)) {
             return GUID_RxAxis;
-        } else if (guid.equals(User32Ex.GUID_RyAxis)) {
+        } else if (guid.equals(WinAPI.GUID_RyAxis)) {
             return GUID_RyAxis;
-        } else if (guid.equals(User32Ex.GUID_RzAxis)) {
+        } else if (guid.equals(WinAPI.GUID_RzAxis)) {
             return GUID_RzAxis;
-        } else if (guid.equals(User32Ex.GUID_Slider)) {
+        } else if (guid.equals(WinAPI.GUID_Slider)) {
             return GUID_Slider;
-        } else if (guid.equals(User32Ex.GUID_Button)) {
+        } else if (guid.equals(WinAPI.GUID_Button)) {
             return GUID_Button;
-        } else if (guid.equals(User32Ex.GUID_Key)) {
+        } else if (guid.equals(WinAPI.GUID_Key)) {
             return GUID_Key;
-        } else if (guid.equals(User32Ex.GUID_POV)) {
+        } else if (guid.equals(WinAPI.GUID_POV)) {
             return GUID_POV;
-        } else if (guid.equals(User32Ex.GUID_ConstantForce)) {
+        } else if (guid.equals(WinAPI.GUID_ConstantForce)) {
             return GUID_ConstantForce;
-        } else if (guid.equals(User32Ex.GUID_RampForce)) {
+        } else if (guid.equals(WinAPI.GUID_RampForce)) {
             return GUID_RampForce;
-        } else if (guid.equals(User32Ex.GUID_Square)) {
+        } else if (guid.equals(WinAPI.GUID_Square)) {
             return GUID_Square;
-        } else if (guid.equals(User32Ex.GUID_Sine)) {
+        } else if (guid.equals(WinAPI.GUID_Sine)) {
             return GUID_Sine;
-        } else if (guid.equals(User32Ex.GUID_Triangle)) {
+        } else if (guid.equals(WinAPI.GUID_Triangle)) {
             return GUID_Triangle;
-        } else if (guid.equals(User32Ex.GUID_SawtoothUp)) {
+        } else if (guid.equals(WinAPI.GUID_SawtoothUp)) {
             return GUID_SawtoothUp;
-        } else if (guid.equals(User32Ex.GUID_SawtoothDown)) {
+        } else if (guid.equals(WinAPI.GUID_SawtoothDown)) {
             return GUID_SawtoothDown;
-        } else if (guid.equals(User32Ex.GUID_Spring)) {
+        } else if (guid.equals(WinAPI.GUID_Spring)) {
             return GUID_Spring;
-        } else if (guid.equals(User32Ex.GUID_Damper)) {
+        } else if (guid.equals(WinAPI.GUID_Damper)) {
             return GUID_Damper;
-        } else if (guid.equals(User32Ex.GUID_Inertia)) {
+        } else if (guid.equals(WinAPI.GUID_Inertia)) {
             return GUID_Inertia;
-        } else if (guid.equals(User32Ex.GUID_Friction)) {
+        } else if (guid.equals(WinAPI.GUID_Friction)) {
             return GUID_Friction;
-        } else if (guid.equals(User32Ex.GUID_CustomForce)) {
+        } else if (guid.equals(WinAPI.GUID_CustomForce)) {
             return GUID_CustomForce;
         } else
         return GUID_Unknown;
@@ -421,7 +421,7 @@ final class IDirectInputDevice {
         return DIENUM_CONTINUE;
     }
 
-    /** @return Pointer User32Ex.IDirectInputEffect */
+    /** @return Pointer WinAPI.IDirectInputEffect */
     private static Pointer nCreatePeriodicEffect(Pointer address,
                                                  byte[] effectGuidArray,
                                                  int flags,
@@ -766,7 +766,7 @@ final class IDirectInputDevice {
     private static int nGetDeadzoneProperty(Pointer address, int objectId) {
         IDirectInputDevice8 directInputDevice8 = new IDirectInputDevice8(address);
 
-        User32Ex.DIPROPDWORD deadzone = new User32Ex.DIPROPDWORD();
+        WinAPI.DIPROPDWORD deadzone = new WinAPI.DIPROPDWORD();
         deadzone.diph.dwSize = deadzone.size();
         deadzone.diph.dwHeaderSize = 16; // sizeof(DIPROPHEADER)
         deadzone.diph.dwObj = objectId;

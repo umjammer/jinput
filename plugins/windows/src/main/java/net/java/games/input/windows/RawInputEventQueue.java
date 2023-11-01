@@ -44,6 +44,8 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinUser.MSG;
 import com.sun.jna.ptr.IntByReference;
+import net.java.games.input.windows.WinAPI.RAWINPUT;
+import net.java.games.input.windows.WinAPI.User32Ex;
 
 import static com.sun.jna.platform.win32.WinUser.RIM_TYPEKEYBOARD;
 import static com.sun.jna.platform.win32.WinUser.RIM_TYPEMOUSE;
@@ -106,18 +108,18 @@ final class RawInputEventQueue {
         MSG msg = new MSG();
 
         if (User32.INSTANCE.GetMessage(msg, hwnd, 0, 0) != 0) {
-            if (msg.message != User32Ex.WM_INPUT) {
+            if (msg.message != WinAPI.WM_INPUT) {
                 User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
                 return; // ignore it
             }
             long time = msg.time;
             IntByReference inputSize = new IntByReference();
-            User32Ex.RAWINPUT[] inputData = new User32Ex.RAWINPUT[inputSize.getValue()];
-            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), User32Ex.RID_INPUT, null, inputSize, inputData[0].size()) == -1) {
+            RAWINPUT[] inputData = new WinAPI.RAWINPUT[inputSize.getValue()];
+            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), WinAPI.RID_INPUT, null, inputSize, inputData[0].size()) == -1) {
                 User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
                 throw new IOException(String.format("Failed to get raw input data size (%d)", Native.getLastError()));
             }
-            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), User32Ex.RID_INPUT, inputData, inputSize, inputData[0].size()) == -1) {
+            if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), WinAPI.RID_INPUT, inputData, inputSize, inputData[0].size()) == -1) {
                 User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
                 throw new IOException(String.format("Failed to get raw input data (%d)", Native.getLastError()));
             }
@@ -136,7 +138,7 @@ final class RawInputEventQueue {
         }
     }
 
-    private void handleMouseEvent(long time, User32Ex.RAWINPUT data) {
+    private void handleMouseEvent(long time, WinAPI.RAWINPUT data) {
         addMouseEvent(
                 data.header.hDevice,
                 time,
@@ -156,7 +158,7 @@ final class RawInputEventQueue {
         );
     }
 
-    private void handleKeyboardEvent(long time, User32Ex.RAWINPUT data) {
+    private void handleKeyboardEvent(long time, WinAPI.RAWINPUT data) {
         addKeyboardEvent(
                 data.header.hDevice,
                 time,
@@ -182,12 +184,12 @@ final class RawInputEventQueue {
 //                System.err.printf("from windows: registered: %d %d %s (of %d)", devices[i].usUsagePage, devices[i].usUsage, devices[i].hwndTarget, numDevices);
 //            }
 //        }
-        User32Ex.RAWINPUTDEVICE[] devices = new User32Ex.RAWINPUTDEVICE[numDevices];
+        WinAPI.RAWINPUTDEVICE[] devices = new WinAPI.RAWINPUTDEVICE[numDevices];
         for (int i = 0; i < deviceInfos.length; i++) {
             RawDeviceInfo deviceObj = deviceInfos[i];
             int usage = deviceObj.getUsage();
             int usagePage = deviceObj.getUsagePage();
-            devices[i] = new User32Ex.RAWINPUTDEVICE();
+            devices[i] = new WinAPI.RAWINPUTDEVICE();
             devices[i].usUsagePage = (short) (usagePage & 0xffff);
             devices[i].usUsage = (short) (usage & 0xffff);
             devices[i].dwFlags = 0;

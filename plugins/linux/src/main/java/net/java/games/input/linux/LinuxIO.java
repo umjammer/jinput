@@ -9,12 +9,13 @@ package net.java.games.input.linux;
 import java.util.Arrays;
 import java.util.List;
 
-import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import com.sun.jna.platform.linux.Udev;
+import com.sun.jna.ptr.ByReference;
 
 
 /**
@@ -31,6 +32,7 @@ public interface LinuxIO extends Library {
 
     int O_RDONLY = 0;
     int O_RDWR = 2;
+    int O_CLOEXEC = 0x0001;
     int O_NONBLOCK = 2048;
 
     int KEY_MAX = 0x2ff;
@@ -183,17 +185,32 @@ public interface LinuxIO extends Library {
         }
     }
 
+    int HID_MAX_DESCRIPTOR_SIZE = 4096;
+
+    class hidraw_report_descriptor extends Structure {
+        public int size;
+        public byte[] value = new byte[HID_MAX_DESCRIPTOR_SIZE];
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("size", "value");
+        }
+    }
+
     int open64(String path, int flags);
+
+    int open(String pathname, int flags, int /* mode_t */ mode);
+
+    int open(String pathname, int flags);
 
     NativeLong read(int fd, Pointer buffer, NativeLong size);
 
     NativeLong write(int fd, Pointer buffer, NativeLong size);
 
-    int open(String pathname, int flags, int /* mode_t */ mode);
-
     int close(int fd);
 
     int ioctl(int fd, NativeLong request, Pointer arg);
+
+    int ioctl(int fd, NativeLong request, ByReference arg);
 
     int ioctl(int fd, NativeLong request, int arg);
 
@@ -209,7 +226,16 @@ public interface LinuxIO extends Library {
 
     int stat(String pathname, stat buf);
 
+    int fstat(int fildes, stat buf);
+
     int sscanf(byte[] str, String fotmat, Object...args);
 
     NativeLong strlen(byte[] string);
+
+    interface UdevEx extends Udev {
+
+        UdevEx INSTANCE = Native.load("udev", UdevEx.class);
+
+        Udev.UdevDevice udev_device_new_from_devnum(Udev.UdevContext udev, byte type, NativeLong devnum);
+    }
 }

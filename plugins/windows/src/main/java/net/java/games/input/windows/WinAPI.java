@@ -17,9 +17,10 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Union;
+import com.sun.jna.platform.win32.Cfgmgr32;
 import com.sun.jna.platform.win32.Guid.GUID;
 import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.SetupApi.SP_DEVINFO_DATA;
+import com.sun.jna.platform.win32.SetupApi;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HINSTANCE;
 import com.sun.jna.platform.win32.WinDef.HWND;
@@ -32,17 +33,24 @@ import com.sun.jna.platform.win32.WinUser.HOOKPROC;
 import com.sun.jna.platform.win32.WinUser.MSLLHOOKSTRUCT;
 import com.sun.jna.ptr.ByReference;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.W32APIOptions;
+
+import static com.sun.jna.platform.win32.Winioctl.FILE_ANY_ACCESS;
+import static com.sun.jna.platform.win32.Winioctl.FILE_DEVICE_KEYBOARD;
+import static com.sun.jna.platform.win32.Winioctl.METHOD_OUT_DIRECT;
 
 
 /**
  * @see "http://stackoverflow.com/questions/7004810/from-java-capture-mouse-click-and-use-as-hotkey"
  * @see "https://msdn.microsoft.com/library/windows/desktop/ms644986.aspx"
  */
-public interface User32Ex {
+public interface WinAPI {
 
     int MAX_PATH = 260;
+
+    int MAX_STRING_WCHARS = 0xFFF;
 
     int CS_VREDRAW = 0x0001;
     int CS_HREDRAW = 0x0002;
@@ -396,7 +404,7 @@ public interface User32Ex {
         public int cAxes;
         public int[] rgdwAxes;
         public long[] rglDirection;
-        DIENVELOPE.ByReference lpEnvelope;
+        public DIENVELOPE.ByReference lpEnvelope;
         public int cbTypeSpecificParams;
         public DIPERIODIC.ByReference lpvTypeSpecificParams;
         public int dwStartDelay;
@@ -420,10 +428,10 @@ public interface User32Ex {
     }
 
     class DIPERIODIC extends Structure {
-        int dwMagnitude;
-        long lOffset;
-        int dwPhase;
-        int dwPeriod;
+        public int dwMagnitude;
+        public long lOffset;
+        public int dwPhase;
+        public int dwPeriod;
         public static class ByReference extends DIPERIODIC implements Structure.ByReference {
         }
         @Override protected List<String> getFieldOrder() {
@@ -479,34 +487,34 @@ public interface User32Ex {
     }
 
     class IDirectInputEffect extends Structure {
-        interface DownloadCallback extends Callback {
+        public interface DownloadCallback extends Callback {
             int /* HRESULT */ apply();
         }
-        interface EscapeCallback extends Callback {
+        public interface EscapeCallback extends Callback {
             int /* HRESULT */ apply(DIEFFESCAPE pesc);
         }
-        interface GetEffectGuidCallback extends Callback {
+        public interface GetEffectGuidCallback extends Callback {
             int /* HRESULT */ apply(GUID pguid);
         }
-        interface GetEffectStatusCallback extends Callback {
+        public interface GetEffectStatusCallback extends Callback {
             int /* HRESULT */ apply(int[] pdwFlags);
         }
-        interface GetParametersCallback extends Callback {
+        public interface GetParametersCallback extends Callback {
             int /* HRESULT */ apply(DIEFFECT peff, int dwFlags);
         }
-        interface InitializeCallback extends Callback {
+        public interface InitializeCallback extends Callback {
             int /* HRESULT */ apply(HINSTANCE hinst, int dwVersion, GUID.ByValue rguid);
         }
-        interface SetParametersCallback extends Callback {
+        public interface SetParametersCallback extends Callback {
             int /* HRESULT */ apply(DIEFFECT peff, int dwFlags);
         }
-        interface StartCallback extends Callback {
+        public interface StartCallback extends Callback {
             int /* HRESULT */ apply(int dwIterations, int dwFlags);
         }
-        interface StopCallback extends Callback {
+        public interface StopCallback extends Callback {
             int /* HRESULT */ apply();
         }
-        interface UnloadCallback extends Callback {
+        public interface UnloadCallback extends Callback {
             int /* HRESULT */ apply();
         }
         // IUNKNOWN_C_GUTS
@@ -996,20 +1004,107 @@ public interface User32Ex {
 
     int WM_QUERYENDSESSION = 0x0011;
     int WM_INPUT = 0x00ff;
+
     int RIM_INPUT = 0;
     int RIM_INPUTSINK = 1;
+    //int RIM_TYPEMOUSE = 0;
+
+//#region HID
 
     short HID_USAGE_PAGE_GENERIC = 0x01;
     short HID_USAGE_GENERIC_MOUSE = 0x02;
+
+    static int CTL_CODE(int DeviceType, int Function, int Method, int Access) {
+        return ((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | Method;
+    }
+
+    static int HID_OUT_CTL_CODE(int id) { return CTL_CODE(FILE_DEVICE_KEYBOARD, id, METHOD_OUT_DIRECT, FILE_ANY_ACCESS); }
+
+    int IOCTL_HID_GET_FEATURE = HID_OUT_CTL_CODE(100);
+    int IOCTL_HID_GET_INPUT_REPORT = HID_OUT_CTL_CODE(104);
+
+    enum HIDP_REPORT_TYPE {
+        HidP_Input,
+        HidP_Output,
+        HidP_Feature
+    }
+
+    class HIDD_ATTRIBUTES extends Structure {
+        public long  Size;
+        public short VendorID;
+        public short ProductID;
+        public short VersionNumber;
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("Size", "VendorID", "ProductID", "VersionNumber");
+        }
+    }
+
+    class HIDP_CAPS extends Structure {
+        public short /* USAGE */ Usage;
+        public short /* USAGE */ UsagePage;
+        public short InputReportByteLength;
+        public short OutputReportByteLength;
+        public short FeatureReportByteLength;
+        public short[] Reserved = new short[17];
+        public short NumberLinkCollectionNodes;
+        public short NumberInputButtonCaps;
+        public short NumberInputValueCaps;
+        public short NumberInputDataIndices;
+        public short NumberOutputButtonCaps;
+        public short NumberOutputValueCaps;
+        public short NumberOutputDataIndices;
+        public short NumberFeatureButtonCaps;
+        public short NumberFeatureValueCaps;
+        public short NumberFeatureDataIndices;
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("Usage", "UsagePage", "InputReportByteLength", "OutputReportByteLength", "FeatureReportByteLength",
+                    "Reserved", "NumberLinkCollectionNodes", "NumberInputButtonCaps", "NumberInputValueCaps",
+                    "NumberInputDataIndices", "NumberOutputButtonCaps", "NumberOutputValueCaps", "NumberOutputDataIndices",
+                    "NumberFeatureButtonCaps", "NumberFeatureValueCaps", "NumberFeatureDataIndices");
+        }
+    }
+
+//#endregion
+
+//#region config
+
+    class DEVPROPKEY extends Structure {
+        public GUID /* DEVPROPGUID */ fmtid;
+        public long /* DEVPROPID */ pid;
+        DEVPROPKEY(GUID guid, long id) {
+            this.fmtid = guid;
+            this.pid = id;
+            write();
+        }
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("fmtid", "pid");
+        }
+    }
+
+    int DEVPROP_TYPEMOD_LIST = 0x00002000;
+    int DEVPROP_TYPE_STRING = 0x00000012;
+    int DEVPROP_TYPE_STRING_LIST = DEVPROP_TYPE_STRING | DEVPROP_TYPEMOD_LIST;
+
+    DEVPROPKEY DEVPKEY_NAME                 = new DEVPROPKEY(GUID.fromString("{b725f130-47ef-101a-a5f1-02608c9eebac}"), 10);
+    DEVPROPKEY DEVPKEY_Device_InstanceId    = new DEVPROPKEY(GUID.fromString("{78c34fc8-104a-4aca-9ea4-524d52996e57}"), 256);
+    DEVPROPKEY DEVPKEY_Device_HardwareIds   = new DEVPROPKEY(GUID.fromString("{a45c254e-df1c-4efd-8020-67d146a850e0}"), 3);
+    DEVPROPKEY DEVPKEY_Device_Manufacturer  = new DEVPROPKEY(GUID.fromString("{a45c254e-df1c-4efd-8020-67d146a850e0}"), 13);
+    DEVPROPKEY DEVPKEY_Device_CompatibleIds = new DEVPROPKEY(GUID.fromString("{a45c254e-df1c-4efd-8020-67d146a850e0}"), 4);
+
+    DEVPROPKEY PKEY_DeviceInterface_Bluetooth_DeviceAddress = new DEVPROPKEY(GUID.fromString("{2BD67D8B-8BEB-48D5-87E0-6CDA3428040A}"), 1);
+    DEVPROPKEY PKEY_DeviceInterface_Bluetooth_Manufacturer  = new DEVPROPKEY(GUID.fromString("{2BD67D8B-8BEB-48D5-87E0-6CDA3428040A}"), 4);
+    DEVPROPKEY PKEY_DeviceInterface_Bluetooth_ModelNumber   = new DEVPROPKEY(GUID.fromString("{2BD67D8B-8BEB-48D5-87E0-6CDA3428040A}"), 5);
+
+//#endregion
 
     int RIDEV_INPUTSINK = 0x00000100;
     int RIDEV_REMOVE = 0x00000001;
 
     int RID_INPUT = 0x10000003;
     int MOUSE_MOVE_RELATIVE = 0;
-    //int RIM_TYPEMOUSE = 0;
-
-    User32ExTrait INSTANCE = Native.load("user32", User32ExTrait.class);
 
     GUID GUID_XAxis              = GUID.fromString("{A36D02E0-C9F3-11CF-BFC7-444553540000}");
     GUID GUID_YAxis              = GUID.fromString("{A36D02E1-C9F3-11CF-BFC7-444553540000}");
@@ -1042,7 +1137,9 @@ public interface User32Ex {
     GUID GUID_Friction           = GUID.fromString("{13541C2A-8E33-11D0-9AD0-00A0C9A06E35}");
     GUID GUID_CustomForce        = GUID.fromString("{13541C2B-8E33-11D0-9AD0-00A0C9A06E35}");
 
-    interface User32ExTrait extends User32 {
+    interface User32Ex extends User32 {
+
+        User32Ex INSTANCE = Native.load("user32", User32Ex.class);
 
         short GetKeyState(int vKey);
 
@@ -1095,49 +1192,134 @@ public interface User32Ex {
         long /* LSTATUS */ RegCloseKey(HKEY hKey);
     }
 
-    interface Kernel32Ex extends Library {
+    interface Kernel32Ex extends Kernel32 {
+
+        Kernel32Ex INSTANCE = Native.load("kernel32", Kernel32Ex.class, W32APIOptions.UNICODE_OPTIONS);
 
         // https://msdn.microsoft.com/library/windows/desktop/ms686219.aspx
         int ABOVE_NORMAL_PRIORITY_CLASS = 0x00008000;
         int HIGH_PRIORITY_CLASS = 0x00000080;
         int NORMAL_PRIORITY_CLASS = 0x00000020;
 
-        Kernel32Ex INSTANCE = Native.load("kernel32", Kernel32Ex.class);
-    }
-
-    interface Kernel32ExTrait extends Kernel32 {
-
         boolean SetPriorityClass(HANDLE hProcess, int dwPriorityClass);
+
+        boolean GetOverlappedResult(
+                HANDLE hFile,
+                Pointer /* LPOVERLAPPED */ lpOverlapped,
+                IntByReference lpNumberOfBytesTransferred,
+                boolean bWait
+        );
+
+        boolean CancelIo(HANDLE hFile);
     }
 
-    class HDEVINFO extends HANDLE {
+    interface SetupApiEx extends SetupApi {
 
-        public HDEVINFO() {
-        }
-
-        public HDEVINFO(Pointer ptr) {
-            super(ptr);
-        }
-    }
-
-    interface SetupApiInterface extends Library {
-
-        SetupApiInterface INSTANCE = Native.load("setupapi", SetupApiInterface.class,
-                W32APIOptions.UNICODE_OPTIONS);
+        SetupApiEx INSTANCE = Native.load("setupapi", SetupApiEx.class, W32APIOptions.UNICODE_OPTIONS);
 
         GUID GUID_DEVCLASS_KEYBOARD = GUID.fromString("{4d36e96b-e325-11ce-bfc1-08002be10318}");
         GUID GUID_DEVCLASS_MOUSE = GUID.fromString("{4d36e96f-e325-11ce-bfc1-08002be10318}");
 
-        HDEVINFO SetupDiGetClassDevs(GUID ClassGuid, String Enumerator, HWND hwndParent, int Flags);
+        boolean SetupDiGetDeviceInstanceId(HANDLE /* HDEVINFO */  DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData,
+                                           Memory DeviceInstanceId, IntByReference DeviceInstanceIdSize, int RequiredSize);
+    }
 
-        boolean SetupDiEnumDeviceInfo(HDEVINFO DeviceInfoSet, int MemberIndex, SP_DEVINFO_DATA DeviceInfoData);
+    interface Cfgmgr32Ex extends Cfgmgr32 {
 
-        boolean SetupDiGetDeviceRegistryProperty(HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData, int Property,
-                                                 int PropertyRegDataType, Memory PropertyBuffer, int PropertyBufferSize, int RequiredSize);
+        Cfgmgr32Ex INSTANCE = Native.load("CfgMgr32", Cfgmgr32Ex.class, W32APIOptions.UNICODE_OPTIONS);
 
-        boolean SetupDiGetDeviceInstanceId(HDEVINFO DeviceInfoSet, SP_DEVINFO_DATA DeviceInfoData,
-                                           Memory DeviceInstanceId, int DeviceInstanceIdSize, int RequiredSize);
+        long CM_GET_DEVICE_INTERFACE_LIST_PRESENT = 0x00000000L;
 
-        boolean SetupDiDestroyDeviceInfoList(HDEVINFO DeviceInfoSet);
+        int /* CONFIGRET */ CM_Get_DevNode_Property(
+                int /* DEVINST */ dnDevInst,
+                DEVPROPKEY PropertyKey,
+                IntByReference /* DEVPROPTYPE */ PropertyType,
+                Pointer /* PBYTE */ PropertyBuffer,
+                LongByReference /* PULONG */ PropertyBufferSize,
+                long /* ULONG */ ulFlags
+        );
+
+        int /* CONFIGRET */ CM_Get_Device_Interface_List_Size(
+                LongByReference pulLen,
+                GUID InterfaceClassGuid,
+                Pointer /* DEVINSTID_W */ pDeviceID,
+                long ulFlags
+        );
+
+        int /* CONFIGRET */ CM_Get_Device_Interface_List(
+                GUID InterfaceClassGuid,
+                Pointer /* DEVINSTID_W */ pDeviceID,
+                Pointer /* PZZWSTR */ Buffer,
+                long BufferLen,
+                long ulFlags
+        );
+
+        int /* CONFIGRET */ CM_Get_Device_Interface_Property(
+                String /* LPCWSTR */ pszDeviceInterface,
+                DEVPROPKEY PropertyKey,
+                IntByReference /* DEVPROPTYPE */ PropertyType,
+                Pointer PropertyBuffer,
+                LongByReference PropertyBufferSize,
+                long ulFlags
+        );
+    }
+
+    interface Hid extends Library {
+
+        Hid INSTANCE = Native.load("Hid", Hid.class, W32APIOptions.UNICODE_OPTIONS);
+
+        int HIDP_STATUS_SUCCESS = 0x00110000;
+
+        boolean HidD_SetFeature(
+                HANDLE HidDeviceObject,
+                byte[] /* PVOID */ ReportBuffer,
+                long ReportBufferLength
+        );
+
+        boolean HidD_GetPreparsedData(
+                HANDLE HidDeviceObject,
+                PointerByReference /* PHIDP_PREPARSED_DATA */ PreparsedData
+        );
+
+        boolean HidD_FreePreparsedData(
+                Pointer /* PHIDP_PREPARSED_DATA */ PreparsedData
+        );
+
+        void HidD_GetHidGuid(
+                GUID HidGuid
+        );
+
+        boolean HidD_GetAttributes(
+                HANDLE HidDeviceObject,
+                HIDD_ATTRIBUTES Attributes
+        );
+
+        boolean HidD_SetNumInputBuffers(
+                HANDLE HidDeviceObject,
+                long NumberBuffers
+        );
+
+        int /* NTSTATUS */ HidP_GetCaps(
+                Pointer /* PHIDP_PREPARSED_DATA */ PreparsedData,
+                HIDP_CAPS Capabilities
+        );
+
+        boolean HidD_GetSerialNumberString(
+                HANDLE HidDeviceObject,
+                byte[] Buffer,
+                long BufferLength
+        );
+
+        boolean HidD_GetManufacturerString(
+                HANDLE HidDeviceObject,
+                byte[] Buffer,
+                int BufferLength
+        );
+
+        boolean HidD_GetProductString(
+                HANDLE HidDeviceObject,
+                byte[] Buffer,
+                long BufferLength
+        );
     }
 }

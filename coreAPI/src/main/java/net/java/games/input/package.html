@@ -7,5 +7,10 @@ Top level package for JInput 3.
 <h2>Package Specification</h2>
 
 use proper ServiceProvider instead of proprietary plugin system that made deprecated.
+
+to avoid implements conflict, ser system property "net.java.games.input.ControllerEnvironment.excludes".
+
+like <code>-Dnet.java.games.input.ControllerEnvironment.excludes=net.java.games.input:foo.bar</code>
+semicolon separated string for multiple package names.
 </body>
 </html>

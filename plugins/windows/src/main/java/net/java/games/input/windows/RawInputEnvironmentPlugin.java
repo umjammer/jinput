@@ -43,16 +43,19 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Guid.GUID;
 import com.sun.jna.platform.win32.SetupApi.SP_DEVINFO_DATA;
 import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinUser.RAWINPUTDEVICELIST;
 import com.sun.jna.ptr.IntByReference;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
-import net.java.games.input.windows.User32Ex.HDEVINFO;
+import net.java.games.input.windows.WinAPI.SetupApiEx;
 
 import static com.sun.jna.platform.win32.SetupApi.DIGCF_PRESENT;
 import static com.sun.jna.platform.win32.SetupApi.SPDRP_DEVICEDESC;
 import static com.sun.jna.platform.win32.WinBase.INVALID_HANDLE_VALUE;
 import static com.sun.jna.platform.win32.WinError.ERROR_INSUFFICIENT_BUFFER;
+import static net.java.games.input.windows.WinAPI.SetupApiEx.GUID_DEVCLASS_KEYBOARD;
+import static net.java.games.input.windows.WinAPI.SetupApiEx.GUID_DEVCLASS_MOUSE;
 
 
 /**
@@ -62,7 +65,7 @@ import static com.sun.jna.platform.win32.WinError.ERROR_INSUFFICIENT_BUFFER;
  * @author elias
  * @version 1.0
  */
-public final class RawInputEnvironmentPlugin extends ControllerEnvironment {
+final class RawInputEnvironmentPlugin extends ControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(RawInputEnvironmentPlugin.class.getName());
 
@@ -75,26 +78,20 @@ public final class RawInputEnvironmentPlugin extends ControllerEnvironment {
         }
     }
 
-    private final Controller[] controllers;
+    private final List<Controller> controllers = new ArrayList<>();
 
-    /** Creates new DirectInputEnvironment */
-    public RawInputEnvironmentPlugin() {
+    @Override
+    public Controller[] getControllers() {
         RawInputEventQueue queue;
-        Controller[] controllers = new Controller[] {};
         if (isSupported()) {
             try {
                 queue = new RawInputEventQueue();
-                controllers = enumControllers(queue);
+                enumControllers(queue);
             } catch (IOException e) {
                 log.fine("Failed to enumerate devices: " + e.getMessage());
             }
         }
-        this.controllers = controllers;
-    }
-
-    @Override
-    public Controller[] getControllers() {
-        return controllers;
+        return controllers.toArray(Controller[]::new);
     }
 
     private static SetupAPIDevice lookupSetupAPIDevice(String deviceName, List<SetupAPIDevice> setupapiDevices) {
@@ -141,13 +138,11 @@ public final class RawInputEnvironmentPlugin extends ControllerEnvironment {
         }
     }
 
-    private Controller[] enumControllers(RawInputEventQueue queue) throws IOException {
-        List<Controller> controllers = new ArrayList<>();
+    private void enumControllers(RawInputEventQueue queue) throws IOException {
         List<RawDevice> devices = new ArrayList<>();
         enumerateDevices(queue, devices);
         List<SetupAPIDevice> setupapiDevices = enumSetupAPIDevices();
         createControllersFromDevices(queue, controllers, devices, setupapiDevices);
-        return controllers.toArray(Controller[]::new);
     }
 
     @Override
@@ -191,7 +186,7 @@ public final class RawInputEnvironmentPlugin extends ControllerEnvironment {
 
         NativeUtil.unwrapGUID(guidArray, setupClassGuid);
 
-        HDEVINFO hDevInfo = User32Ex.SetupApiInterface.INSTANCE.SetupDiGetClassDevs(setupClassGuid,
+        HANDLE hDevInfo = SetupApiEx.INSTANCE.SetupDiGetClassDevs(setupClassGuid,
                 null,
                 null,
                 DIGCF_PRESENT);
@@ -201,58 +196,58 @@ public final class RawInputEnvironmentPlugin extends ControllerEnvironment {
         }
 
         DeviceInfoData.cbSize = DeviceInfoData.size();
-        for (int i = 0; User32Ex.SetupApiInterface.INSTANCE.SetupDiEnumDeviceInfo(hDevInfo, i, DeviceInfoData); i++) {
-            int DataT = 0;
+        for (int i = 0; SetupApiEx.INSTANCE.SetupDiEnumDeviceInfo(hDevInfo, i, DeviceInfoData); i++) {
+            IntByReference DataT = new IntByReference();
             Memory buffer = new Memory(256);
-            int buffersize = 0;
+            IntByReference buffersize = new IntByReference();
 
-            while (!User32Ex.SetupApiInterface.INSTANCE.SetupDiGetDeviceRegistryProperty(
+            while (!SetupApiEx.INSTANCE.SetupDiGetDeviceRegistryProperty(
                     hDevInfo,
                     DeviceInfoData,
                     SPDRP_DEVICEDESC,
 					DataT,
                     buffer,
-                    buffersize,
+                    buffersize.getValue(),
 					buffersize)) {
                 if (Native.getLastError() == ERROR_INSUFFICIENT_BUFFER) {
                     buffer.close();
-                    buffer = new Memory(buffersize);
+                    buffer = new Memory(buffersize.getValue());
                 } else {
-                    User32Ex.SetupApiInterface.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
+                    SetupApiEx.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
                     throw new IOException(String.format("Failed to get device description (%x)", Native.getLastError()));
                 }
             }
 
-            String deviceName = new String(buffer.getByteArray(0, buffersize), StandardCharsets.UTF_8);
+            String deviceName = new String(buffer.getByteArray(0, buffersize.getValue()), StandardCharsets.UTF_8);
 
-            while (!User32Ex.SetupApiInterface.INSTANCE.SetupDiGetDeviceInstanceId(
+            while (!SetupApiEx.INSTANCE.SetupDiGetDeviceInstanceId(
                     hDevInfo,
                     DeviceInfoData,
                     buffer,
                     buffersize,
-					buffersize))
+					buffersize.getValue()))
             {
                 if (Native.getLastError() == ERROR_INSUFFICIENT_BUFFER) {
                     buffer.close();
-                    buffer = new Memory(buffersize);
+                    buffer = new Memory(buffersize.getValue());
                 } else {
-                    User32Ex.SetupApiInterface.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
+                    SetupApiEx.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
                     throw new IOException(String.format("Failed to get device instance id (%x)", Native.getLastError()));
                 }
             }
 
-            String deviceInstanceId = new String(buffer.getByteArray(0, buffersize), StandardCharsets.UTF_8);
+            String deviceInstanceId = new String(buffer.getByteArray(0, buffersize.getValue()), StandardCharsets.UTF_8);
             SetupAPIDevice setupApiDevice = new SetupAPIDevice(deviceInstanceId, deviceName);
             deviceList.add(setupApiDevice);
         }
-        User32Ex.SetupApiInterface.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
+        SetupApiEx.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
     }
 
     private static byte[] getKeyboardClassGUID() {
-        return NativeUtil.wrapGUID(User32Ex.SetupApiInterface.GUID_DEVCLASS_KEYBOARD);
+        return NativeUtil.wrapGUID(GUID_DEVCLASS_KEYBOARD);
     }
 
     private static byte[] getMouseClassGUID() {
-        return NativeUtil.wrapGUID(User32Ex.SetupApiInterface.GUID_DEVCLASS_MOUSE);
+        return NativeUtil.wrapGUID(GUID_DEVCLASS_MOUSE);
     }
 }

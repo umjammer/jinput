@@ -51,9 +51,9 @@ import com.sun.jna.ptr.IntByReference;
 import static com.sun.jna.platform.win32.User32.WS_EX_TOPMOST;
 import static com.sun.jna.platform.win32.WinUser.WS_ICONIC;
 import static com.sun.jna.platform.win32.WinUser.WS_POPUP;
-import static net.java.games.input.windows.User32Ex.COLOR_WINDOW;
-import static net.java.games.input.windows.User32Ex.CS_HREDRAW;
-import static net.java.games.input.windows.User32Ex.CS_VREDRAW;
+import static net.java.games.input.windows.WinAPI.COLOR_WINDOW;
+import static net.java.games.input.windows.WinAPI.CS_HREDRAW;
+import static net.java.games.input.windows.WinAPI.CS_VREDRAW;
 
 
 /**

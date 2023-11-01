@@ -52,7 +52,7 @@ import net.java.games.input.Mouse;
  * @author elias
  * @version 1.0
  */
-public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
+final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(DirectInputEnvironmentPlugin.class.getName());
 
@@ -65,19 +65,34 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
         }
     }
 
-    private final Controller[] controllers;
+    private final List<Controller> controllers = new ArrayList<>();
     private final List<IDirectInputDevice> activeDevices = new ArrayList<>();
     private final DummyWindow window;
 
     /** Creates new DirectInputEnvironment */
     public DirectInputEnvironmentPlugin() {
         DummyWindow window = null;
-        Controller[] controllers = new Controller[] {};
         if (isSupported()) {
             try {
                 window = new DummyWindow();
+            } catch (IOException e) {
+                log.fine("Failed to enumerate devices: " + e.getMessage());
+            }
+            this.window = window;
+            Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
+        } else {
+            // These are final fields, so can't set them, then over ride
+            // them if we are supported.
+            this.window = null;
+        }
+    }
+
+    @Override
+    public Controller[] getControllers() {
+        if (isSupported()) {
+            try {
                 try {
-                    controllers = enumControllers(window);
+                    enumControllers(window);
                 } catch (IOException e) {
                     window.destroy();
                     throw e;
@@ -85,20 +100,9 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
             } catch (IOException e) {
                 log.fine("Failed to enumerate devices: " + e.getMessage());
             }
-            this.window = window;
-            this.controllers = controllers;
-            Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
-        } else {
-            // These are final fields, so can't set them, then over ride
-            // them if we are supported.
-            this.window = null;
-            this.controllers = controllers;
         }
-    }
 
-    @Override
-    public Controller[] getControllers() {
-        return controllers;
+        return controllers.toArray(Controller[]::new);
     }
 
     private Component[] createComponents(IDirectInputDevice device, boolean mapMouseButtons) {
@@ -115,9 +119,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
             controllerComponents.add(component);
             device.registerComponent(deviceObject, component);
         }
-        Component[] components = new Component[controllerComponents.size()];
-        controllerComponents.toArray(components);
-        return components;
+        return controllerComponents.toArray(Component[]::new);
     }
 
     private Mouse createMouseFromDevice(IDirectInputDevice device) {
@@ -131,8 +133,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
 
     private AbstractController createControllerFromDevice(IDirectInputDevice device, Controller.Type type) {
         Component[] components = createComponents(device, false);
-        AbstractController controller = new DIAbstractController(device, components, new Controller[] {}, device.getRumblers(), type);
-        return controller;
+        return new DIAControllerImpl(device, components, new Controller[0], device.getRumblers(), type);
     }
 
     private Keyboard createKeyboardFromDevice(IDirectInputDevice device) {
@@ -152,8 +153,7 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
         };
     }
 
-    private Controller[] enumControllers(DummyWindow window) throws IOException {
-        List<Controller> controllers = new ArrayList<>();
+    private void enumControllers(DummyWindow window) throws IOException {
         IDirectInput dinput = new IDirectInput(window);
         try {
             List<IDirectInputDevice> devices = dinput.getDevices();
@@ -168,9 +168,6 @@ public final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
         } finally {
             dinput.release();
         }
-        Controller[] controllersArray = new Controller[controllers.size()];
-        controllers.toArray(controllersArray);
-        return controllersArray;
     }
 
     private void shutdownHook() {

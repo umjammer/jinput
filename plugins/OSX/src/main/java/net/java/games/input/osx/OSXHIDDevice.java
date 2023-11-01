@@ -78,10 +78,10 @@ import static vavix.rococoa.iokit.IOKitLib.kIOHIDTransportKey;
  */
 final class OSXHIDDevice {
 
-    private final static Logger log = Logger.getLogger(OSXHIDDevice.class.getName());
+    private static final Logger log = Logger.getLogger(OSXHIDDevice.class.getName());
 
-    private final static int AXIS_DEFAULT_MIN_VALUE = 0;
-    private final static int AXIS_DEFAULT_MAX_VALUE = 64 * 1024;
+    public static final int AXIS_DEFAULT_MIN_VALUE = 0;
+    public static final int AXIS_DEFAULT_MAX_VALUE = 64 * 1024;
 
     private final Pointer deviceAddress;
     private final Pointer /* IOHIDDeviceInterface* */ deviceInterfaceAddress;
@@ -126,8 +126,8 @@ final class OSXHIDDevice {
         ElementType elementType = ElementType.map(elementTypeId);
         int min = (int) getLongFromProperties(elementProperties, kIOHIDElementMinKey, AXIS_DEFAULT_MIN_VALUE);
         int max = (int) getLongFromProperties(elementProperties, kIOHIDElementMaxKey, AXIS_DEFAULT_MAX_VALUE);
-//		long scaled_min = getLongFromProperties(elementProperties, kIOHIDElementScaledMinKey, Long.MIN_VALUE);
-//		long scaled_max = getLongFromProperties(elementProperties, kIOHIDElementScaledMaxKey, Long.MAX_VALUE);
+//		long scaledMin = getLongFromProperties(elementProperties, kIOHIDElementScaledMinKey, Long.MIN_VALUE);
+//		long scaledMax = getLongFromProperties(elementProperties, kIOHIDElementScaledMaxKey, Long.MAX_VALUE);
         UsagePair deviceUsagePair = getUsagePair();
         boolean defaultRelative = deviceUsagePair != null && (deviceUsagePair.usage() == GenericDesktopUsage.POINTER || deviceUsagePair.usage() == GenericDesktopUsage.MOUSE);
 
@@ -212,6 +212,8 @@ log.finer("elementType = 0x" + elementType + " | usage = " + usage + " | usagePa
         return createUsagePair(usagePageId, usageId);
     }
 
+//#region debug
+
     private void dumpProperties() {
         log.info(toString());
         dumpMap("", properties);
@@ -246,6 +248,8 @@ log.finer("elementType = 0x" + elementType + " | usage = " + usage + " | usagePa
             log.info(prefix + obj);
     }
 
+//#endregion
+
     private Map<String, ?> getDeviceProperties() throws IOException {
         PointerByReference pProperties = new PointerByReference();
 
@@ -275,7 +279,7 @@ log.finer("elementType = 0x" + elementType + " | usage = " + usage + " | usagePa
     }
 
     /** @param event value will be filled */
-    public synchronized void fillElementValue(int /* IOHIDElementCookie */ elementCookie, OSXEvent event) throws IOException {
+    synchronized void fillElementValue(int /* IOHIDElementCookie */ elementCookie, OSXEvent event) throws IOException {
         checkReleased();
         IOHIDEventStruct.ByReference nativeEvent = new IOHIDEventStruct.ByReference();
 
@@ -286,7 +290,7 @@ log.finer("elementType = 0x" + elementType + " | usage = " + usage + " | usagePa
         event.set(nativeEvent);
     }
 
-    public synchronized OSXHIDQueue createQueue(int queueDepth) throws IOException {
+    synchronized OSXHIDQueue createQueue(int queueDepth) throws IOException {
         checkReleased();
         Pointer /* IOHIDQueueInterface** */ queueAddress = deviceInterface.allocQueue.invoke(deviceInterfaceAddress);
         if (queueAddress == Pointer.NULL) {

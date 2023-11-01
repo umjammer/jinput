@@ -18,11 +18,11 @@ public class LinuxJoystickPOV extends LinuxJoystickAxis {
         this.hatY = hatY;
     }
 
-    protected LinuxJoystickAxis getXAxis() {
+    LinuxJoystickAxis getXAxis() {
         return hatX;
     }
 
-    protected LinuxJoystickAxis getYAxis() {
+    LinuxJoystickAxis getYAxis() {
         return hatY;
     }
 

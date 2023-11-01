@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 import com.sun.jna.Pointer;
 import net.java.games.input.Component;
 import net.java.games.input.Rumbler;
-import net.java.games.input.windows.User32Ex.DIEFFECT;
+import net.java.games.input.windows.WinAPI.DIEFFECT;
 
 import static net.java.games.input.windows.IDirectInputDevice.DIEP_GAIN;
 
@@ -91,7 +91,7 @@ final class IDirectInputEffect implements Rumbler {
         if (!released) {
             released = true;
 
-            User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+            WinAPI.IDirectInputEffect effect = new WinAPI.IDirectInputEffect(address);
             effect.Release.apply(address);
         }
     }
@@ -102,7 +102,7 @@ final class IDirectInputEffect implements Rumbler {
     }
 
     private void setGain(int gain) throws IOException {
-        User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+        WinAPI.IDirectInputEffect effect = new WinAPI.IDirectInputEffect(address);
 
         DIEFFECT params = new DIEFFECT();
         params.dwSize = params.size();
@@ -119,7 +119,7 @@ final class IDirectInputEffect implements Rumbler {
     }
 
     private void start(int iterations, int flags) throws IOException {
-        User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+        WinAPI.IDirectInputEffect effect = new WinAPI.IDirectInputEffect(address);
 
         int res = effect.Start.apply(iterations, flags);
         if (res != IDirectInputDevice.DI_OK)
@@ -127,7 +127,7 @@ final class IDirectInputEffect implements Rumbler {
     }
 
     private void stop() throws IOException {
-        User32Ex.IDirectInputEffect effect = new User32Ex.IDirectInputEffect(address);
+        WinAPI.IDirectInputEffect effect = new WinAPI.IDirectInputEffect(address);
 
         int res = effect.Stop.apply();
         if (res != IDirectInputDevice.DI_OK)

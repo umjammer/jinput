@@ -45,16 +45,17 @@ import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.Guid;
 import com.sun.jna.platform.win32.WinDef.LPVOID;
 import com.sun.jna.ptr.PointerByReference;
-import net.java.games.input.windows.User32Ex.DIDEVICEINSTANCE;
-import net.java.games.input.windows.User32Ex.IDirectInput8;
-import net.java.games.input.windows.User32Ex.DirectInput8Interface;
+import net.java.games.input.windows.WinAPI.DIDEVICEINSTANCE;
+import net.java.games.input.windows.WinAPI.DirectInput8Interface;
+import net.java.games.input.windows.WinAPI.IDirectInput8;
+import net.java.games.input.windows.WinAPI.User32Ex;
 
-import static net.java.games.input.windows.User32Ex.DI8DEVCLASS_ALL;
-import static net.java.games.input.windows.User32Ex.DIEDFL_ATTACHEDONLY;
-import static net.java.games.input.windows.User32Ex.DIENUM_CONTINUE;
-import static net.java.games.input.windows.User32Ex.DIENUM_STOP;
-import static net.java.games.input.windows.User32Ex.DIRECTINPUT_VERSION;
-import static net.java.games.input.windows.User32Ex.IID_IDirectInput8;
+import static net.java.games.input.windows.WinAPI.DI8DEVCLASS_ALL;
+import static net.java.games.input.windows.WinAPI.DIEDFL_ATTACHEDONLY;
+import static net.java.games.input.windows.WinAPI.DIENUM_CONTINUE;
+import static net.java.games.input.windows.WinAPI.DIENUM_STOP;
+import static net.java.games.input.windows.WinAPI.DIRECTINPUT_VERSION;
+import static net.java.games.input.windows.WinAPI.IID_IDirectInput8;
 
 
 /**

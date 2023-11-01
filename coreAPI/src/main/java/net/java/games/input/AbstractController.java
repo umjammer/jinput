@@ -141,6 +141,24 @@ public abstract class AbstractController implements Controller {
         return rumblers;
     }
 
+    /** */
+    protected boolean isOpen;
+
+    @Override
+    public void open() throws IOException {
+        isOpen = true;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    @Override
+    public void close() throws IOException {
+        isOpen = false;
+    }
+
     /**
      * Returns the port type for this Controller.
      *

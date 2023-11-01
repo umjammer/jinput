@@ -38,7 +38,7 @@ import java.util.List;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.Guid.GUID;
 
-import static net.java.games.input.windows.User32Ex.MAX_PATH;
+import static net.java.games.input.windows.WinAPI.MAX_PATH;
 
 
 /**

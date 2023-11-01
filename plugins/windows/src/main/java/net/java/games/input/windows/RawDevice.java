@@ -40,13 +40,14 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 import net.java.games.input.AbstractController;
-import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO;
-import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO_HID;
-import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO_KEYBOARD;
-import net.java.games.input.windows.User32Ex.RID_DEVICE_INFO_MOUSE;
+import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO;
+import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO_HID;
+import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO_KEYBOARD;
+import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO_MOUSE;
+import net.java.games.input.windows.WinAPI.User32Ex;
 
-import static net.java.games.input.windows.User32Ex.RIDI_DEVICEINFO;
-import static net.java.games.input.windows.User32Ex.RIDI_DEVICENAME;
+import static net.java.games.input.windows.WinAPI.RIDI_DEVICEINFO;
+import static net.java.games.input.windows.WinAPI.RIDI_DEVICENAME;
 
 
 /**
@@ -350,7 +351,7 @@ final class RawDevice {
     }
 
     private static RawDeviceInfo nGetInfo(RawDevice deviceObj, HANDLE handle) throws IOException {
-        RID_DEVICE_INFO deviceInfo = new User32Ex.RID_DEVICE_INFO();
+        RID_DEVICE_INFO deviceInfo = new WinAPI.RID_DEVICE_INFO();
         IntByReference size = new IntByReference(deviceInfo.size());
 
         deviceInfo.cbSize = size.getValue();

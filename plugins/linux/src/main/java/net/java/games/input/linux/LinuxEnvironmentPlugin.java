@@ -58,7 +58,7 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
     private final static String POSTFIX64BIT = "64";
     private static boolean supported = false;
 
-    private final Controller[] controllers;
+    private List<Controller> controllers;
     private final List<LinuxDevice> devices = new ArrayList<>();
     private final static LinuxDeviceThread deviceThread = new LinuxDeviceThread();
 
@@ -69,17 +69,13 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         }
     }
 
-    public static Object execute(LinuxDeviceTask task) throws IOException {
+    static Object execute(LinuxDeviceTask task) throws IOException {
         return deviceThread.execute(task);
     }
 
     public LinuxEnvironmentPlugin() {
         if (isSupported()) {
-            this.controllers = enumerateControllers();
-            log.fine("Linux plugin claims to have found " + controllers.length + " controllers");
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
-        } else {
-            controllers = new Controller[0];
         }
     }
 
@@ -92,7 +88,11 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
      */
     @Override
     public Controller[] getControllers() {
-        return controllers;
+        if (this.controllers == null) {
+            enumerateControllers();
+log.fine("Linux plugin claims to have found " + controllers.size() + " controllers");
+        }
+        return controllers.toArray(Controller[]::new);
     }
 
     private static Component[] createComponents(List<LinuxEventComponent> eventComponents, LinuxEventDevice device) {
@@ -186,8 +186,8 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
             return null;
     }
 
-    private Controller[] enumerateControllers() {
-        List<Controller> controllers = new ArrayList<>();
+    private void enumerateControllers() {
+        this.controllers = new ArrayList<>();
         List<Controller> eventControllers = new ArrayList<>();
         List<Controller> jsControllers = new ArrayList<>();
         enumerateEventControllers(eventControllers);
@@ -226,10 +226,6 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
         }
         controllers.addAll(eventControllers);
         controllers.addAll(jsControllers);
-
-        Controller[] controllersArray = new Controller[controllers.size()];
-        controllers.toArray(controllersArray);
-        return controllersArray;
     }
 
     private static Component.Identifier.Button getButtonIdentifier(int index) {

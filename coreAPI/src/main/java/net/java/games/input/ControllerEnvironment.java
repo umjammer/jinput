@@ -41,22 +41,17 @@ import java.util.ArrayList;
  * environment for the local machine.
  * <p>
  * In this reference implementation, this class can also be used to register
- * controllers with the default environment as "plug-ins".  A plug-in is
+ * controllers with the default environment as spi.  A spi is
  * created by subclassing ControllerEnvironment with a class that has a public
- * no-argument constructor, implements the net.java.games.util.plugins.Plugin
- * interface and has a name ending in "Plugin".
- * (See net.java.games.input.DirectInputEnvironmentPlugin in the DXplugin
+ * no-argument constructor, extends the net.java.games.input.ControllerEnvironment
+ * abstract clsss.
+ * (See net.java.games.input.windows.DirectInputEnvironment in the windows-plugin
  * part of the source tree for an example.)
  * <p>
- * When the DefaultControllerEnvironment is instanced it uses the plugin library
- * to look for Plugins in both [java.home]/lib/controller and
- * [user.dir]/controller.  This allows controller plugins to be installed either
- * globally for the entire Java environment or locally for just one particular
- * Java app.
- * <p>
- * For more information on the organization of plugins within the controller
- * root directories, see net.java.games.util.plugins.Plugins (Note the
- * plural -- "Plugins" not "Plugin" which is just a marker interface.)
+ * <ul>
+ *  <li>don't collect controllers in the constructor.</li>
+ *  <li>collect controllers in {@link #getControllers} method.</li>
+ * </ul>
  */
 public abstract class ControllerEnvironment {
 

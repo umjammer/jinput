@@ -93,8 +93,8 @@ public interface CFLib extends Library {
             retain = (RetqinCallback) CallbackReference.getCallback(RetqinCallback.class, p.getPointer(0x08));
             release = (ReleaseCallback) CallbackReference.getCallback(ReleaseCallback.class, p.getPointer(0x10));
             copyDescription = (CopyDescriptionCallback) CallbackReference.getCallback(CopyDescriptionCallback.class, p.getPointer(0x18));
-            equal = (EqualCallback) CallbackReference.getCallback(EqualCallback.class, p.getPointer(0x20));;
-log.fine(this.toString());
+            equal = (EqualCallback) CallbackReference.getCallback(EqualCallback.class, p.getPointer(0x20));
+            log.fine(this.toString());
         }
 
         @Override

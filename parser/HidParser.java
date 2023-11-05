@@ -32,32 +32,36 @@ package vavi.hid.parser;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import vavi.util.Debug;
+import java.util.stream.Collectors;
 
 
 /**
- * Mandatory items for REPORT Input (Output or Feature)
- * <ul>
- *  <li>Usage</li>
- *  <li>Usage Page</li>
- *  <li>Logical Minimum</li>
- *  <li>Logical Maximum</li>
- *  <li>Report Size</li>
- *  <li>Report Count</li>
- * </ul>
+ * Mandatory items for REPORT
+ * <pre>
+ * Input (Output or Feature)
+ * Usage
+ *  Usage Page
+ *  Logical Minimum
+ *  Logical Maximum
+ *  Report Size
+ *  Report Count
+ * </pre>
  *
  * @see "http://msdn.microsoft.com/en-us/library/windows/hardware/hh975383.aspx"
  * @see "https://github.com/nyholku/purejavahidapi"
  */
 public class HidParser {
 
+    private static final Logger logger = Logger.getLogger(HidParser.class.getName());
+
     private Collection rootCollection;
     private Collection topCollection;
-    private LinkedList<Global> globalStack;
+    private final Deque<Global> globalStack = new LinkedList<>();
     private int delimiterDepth;
     private int parseIndex;
     private byte[] descriptor;
@@ -84,7 +88,7 @@ public class HidParser {
         void parse(HidParser context, Item item);
     }
 
-    public enum ItemType {// order import, do not change
+    public enum ItemType { // order import, do not change
         MAIN     { @Override Tag valueOf(int tag) { return MainTag.valueOf(tag); }},
         GLOBAL   { @Override Tag valueOf(int tag) { return GlobalTag.valueOf(tag); }},
         LOCAL    { @Override Tag valueOf(int tag) { return LocalTag.valueOf(tag); }},
@@ -93,7 +97,7 @@ public class HidParser {
         abstract Tag valueOf(int tag);
     }
 
-    enum MainTag implements Tag { // order import, do not change
+    public enum MainTag implements Tag { // order import, do not change
         PADDING_0 { @Override public void parse(HidParser context, Item item) {}},
         PADDING_1 { @Override public void parse(HidParser context, Item item) {}},
         PADDING_2 { @Override public void parse(HidParser context, Item item) {}},
@@ -127,9 +131,9 @@ public class HidParser {
         },
         ENDCOLLECTION {
             @Override public void parse(HidParser context, Item item) {
-                if (context.topCollection.parent == null)
+                if (context.topCollection.getParent() == null)
                     throw new IllegalStateException("collection stack underflow");
-                context.topCollection = context.topCollection.parent;
+                context.topCollection = context.topCollection.getParent();
                 context.local.reset();
             }
         };
@@ -140,36 +144,39 @@ public class HidParser {
         }
     }
 
-    enum LocalTag implements Tag {// order import, do not change
+    public enum LocalTag implements Tag { // order import, do not change
         USAGE {
             @Override public void parse(HidParser context, Item item) {
-                super.parse(context, item);
-                if (context.local.delimiterBranch > 1)
+                if (item.size == 0)
+                    throw new IllegalStateException("item data expected for local item");
+
+                int usage = item.uValue;
+                if (item.size <= 2) // FIXME is this in the spec?
+                    usage = (context.global.usagePage << 16) + usage;
+
+                if (context.local.delimiterBranch > 1) {
                     // alternative usage ignored
                     return;
+                }
                 context.addUsage(usage);
             }
         },
         USAGE_MINIMUM {
             @Override public void parse(HidParser context, Item item) {
-                super.parse(context, item);
-                if (context.local.delimiterDepth > 1)
-                    // alternative usage ignored
-
-                    context.local.usageMinimum = usage;
+logger.finer("USAGE_MAXIMUM: " + item.uValue + ", " + context.local.delimiterBranch);
+                context.local.usageMinimum = item.uValue;
             }
         },
         USAGE_MAXIMUM {
             @Override public void parse(HidParser context, Item item) {
-                super.parse(context, item);
-                if (context.local.delimiterBranch > 1)
-                    // alternative usage ignored
-
-                    for (int n = context.local.usageMinimum; n <= item.uValue; n++)
-                        context.addUsage(n);
+logger.finer("USAGE_MAXIMUM: " + item.uValue + ", " + context.local.delimiterBranch);
+                for (int n = context.local.usageMinimum; n <= item.uValue; n++) {
+logger.finer("USAGE_MAXIMUM: " + n);
+                    context.addUsage(context.global.usagePage << 16 | n);
+                }
             }
         },
-        DESIGNATOR_INDEX   { @Override public void parse(HidParser context, Item item) { /* ignore the rest */ }},
+        DESIGNATOR_INDEX   { @Override public void parse(HidParser context, Item item) {}},
         DESIGNATOR_MINIMUM { @Override public void parse(HidParser context, Item item) {}},
         DESIGNATOR_MAXIMUM { @Override public void parse(HidParser context, Item item) {}},
         STRING_INDEX       { @Override public void parse(HidParser context, Item item) {}},
@@ -177,7 +184,6 @@ public class HidParser {
         STRING_MAXIMUM     { @Override public void parse(HidParser context, Item item) {}},
         DELIMITER {
             @Override public void parse(HidParser context, Item item) {
-                super.parse(context, item);
                 if (item.uValue > 0) {
                     if (context.local.delimiterDepth != 0)
                         throw new IllegalStateException("nested delimiters");
@@ -195,19 +201,9 @@ public class HidParser {
                 throw new IllegalStateException(String.format("illegal/unsupported local tag %d", tag));
             return values()[tag];
         }
-        protected int usage;
-        /** @after {@link #usage} */
-        @Override public void parse(HidParser context, Item item) {
-            if (item.size == 0)
-                throw new IllegalStateException("item data expected for local item");
-
-            usage = item.uValue;
-            if (item.size <= 2) // FIXME is this in the spec?
-                usage = (context.global.usagePage << 16) + usage;
-        }
     }
 
-    enum GlobalTag implements Tag {
+    public enum GlobalTag implements Tag {
         USAGE_PAGE {
             @Override public void parse(HidParser context, Item item) {
                 context.global.usagePage = item.uValue;
@@ -225,13 +221,13 @@ public class HidParser {
         },
         PHYSICAL_MINIMUM {
             @Override public void parse(HidParser context, Item item) {
-                context.global.physicalMaximum = item.sValue;
-Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMaximum);
+                context.global.physicalMinimum = item.sValue;
             }
         },
         PHYSICAL_MAXIMUM {
             @Override public void parse(HidParser context, Item item) {
-                context.global.physicalMinimum = item.sValue;
+                context.global.physicalMaximum = item.sValue;
+logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
             }
         },
         UNIT_EXPONENT {
@@ -284,15 +280,31 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         }
     }
 
-    private static final int HID_MAIN_ITEM_CONSTANT = 0x001;
-    private static final int HID_MAIN_ITEM_VARIABLE = 0x002;
-    private static final int HID_MAIN_ITEM_RELATIVE = 0x004;
-    private static final int HID_MAIN_ITEM_WRAP = 0x008;
-    private static final int HID_MAIN_ITEM_NONLINEAR = 0x010;
-    private static final int HID_MAIN_ITEM_NO_PREFERRED = 0x020;
-    private static final int HID_MAIN_ITEM_NULL_STATE = 0x040;
-    private static final int HID_MAIN_ITEM_VOLATILE = 0x080;
-    private static final int HID_MAIN_ITEM_BUFFERED_BYTE = 0x100;
+    public enum Feature {
+        CONSTANT("Constant", "Data"),
+        VARIABLE("Variable", "Array"),
+        RELATIVE("Relative", "Absolute"),
+        WRAP("Wrap", "No Wrap"),
+        NONLINEAR("Non Linear", "Linear"),
+        NO_PREFERRED("No Preferred State", "Preferred State"),
+        NULL_STATE("Null State", "No Null Position"),
+        VOLATILE("Volatile", "Non Volatile"),
+        BUFFERED_BYTE("Buffered Bytes", "Bitfield");
+        final int mask;
+        final String on;
+        final String off;
+        Feature(String on, String off) {
+            this.on = on;
+            this.off = off;
+            this.mask = 0x001 << ordinal();
+        }
+        static EnumSet<Feature> valueOf(int v) {
+            return Arrays.stream(values()).filter(e -> (v & e.mask) != 0).collect(Collectors.toCollection(() -> EnumSet.noneOf(Feature.class)));
+        }
+        static String asString(EnumSet<Feature> es) {
+            return Arrays.stream(values()).map(e -> es.contains(e) ? e.on : e.off).collect(Collectors.joining(", "));
+        }
+    }
 
     private static final int HID_LONG_ITEM_PREFIX = 0xfe;
 
@@ -307,7 +319,7 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         public int delimiterDepth;
         public int delimiterBranch;
 
-        public void reset() {
+        void reset() {
             usageIndex = 0;
             usageMinimum = 0;
             delimiterDepth = 0;
@@ -317,7 +329,7 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         }
     }
 
-    public static final class Global {
+    public static final class Global implements Cloneable {
 
         int usagePage;
         int logicalMinimum;
@@ -329,9 +341,6 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         int reportId;
         int reportSize;
         int reportCount;
-
-        public Global() {
-        }
 
         @Override
         public Object clone() {
@@ -354,7 +363,7 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         int uValue;
         int sValue;
 
-        public Item(int size, ItemType type, int tag, int value) {
+        Item(int size, ItemType type, int tag, int value) {
             this.size = size;
             this.type = type;
             this.tag = type.valueOf(tag);
@@ -363,20 +372,87 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
             sValue = value;
             switch (size) { // for long items 'size' is not valid, but they are no supported anyway and have value==0
             case 1:
-                if ((value & 0xFFFFFF80) != 0)
-                    sValue |= 0xFFFFFF00;
+                if ((value & 0xffff_ff80) != 0)
+                    sValue |= 0xffff_ff00;
                 break;
             case 2:
-                if ((value & 0xFFFF8000) != 0)
-                    sValue |= 0xFFFF0000;
+                if ((value & 0xffff_8000) != 0)
+                    sValue |= 0xffff_0000;
                 break;
             default:
                 break;
             }
         }
 
-        void parse(HidParser context) {
-            tag.parse(context, this);
+        /** */
+        static boolean processNext(HidParser context) {
+            if (context.parseIndex >= context.descriptorLength) {
+logger.finer("EOD");
+                return false;
+            }
+            Item item;
+            int at = context.parseIndex;
+            int prev = context.descriptor[context.parseIndex++] & 0xff;
+
+            if (prev == HID_LONG_ITEM_PREFIX) {
+                if (context.parseIndex >= context.descriptorLength)
+                    throw new IllegalStateException("unexpected end of data white fetching long item size");
+
+                int size = context.descriptor[context.parseIndex++] & 0xff;
+                if (context.parseIndex >= context.descriptorLength)
+                    throw new IllegalStateException("unexpected end of data white fetching long item tag");
+                int tag = context.descriptor[context.parseIndex++] & 0xff;
+
+                if (context.parseIndex + size - 1 >= context.descriptorLength)
+                    throw new IllegalStateException("unexpected end of data white fetching long item");
+                context.parseIndex += size;
+                item = new Item(size, ItemType.LONG, tag, 0);
+            } else {
+                int type = (prev >> 2) & 3;
+                int tag = (prev >> 4) & 15;
+                int size = prev & 3;
+                int value = 0;
+                switch (size) {
+                case 0:
+                    break;
+
+                case 1:
+                    if (context.parseIndex >= context.descriptorLength)
+                        throw new IllegalStateException("unexpected end of data white fetching item size==1");
+                    value = context.descriptor[context.parseIndex++] & 0xFF;
+                    break;
+
+                case 2:
+                    if (context.parseIndex + 1 >= context.descriptorLength)
+                        throw new IllegalStateException("unexpected end of data white fetching item size==1");
+                    value = (context.descriptor[context.parseIndex++] & 0xFF) |
+                            ((context.descriptor[context.parseIndex++] & 0xFF) << 8);
+                    break;
+
+                case 3:
+                    size++; // 3 means 4 bytes
+                    if (context.parseIndex + 1 >= context.descriptorLength)
+                        throw new IllegalStateException("unexpected end of data white fetching item size==1");
+                    value = (context.descriptor[context.parseIndex++] & 0xFF) |
+                            ((context.descriptor[context.parseIndex++] & 0xFF) << 8) |
+                            ((context.descriptor[context.parseIndex++] & 0xFF) << 16) |
+                            (context.descriptor[context.parseIndex++] << 24);
+                }
+
+                if (tag == 0 && type == 0) throw new EORException();
+                if (type >= ItemType.values().length)
+                    throw new IllegalStateException(String.format("illegal/unsupported type %d", type));
+                item = new Item(size, ItemType.values()[type], tag, value);
+            }
+
+            if (logger.isLoggable(Level.FINEST)) {
+                String tags = "?";
+                if (item.tag != null)
+                    tags = item.tag.toString();
+                out.printf("[%3d] = 0x%02X:  size %d  type %-8s  tag %-20s  value 0x%6$08X (%6$d)\n", at, prev, item.size, item.type, tags, item.sValue);
+            }
+            item.tag.parse(context, item);
+            return true;
         }
     }
 
@@ -390,12 +466,10 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
     }
 
     private Field registerField(Report report, int values) {
-        Field field;
-
         if (report.maxField == HID_MAX_FIELDS)
             throw new IllegalStateException("too many fields in report");
 
-        field = new Field(topCollection);
+        Field field = new Field(topCollection);
         report.fields[report.maxField++] = field;
         field.report = report;
 
@@ -403,33 +477,32 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
     }
 
     private int lookUpCollection(int type) {
-        for (Collection c = topCollection; c.parent != null; c = c.parent) {
-            if (c.type == type)
-                return c.usage;
+        for (Collection c = topCollection; c.getParent() != null; c = c.getParent()) {
+            if (c.getType() == type)
+                return c.getUsagePair();
         }
         return 0;
     }
 
-    private void addUsage(int usage) {
+    private void addUsage(int usagePair) {
         if (local.usageIndex >= local.usages.length)
             throw new IllegalStateException("usage index exceeded");
-        local.usages[local.usageIndex++] = usage;
+logger.finer(String.format("usage: %08x", usagePair));
+        local.usages[local.usageIndex++] = usagePair;
     }
 
     private void addField(int reportType, int flags) {
         Report report = registerReport(reportType, global.reportId);
 
-        //		if ((parser->global.logical_minimum < 0 &&
-        //				                 parser->global.logical_maximum <
-        //			                 parser->global.logical_minimum) ||
-        //				                 (parser->global.logical_minimum >= 0 &&
-        //				                 (__u32)parser->global.logical_maximum <
-        //				                 (__u32)parser->global.logical_minimum)) {
-        //				                 dbg_hid("logical range invalid 0x%x 0x%x\n",
-        //				                         parser->global.logical_minimum,
-        //				                         parser->global.logical_maximum);
-        //				                 return -1;
-        //				         }
+//		if ((parser.global.logical_minimum < 0 &&
+//			parser.global.logical_maximum < parser.global.logical_minimum) ||
+//			(parser.global.logical_minimum >= 0 &&
+//			parser.global.logical_maximum < parser.global.logical_minimum)) {
+//				System.err.printf("logical range invalid 0x%x 0x%x\n",
+//				    parser.global.logical_minimum,
+//				    parser.global.logical_maximum);
+//				return;
+//		}
 
         int j = 0;
         for (int i = 0; i < global.reportCount; i++) {
@@ -457,73 +530,10 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         }
     }
 
-    private Item getNextItem() {
-        if (parseIndex >= descriptorLength)
-            return null;
-        Item item;
-        int at = parseIndex;
-        int prev = descriptor[parseIndex++] & 0xFF;
-
-        if (prev == HID_LONG_ITEM_PREFIX) {
-            if (parseIndex >= descriptorLength)
-                throw new IllegalStateException("unexpected end of data white fetching long item size");
-
-            int size = descriptor[parseIndex++] & 0xFF;
-            if (parseIndex >= descriptorLength)
-                throw new IllegalStateException("unexpected end of data white fetching long item tag");
-            int tag = descriptor[parseIndex++] & 0xFF;
-
-            if (parseIndex + size - 1 >= descriptorLength)
-                throw new IllegalStateException("unexpected end of data white fetching long item");
-            parseIndex += size;
-            item = new Item(size, ItemType.LONG, tag, 0);
-        } else {
-            int type = (prev >> 2) & 3;
-            int tag = (prev >> 4) & 15;
-            int size = prev & 3;
-            int value = 0;
-            switch (size) {
-            case 0:
-                break;
-
-            case 1:
-                if (parseIndex >= descriptorLength)
-                    throw new IllegalStateException("unexpected end of data white fetching item size==1");
-                value = descriptor[parseIndex++] & 0xFF;
-                break;
-
-            case 2:
-                if (parseIndex + 1 >= descriptorLength)
-                    throw new IllegalStateException("unexpected end of data white fetching item size==1");
-                value = (descriptor[parseIndex++] & 0xFF) | ((descriptor[parseIndex++] & 0xFF) << 8);
-                break;
-
-            case 3:
-                size++; // 3 means 4 bytes
-                if (parseIndex + 1 >= descriptorLength)
-                    throw new IllegalStateException("unexpected end of data white fetching item size==1");
-                value = (descriptor[parseIndex++] & 0xFF) | ((descriptor[parseIndex++] & 0xFF) << 8) | ((descriptor[parseIndex++] & 0xFF) << 16) | (descriptor[parseIndex++] << 24);
-            }
-
-            if (tag == 0 && type == 0) throw new EORException();
-            if (type >= ItemType.values().length)
-                throw new IllegalStateException(String.format("illegal/unsupported type %d", type));
-            item = new Item(size, ItemType.values()[type], tag, value);
-        }
-
-        if (Logger.getGlobal().isLoggable(Level.FINEST)) {
-            String tags = "?";
-            if (item.tag != null)
-                tags = item.tag.toString();
-            out.printf("[%3d] = 0x%02X:  size %d  type %-8s  tag %-20s  value 0x%08X (%d)\n", at, prev, item.size, item.type, tags, item.sValue, item.sValue);
-        }
-        return item;
-    }
-
-    private void resetParser() {
+    private void reset() {
         rootCollection = new Collection(null, 0, 0);
         topCollection = rootCollection;
-        globalStack = new LinkedList<>();
+        globalStack.clear();
         delimiterDepth = 0;
         parseIndex = 0;
         descriptor = null;
@@ -533,30 +543,30 @@ Debug.println(Level.FINE, "global.physicalMaximum " + context.global.physicalMax
         reports = new LinkedList<>();
     }
 
-    public void parse(byte[] descriptor, int length) {
-        resetParser();
+    /** entry point */
+    public Collection parse(byte[] descriptor, int length) {
+        reset();
         this.descriptor = descriptor;
-        descriptorLength = length;
+        this.descriptorLength = length;
         try {
-            Item item;
-            while (null != (item = getNextItem())) {
-                item.parse(this);
-            }
+            while (Item.processNext(this));
         } catch (EORException e) {
-Debug.println(Level.FINE, "end of report");
+logger.finer("end of report");
         }
-        if (topCollection.parent != null)
+        if (topCollection.getParent() != null)
             throw new IllegalStateException("unbalanced collection at end of report description");
 
         if (delimiterDepth > 0)
             throw new IllegalStateException("unbalanced delimiter at end of report description");
+
+        return rootCollection;
     }
 
     public void dump() {
-Debug.println(Level.FINE, "rootCollection: c:" + rootCollection.children.size() + ", f:" + rootCollection.fields.size());
+logger.finer("rootCollection: c:" + rootCollection.getChildren().size() + ", f:" + rootCollection.getFields().size());
         rootCollection.dump(out, "");
 
-//Debug.println(Level.FINE, "reports:");
+//logger.finer("reports:");
 //        for (Report r : reports) {
 //            r.dump(out, "");
 //        }

@@ -31,7 +31,12 @@
 package vavi.hid.parser;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+
+import net.java.games.input.usb.UsagePage;
+import vavi.util.Debug;
 
 
 /**
@@ -39,15 +44,43 @@ import java.util.LinkedList;
  */
 public final class Collection {
 
-    Collection parent;
-    LinkedList<Collection> children;
-    LinkedList<Field> fields;
-    int usage;
-    int type;
+    private final Collection parent;
+    private final LinkedList<Collection> children;
+    private final LinkedList<Field> fields;
+    private final int usagePair;
+    private final int type;
 
-    Collection(Collection parent, int usage, int type) {
+    public Collection getParent() {
+        return parent;
+    }
+
+    public LinkedList<Collection> getChildren() {
+        return children;
+    }
+
+    public LinkedList<Field> getFields() {
+        return fields;
+    }
+
+    public int getUsagePair() {
+        return usagePair;
+    }
+
+    public int getUsagePage() {
+        return (usagePair >> 16) & 0xffff;
+    }
+
+    public int getUsage() {
+        return  usagePair & 0xffff;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    Collection(Collection parent, int usagePair, int type) {
         this.parent = parent;
-        this.usage = usage;
+        this.usagePair = usagePair;
         this.type = type;
         children = new LinkedList<>();
         if (parent != null)
@@ -59,14 +92,37 @@ public final class Collection {
         fields.add(field);
     }
 
-    public void dump(PrintStream out, String tab) {
+    void dump(PrintStream out, String tab) {
         if (parent != null) {
-            out.printf(tab + "collection  type %d  usage 0x%04X:0x%04X\n", type, (usage >> 16) & 0xFFFF, usage & 0xFFFF);
+            UsagePage usagePage_ = UsagePage.map(getUsagePage());
+            out.printf(tab + "collection  type %d  usage 0x%04X:0x%04X %s:%s%n", type, getUsagePage(), getUsage(), usagePage_ == null ? "" : usagePage_, usagePage_ == null ? "" : usagePage_.mapUsage(getUsage()));
             tab += "   ";
         }
-        for (Collection c : children)
+        for (Collection c : children) {
             c.dump(out, tab);
-        for (Field f : fields)
+        }
+        for (Field f : fields) {
             f.dump(out, tab);
+        }
+    }
+
+    public List<Field> enumerateFields() {
+        List<Field> result = new ArrayList<>();
+        for (Collection c : children) {
+            result.addAll(c.enumerateFields());
+        }
+        result.addAll(fields);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Collection{" +
+                "parent=" + parent +
+                ", children=" + children.size() +
+                ", fields=" + fields.size() +
+                ", usage=" + usagePair +
+                ", type=" + type +
+                '}';
     }
 }

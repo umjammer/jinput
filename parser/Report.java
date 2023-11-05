@@ -46,13 +46,13 @@ public final class Report {
     int maxField;
     int size;
 
-    public Report(int type, int id, Collection collection) {
+    Report(int type, int id, Collection collection) {
         this.type = type;
         this.id = id;
         this.collection = collection;
     }
 
-    public void dump(PrintStream out, String tab) {
+    void dump(PrintStream out, String tab) {
         HidParser.out.printf(tab + "REPORT-------------------------\n");
         HidParser.out.printf(tab + "         type: %s\n", new String[] {"input", "output", "feature"}[type]);
         HidParser.out.printf(tab + "           id: 0x%02X\n", id);

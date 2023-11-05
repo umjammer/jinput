@@ -33,44 +33,23 @@
 
 package net.java.games.input.usb;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.java.games.input.Component;
 
 
 /**
- * Button Usages
+ * Generic Desktop Usages
  *
  * @author elias
  * @version 1.0
  */
-public final class ButtonUsage implements Usage {
+public interface UsageId {
 
-    private final static Map<Integer, ButtonUsage> map = new HashMap<>();
+    // static UsageId map(int id);
 
-    private final int buttonId;
+    /** */
+    int getId();
 
-    public static ButtonUsage map(int buttonId) {
-        ButtonUsage existing = map.get(buttonId);
-        if (existing != null)
-            return existing;
-        ButtonUsage newButton = new ButtonUsage(buttonId);
-        map.put(buttonId, newButton);
-        return newButton;
-    }
-
-    private ButtonUsage(int buttonId) {
-        this.buttonId = buttonId;
-    }
-
-    @Override
-    public Component.Identifier.Button getIdentifier() {
-        return Arrays.stream(Component.Identifier.Button.values()).filter(e -> e.getName().equals(String.valueOf(buttonId - 1))).findFirst().orElse(null);
-    }
-
-    public String toString() {
-        return "ButtonUsage(" + buttonId + ")";
-    }
+    /** */
+    Component.Identifier getIdentifier();
 }

@@ -43,8 +43,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import net.java.games.input.Controller;
 import net.java.games.input.usb.ElementType;
-import net.java.games.input.usb.GenericDesktopUsage;
-import net.java.games.input.usb.Usage;
+import net.java.games.input.usb.GenericDesktopUsageId;
+import net.java.games.input.usb.UsageId;
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.UsagePair;
 import vavix.rococoa.corefoundation.CFAllocator;
@@ -129,19 +129,19 @@ final class OSXHIDDevice {
 //		long scaledMin = getLongFromProperties(elementProperties, kIOHIDElementScaledMinKey, Long.MIN_VALUE);
 //		long scaledMax = getLongFromProperties(elementProperties, kIOHIDElementScaledMaxKey, Long.MAX_VALUE);
         UsagePair deviceUsagePair = getUsagePair();
-        boolean defaultRelative = deviceUsagePair != null && (deviceUsagePair.usage() == GenericDesktopUsage.POINTER || deviceUsagePair.usage() == GenericDesktopUsage.MOUSE);
+        boolean defaultRelative = deviceUsagePair != null && (deviceUsagePair.usageId() == GenericDesktopUsageId.POINTER || deviceUsagePair.usageId() == GenericDesktopUsageId.MOUSE);
 
         boolean isRelative = getBooleanFromProperties(elementProperties, kIOHIDElementIsRelativeKey, defaultRelative);
 //		boolean isWrapping = getBooleanFromProperties(elementProperties, kIOHIDElementIsWrappingKey);
 //		boolean isNonLinear = getBooleanFromProperties(elementProperties, kIOHIDElementIsNonLinearKey);
 //		boolean hasPreferredState = getBooleanFromProperties(elementProperties, kIOHIDElementHasPreferredStateKey);
 //		boolean hasNullState = getBooleanFromProperties(elementProperties, kIOHIDElementHasNullStateKey);
-        int usage = getIntFromProperties(elementProperties, kIOHIDElementUsageKey);
+        int usageId = getIntFromProperties(elementProperties, kIOHIDElementUsageKey);
         int usagePage = getIntFromProperties(elementProperties, kIOHIDElementUsagePageKey);
-        UsagePair usagePair = createUsagePair(usagePage, usage);
-log.finer("elementType = 0x" + elementType + " | usage = " + usage + " | usagePage = " + usagePage);
+        UsagePair usagePair = createUsagePair(usagePage, usageId);
+log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usagePage = " + usagePage);
         if (usagePair == null || (elementType != ElementType.INPUT_MISC && elementType != ElementType.INPUT_BUTTON && elementType != ElementType.INPUT_AXIS)) {
-//log.info("elementType = 0x" + elementType + " | usage = " + usage + " | usagePage = " + usagePage);
+//log.info("elementType = 0x" + elementType + " | usageId = " + usageId + " | usagePage = " + usagePage);
             return null;
         } else {
             return new OSXHIDElement(this, usagePair, elementCookie, elementType, min, max, isRelative);
@@ -199,7 +199,7 @@ log.finer("elementType = 0x" + elementType + " | usage = " + usage + " | usagePa
     private static UsagePair createUsagePair(int usagePageId, int usageId) {
         UsagePage usagePage = UsagePage.map(usagePageId);
         if (usagePage != null) {
-            Usage usage = usagePage.mapUsage(usageId);
+            UsageId usage = usagePage.mapUsage(usageId);
             if (usage != null)
                 return new UsagePair(usagePage, usage);
         }

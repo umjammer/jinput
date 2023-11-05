@@ -44,7 +44,7 @@ import net.java.games.input.Component;
  * @author elias
  * @version 1.0
  */
-public enum GenericDesktopUsage implements Usage {
+public enum GenericDesktopUsageId implements UsageId {
 
     /** Physical Collection */
     POINTER(0x01),
@@ -150,21 +150,31 @@ public enum GenericDesktopUsage implements Usage {
     private final int usageId;
     private final Component.Identifier identifier;
 
-    public static GenericDesktopUsage map(int usageId) {
+    public static GenericDesktopUsageId map(int usageId) {
         return Arrays.stream(values()).filter(e -> e.usageId == usageId).findFirst().orElse(null);
     }
 
-    GenericDesktopUsage(int usageId) {
+    GenericDesktopUsageId(int usageId) {
         this(usageId, null);
     }
 
-    GenericDesktopUsage(int usageId, Component.Identifier identifier) {
+    GenericDesktopUsageId(int usageId, Component.Identifier identifier) {
         this.usageId = usageId;
         this.identifier = identifier;
     }
 
     @Override
+    public int getId() {
+        return usageId;
+    }
+
+    @Override
     public final Component.Identifier getIdentifier() {
         return identifier;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "(" + usageId + ")";
     }
 }

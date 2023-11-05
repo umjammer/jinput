@@ -47,16 +47,16 @@ import java.util.function.Function;
 public enum UsagePage {
 
     UNDEFINED(0x00),
-    GENERIC_DESKTOP(0x01, GenericDesktopUsage::map),
+    GENERIC_DESKTOP(0x01, GenericDesktopUsageId::map),
     SIMULATION(0x02),
     VR(0x03),
     SPORT(0x04),
     GAME(0x05),
     // Reserved 0x06
     /** USB Device Class Definition for Human Interface Devices (HID). Note: the usage type for all key codes is Selector (Sel). */
-    KEYBOARD_OR_KEYPAD(0x07, KeyboardUsage::map),
+    KEYBOARD_OR_KEYPAD(0x07, KeyboardUsageId::map),
     LEDS(0x08),
-    BUTTON(0x09, ButtonUsage::map),
+    BUTTON(0x09, ButtonUsageId::map),
     ORDINAL(0x0A),
     TELEPHONY(0x0B),
     CONSUMER(0x0C),
@@ -85,14 +85,14 @@ public enum UsagePage {
     /** OAAF Definitions for arcade and coinop related Devices */
     ARCADE(0x91);
 
-    private final Function<Integer, Usage> usageMap;
+    private final Function<Integer, UsageId> usageMap;
     private final int usagePageId;
 
     public static UsagePage map(int pageId) {
         return Arrays.stream(values()).filter(e -> e.usagePageId == pageId).findFirst().orElse(null);
     }
 
-    UsagePage(int pageId, Function<Integer, Usage> usageMap) {
+    UsagePage(int pageId, Function<Integer, UsageId> usageMap) {
         this.usageMap = usageMap;
         this.usagePageId = pageId;
     }
@@ -101,7 +101,16 @@ public enum UsagePage {
         this(pageId, null);
     }
 
-    public final Usage mapUsage(int usageId) {
+    public int getId() {
+        return usagePageId;
+    }
+
+    public final UsageId mapUsage(int usageId) {
         return usageMap == null ? null : usageMap.apply(usageId);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "(" + usagePageId + ")";
     }
 }

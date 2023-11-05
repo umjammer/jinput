@@ -34,20 +34,20 @@ package net.java.games.input.usb;
 
 
 /**
- * Usage/Page pair
+ * UsageId/Page pair
  *
  * @author elias
  * @version 1.0
  */
-public record UsagePair(UsagePage usagePage, Usage usage) {
+public record UsagePair(UsagePage usagePage, UsageId usageId) {
 
     public int hashCode() {
-        return usage.hashCode() ^ usagePage.hashCode();
+        return usageId.hashCode() ^ usagePage.hashCode();
     }
 
     public boolean equals(Object other) {
         if (!(other instanceof UsagePair otherPair))
             return false;
-        return otherPair.usage.equals(usage) && otherPair.usagePage.equals(usagePage);
+        return otherPair.usageId.equals(usageId) && otherPair.usagePage.equals(usagePage);
     }
 }

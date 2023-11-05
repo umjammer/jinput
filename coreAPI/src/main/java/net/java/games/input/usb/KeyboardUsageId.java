@@ -44,7 +44,7 @@ import net.java.games.input.Component;
  * @author elias
  * @version 1.0
  */
-public enum KeyboardUsage implements Usage {
+public enum KeyboardUsageId implements UsageId {
 
     /** ErrorRollOver */
     ERRORROLLOVER(0x01),
@@ -392,7 +392,7 @@ public enum KeyboardUsage implements Usage {
     /** Right GUI */
     RIGHTGUI(Component.Identifier.Key.RWIN, 0xE7);
 
-    private final int usage;
+    private final int usageId;
     private final Component.Identifier.Key identifier;
 
     @Override
@@ -400,16 +400,21 @@ public enum KeyboardUsage implements Usage {
         return identifier;
     }
 
-    public static KeyboardUsage map(int usage) {
-        return Arrays.stream(values()).filter(e -> e.usage == usage).findFirst().orElse(null);
+    public static KeyboardUsageId map(int usageId) {
+        return Arrays.stream(values()).filter(e -> e.usageId == usageId).findFirst().orElse(null);
     }
 
-    KeyboardUsage(int usage) {
-        this(Component.Identifier.Key.UNKNOWN, usage);
+    KeyboardUsageId(int usageId) {
+        this(Component.Identifier.Key.UNKNOWN, usageId);
     }
 
-    KeyboardUsage(Component.Identifier.Key id, int usage) {
+    @Override
+    public int getId() {
+        return usageId;
+    }
+
+    KeyboardUsageId(Component.Identifier.Key id, int usageId) {
         this.identifier = id;
-        this.usage = usage;
+        this.usageId = usageId;
     }
 }

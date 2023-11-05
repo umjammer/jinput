@@ -64,7 +64,7 @@ final class OSXHIDElement {
         this.elementType = elementType;
         this.min = min;
         this.max = max;
-        this.identifier = usagePair.usage().getIdentifier();
+        this.identifier = usagePair.usageId().getIdentifier();
         this.isRelative = isRelative;
     }
 

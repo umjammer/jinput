@@ -48,7 +48,7 @@ import net.java.games.input.DeviceSupportPlugin;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
 import net.java.games.input.Rumbler;
-import net.java.games.input.usb.GenericDesktopUsage;
+import net.java.games.input.usb.GenericDesktopUsageId;
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.UsagePair;
 
@@ -201,23 +201,23 @@ log.finer("device: '" + device.getProductName() + "' has no usage pair");
         }
 log.fine("-------- device: '" + device.getProductName() + "' --------");
         List<OSXHIDElement> elements = device.getElements();
-        if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && (usagePage.usage() == GenericDesktopUsage.MOUSE ||
-                usagePage.usage() == GenericDesktopUsage.POINTER)) {
+        if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && (usagePage.usageId() == GenericDesktopUsageId.MOUSE ||
+                usagePage.usageId() == GenericDesktopUsageId.POINTER)) {
 log.fine("mouse device: '" + device.getProductName() + "' --------");
 //            Controller mouse = createMouseFromDevice(device, elements);
 //            if (mouse != null)
 //                controllers.add(mouse);
-        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && (usagePage.usage() == GenericDesktopUsage.KEYBOARD ||
-                usagePage.usage() == GenericDesktopUsage.KEYPAD)) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && (usagePage.usageId() == GenericDesktopUsageId.KEYBOARD ||
+                usagePage.usageId() == GenericDesktopUsageId.KEYPAD)) {
 log.fine("keyboard device: '" + device.getProductName() + "' --------");
 //            controllers.add(createKeyboardFromDevice(device, elements));
-        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usage() == GenericDesktopUsage.JOYSTICK) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usageId() == GenericDesktopUsageId.JOYSTICK) {
 log.fine("joystick device: '" + device.getProductName() + "' --------");
             controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
-        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usage() == GenericDesktopUsage.MULTI_AXIS_CONTROLLER) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usageId() == GenericDesktopUsageId.MULTI_AXIS_CONTROLLER) {
 log.fine("multi-axis device: '" + device.getProductName() + "' --------");
             controllers.add(createControllerFromDevice(device, elements, Controller.Type.STICK));
-        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usage() == GenericDesktopUsage.GAME_PAD) {
+        } else if (usagePage.usagePage() == UsagePage.GENERIC_DESKTOP && usagePage.usageId() == GenericDesktopUsageId.GAME_PAD) {
 log.fine("gamepad device: '" + device.getProductName() + "' --------");
             controllers.add(createControllerFromDevice(device, elements, Controller.Type.GAMEPAD));
         }

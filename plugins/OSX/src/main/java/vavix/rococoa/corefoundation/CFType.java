@@ -32,7 +32,7 @@ import com.sun.jna.PointerType;
  */
 public class CFType extends PointerType {
 
-    private Logger log = Logger.getLogger("TinyUmbrella");
+    private static final Logger log = Logger.getLogger("TinyUmbrella");
 
     public CFType(Pointer address) {
         super(address);

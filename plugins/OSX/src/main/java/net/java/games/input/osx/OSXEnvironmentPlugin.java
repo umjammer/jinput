@@ -47,6 +47,7 @@ import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.DeviceSupportPlugin;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
+import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 import net.java.games.input.usb.GenericDesktopUsageId;
 import net.java.games.input.usb.UsagePage;
@@ -68,7 +69,7 @@ public final class OSXEnvironmentPlugin extends ControllerEnvironment {
 
     static {
         String osName = System.getProperty("os.name", "").trim();
-log.fine(osName);
+log.finer(osName);
         if (osName.contains("Mac")) {
             // Could check isMacOSXEqualsOrBetterThan in here too.
             supported = true;
@@ -131,7 +132,7 @@ log.fine(element.toString());
 
     private static Keyboard createKeyboardFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
         List<Component> components = new ArrayList<>();
-        OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
+        OSXHIDQueue queue = device.createQueue(PollingController.EVENT_QUEUE_DEPTH);
         try {
             addElements(queue, elements, components, false);
         } catch (IOException e) {
@@ -145,7 +146,7 @@ log.fine("@@@ components: " + components);
 
     private static Mouse createMouseFromDevice(OSXHIDDevice device, List<OSXHIDElement> elements) throws IOException {
         List<Component> components = new ArrayList<>();
-        OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
+        OSXHIDQueue queue = device.createQueue(PollingController.EVENT_QUEUE_DEPTH);
         try {
             addElements(queue, elements, components, true);
         } catch (IOException e) {
@@ -167,7 +168,7 @@ log.fine("@@@ components: " + components);
         List<Component> components = new ArrayList<>();
         List<Controller> controllers = new ArrayList<>();
         List<Rumbler> rumblers = new ArrayList<>();
-        OSXHIDQueue queue = device.createQueue(AbstractController.EVENT_QUEUE_DEPTH);
+        OSXHIDQueue queue = device.createQueue(PollingController.EVENT_QUEUE_DEPTH);
         // osx elements
         try {
             addElements(queue, elements, components, false);
@@ -178,14 +179,14 @@ log.fine("@@@ components: " + components);
         // extra elements by plugin
         for (DeviceSupportPlugin plugin : DeviceSupportPlugin.getPlugins()) {
             if (plugin.match(device)) {
-log.fine("@@@ plugin for extra: " + plugin.getClass().getName());
+log.finer("@@@ plugin for extra: " + plugin.getClass().getName());
                 components.addAll(plugin.getExtraComponents(device));
                 controllers.addAll(plugin.getExtraChildControllers(device));
                 rumblers.addAll(plugin.getExtraRumblers(device));
             }
         }
-log.fine("@@@ components: " + components.size());
-log.fine("@@@ components: " + components);
+log.fine("@@@ components: " + components.size() + ", " + components);
+log.fine("@@@ rumblers: " + rumblers.size() + ", " + rumblers);
         return new OSXController(device, queue,
                 components.toArray(Component[]::new),
                 controllers.toArray(Controller[]::new),

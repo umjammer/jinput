@@ -317,7 +317,7 @@ public interface CFLib extends Library {
 
     interface CFDictionaryApplierFunction extends Callback {
 
-        void invoke(CFString key, CFType value, Pointer/*Structure.ByReference*/ context);
+        void invoke(CFString key, CFType value, Pointer /* Structure.ByReference */ context);
     }
 
     NativeLong CFDictionaryGetTypeID();
@@ -500,7 +500,7 @@ public interface CFLib extends Library {
 
     void CFDictionaryRemoveAllValues(CFDictionary theDict);
 
-    Pointer /*CFMutableDictionaryRef*/ CFDictionaryCreateMutable(CFAllocator allocator, CFIndex capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
+    Pointer /* CFMutableDictionaryRef */ CFDictionaryCreateMutable(CFAllocator allocator, CFIndex capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
 
 //#endregion CFDictionary
 

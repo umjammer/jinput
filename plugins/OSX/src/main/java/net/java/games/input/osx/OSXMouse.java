@@ -34,6 +34,7 @@ package net.java.games.input.osx;
 
 import java.io.IOException;
 
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
@@ -78,5 +79,10 @@ final class OSXMouse extends Mouse {
     @Override
     public PortType getPortType() {
         return port;
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

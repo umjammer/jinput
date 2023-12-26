@@ -46,7 +46,7 @@ import net.java.games.input.usb.UsagePair;
  * @author gregorypierce
  * @version 1.0
  */
-final class OSXHIDElement {
+public final class OSXHIDElement {
 
     private final OSXHIDDevice device;
     private final UsagePair usagePair;
@@ -129,14 +129,14 @@ final class OSXHIDElement {
     @Override
     public String toString() {
         return "OSXHIDElement{" +
-                "device=" + device +
-                ", usagePair=" + usagePair +
+                "usagePair=" + usagePair +
                 ", elementCookie=" + elementCookie +
                 ", elementType=" + elementType +
                 ", min=" + min +
                 ", max=" + max +
                 ", identifier=" + identifier +
                 ", isRelative=" + isRelative +
+                ", device=" + device.getProductName() +
                 '}';
     }
 }

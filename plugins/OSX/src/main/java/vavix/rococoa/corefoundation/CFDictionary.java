@@ -138,7 +138,7 @@ public class CFDictionary extends CFType {
 
         static int mapIdGenerator = 0;
 
-        static Map<Integer, Map<Object, Object>> maps = new HashMap<>();
+        static final Map<Integer, Map<Object, Object>> maps = new HashMap<>();
     }
 
     public static class ArrayContext extends Structure {
@@ -169,7 +169,7 @@ public class CFDictionary extends CFType {
 
         static int arrayIdGenerator = 0;
 
-        static Map<Integer, Object[]> arrays = new HashMap<>();
+        static final Map<Integer, Object[]> arrays = new HashMap<>();
     }
 
     private static String createStringFromCFString(CFString cfstring) {

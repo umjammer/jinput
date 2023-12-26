@@ -32,7 +32,7 @@ import com.sun.jna.Pointer;
  */
 public class CFData extends CFType {
 
-    private static CFIndex ZERO = CFIndex.of(0);
+    private static final CFIndex ZERO = CFIndex.of(0);
 
     public CFData(Pointer address) {
         super(address);

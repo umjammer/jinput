@@ -11,7 +11,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.osx.plugin.DualShock4Plugin.Report5;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -69,6 +71,7 @@ Debug.println("getControllers: " + plugin.getControllers().length);
 
     @Test
     @EnabledIf("localPropertiesExists")
+    @DisplayName("components count")
     void test3() throws Exception {
         OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
         OSXController controller = Arrays.stream(plugin.getControllers())
@@ -77,5 +80,28 @@ Debug.println("getControllers: " + plugin.getControllers().length);
                 .filter(c -> c.getProductId() == productId && c.getVendorId() == vendorId)
                 .findFirst().get();
         assertEquals(21, controller.getComponents().length);
+    }
+
+    @Test
+    @EnabledIf("localPropertiesExists")
+    @DisplayName("rumbler")
+    void test4() throws Exception {
+        OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
+        OSXController controller = Arrays.stream(plugin.getControllers())
+                .filter(c -> c instanceof OSXController)
+                .map(c -> (OSXController) c)
+                .filter(c -> c.getProductId() == productId && c.getVendorId() == vendorId)
+                .findFirst().get();
+
+        Report5 report = new Report5();
+        report.smallRumble = 255;
+        report.bigRumble = 0;
+        report.ledRed = 255;
+        report.ledGreen = 0;
+        report.ledBlue = 0;
+        report.flashLed1 = 0;
+        report.flashLed2 = 0;
+
+        controller.output(report);
     }
 }

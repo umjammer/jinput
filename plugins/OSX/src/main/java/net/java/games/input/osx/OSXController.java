@@ -34,11 +34,15 @@ package net.java.games.input.osx;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
+import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
+import net.java.games.input.usb.HidController;
+import net.java.games.input.usb.HidRumbler;
+
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportTypeOutput;
 
 
 /**
@@ -47,7 +51,7 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class OSXController extends AbstractController {
+final class OSXController extends PollingController implements HidController {
 
     private final OSXHIDQueue queue;
     private final Type type;
@@ -62,6 +66,7 @@ final class OSXController extends AbstractController {
 
     @Override
     protected synchronized boolean getNextDeviceEvent(Event event) throws IOException {
+        // for event listener
         if (queue.getNextEvent(device.osxEvent)) {
             OSXComponent component = queue.mapEvent(device.osxEvent);
             event.set(component, component.getElement().convertValue(), device.osxEvent.getNanos());
@@ -83,5 +88,27 @@ final class OSXController extends AbstractController {
     @Override
     public PortType getPortType() {
         return device.getPortType();
+    }
+
+    @Override
+    public int getProductId() {
+        return device.getProductId();
+    }
+
+    @Override
+    public int getVendorId() {
+        return device.getVendorId();
+    }
+
+    @Override
+    public void output(Report report) throws IOException {
+        report.cascadeTo(getRumblers());
+
+        int reportId = ((HidReport) report).getReportId();
+        byte[] data = ((HidReport) report).getData();
+        for (Rumbler rumbler : getRumblers()) {
+            ((HidRumbler) rumbler).fill(data);
+        }
+        device.setReport(kIOHIDReportTypeOutput, reportId, data, data.length);
     }
 }

@@ -37,8 +37,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import net.java.games.input.Controller;
@@ -47,6 +49,7 @@ import net.java.games.input.usb.GenericDesktopUsageId;
 import net.java.games.input.usb.UsageId;
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.UsagePair;
+import vavi.util.Debug;
 import vavix.rococoa.corefoundation.CFAllocator;
 import vavix.rococoa.corefoundation.CFDictionary;
 import vavix.rococoa.iokit.IOKitLib;
@@ -65,8 +68,10 @@ import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementUsageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementUsagePageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsagePageKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductIDKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDTransportKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDVendorIDKey;
 
 
 /**
@@ -76,7 +81,7 @@ import static vavix.rococoa.iokit.IOKitLib.kIOHIDTransportKey;
  * @author gregorypierce
  * @version 1.0
  */
-final class OSXHIDDevice {
+public final class OSXHIDDevice {
 
     private static final Logger log = Logger.getLogger(OSXHIDDevice.class.getName());
 
@@ -114,6 +119,14 @@ final class OSXHIDDevice {
 
     public String getProductName() {
         return (String) properties.get(kIOHIDProductKey);
+    }
+
+    public int getProductId() {
+        return (int) (long) properties.get(kIOHIDProductIDKey);
+    }
+
+    public int getVendorId() {
+        return (int) (long) properties.get(kIOHIDVendorIDKey);
     }
 
     private OSXHIDElement createElementFromElementProperties(Map<String, ?> elementProperties) {
@@ -316,5 +329,19 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
     private void checkReleased() throws IOException {
         if (released)
             throw new IOException();
+    }
+
+    /** */
+    public void setReport(int type, int reportID, byte[] buf, int len) throws IOException {
+        Memory m = new Memory(len + 1);
+        m.setByte(0, (byte) reportID);
+        m.write(1, buf, 0, len);
+Debug.println(Level.FINER, m.dump());
+        int ioReturnValue = deviceInterface.setReport.invoke(deviceInterfaceAddress, type, reportID, m, (int) m.size(), -1, null, null, null);
+Debug.println(Level.FINER, "ioReturnValue: " + ioReturnValue);
+        m.close();
+        if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
+            throw new IOException(String.format("Device '%s' setReport failed: %x", getProductName(), ioReturnValue));
+        }
     }
 }

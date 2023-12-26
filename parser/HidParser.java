@@ -59,8 +59,9 @@ public class HidParser {
 
     private static final Logger logger = Logger.getLogger(HidParser.class.getName());
 
-    private Collection rootCollection;
+    private static final Collection rootCollection = new Collection(null, 0, 0xff);
     private Collection topCollection;
+    private int collectionUsage; // TODO adhoc
     private final Deque<Global> globalStack = new LinkedList<>();
     private int delimiterDepth;
     private int parseIndex;
@@ -120,7 +121,7 @@ public class HidParser {
         },
         COLLECTION {
             @Override public void parse(HidParser context, Item item) {
-                context.topCollection = new Collection(context.topCollection, context.local.usages[0], item.uValue & 3);
+                context.topCollection = new Collection(context.topCollection, context.collectionUsage, item.uValue & 3);
             }
         },
         FEATURE {
@@ -151,11 +152,20 @@ public class HidParser {
                     throw new IllegalStateException("item data expected for local item");
 
                 int usage = item.uValue;
-                if (item.size <= 2) // FIXME is this in the spec?
+                if (item.size <= 2) { // FIXME is this in the spec?
                     usage = (context.global.usagePage << 16) + usage;
+logger.finer(String.format("item.size <= 2: %08x", usage));
+                }
 
+                if (context.topCollection == rootCollection) { // TODO adhoc
+                    // rootCollection usage ignored
+                    context.collectionUsage = usage;
+logger.finer(String.format("topCollection is rootCollection: %08x", usage));
+                    return;
+                }
                 if (context.local.delimiterBranch > 1) {
                     // alternative usage ignored
+logger.finer(String.format("context.local.delimiterBranch > 1: %08x", usage));
                     return;
                 }
                 context.addUsage(usage);
@@ -303,6 +313,9 @@ logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
         }
         static String asString(EnumSet<Feature> es) {
             return Arrays.stream(values()).map(e -> es.contains(e) ? e.on : e.off).collect(Collectors.joining(", "));
+        }
+        public static boolean containsIn(Feature e, int v) {
+            return valueOf(v).contains(e);
         }
     }
 
@@ -494,16 +507,17 @@ logger.finer(String.format("usage: %08x", usagePair));
     private void addField(int reportType, int flags) {
         Report report = registerReport(reportType, global.reportId);
 
-//		if ((parser.global.logical_minimum < 0 &&
-//			parser.global.logical_maximum < parser.global.logical_minimum) ||
-//			(parser.global.logical_minimum >= 0 &&
-//			parser.global.logical_maximum < parser.global.logical_minimum)) {
-//				System.err.printf("logical range invalid 0x%x 0x%x\n",
-//				    parser.global.logical_minimum,
-//				    parser.global.logical_maximum);
-//				return;
-//		}
+//		if ((global.logicalMinimum < 0 &&
+//                global.logicalMaximum < global.logicalMinimum) ||
+//                (global.logicalMinimum >= 0 &&
+//                        global.logicalMaximum < global.logicalMinimum)) {
+//Debug.printf("logical range invalid 0x%x 0x%x",
+//                    global.logicalMinimum,
+//                    global.logicalMaximum);
+//            return;
+//        }
 
+logger.finer(String.format("ADD FIELD: global: %d", global.reportCount));
         int j = 0;
         for (int i = 0; i < global.reportCount; i++) {
             if (i < local.usageIndex)
@@ -527,12 +541,15 @@ logger.finer(String.format("usage: %08x", usagePair));
             field.physicalMaximum = global.physicalMaximum;
             field.unitExponent = global.unitExponent;
             field.unit = global.unit;
+            field.init();
+logger.finer(String.format("ADD FIELD(%d): %08x (%d)", i, field.usage, j));
         }
     }
 
     private void reset() {
-        rootCollection = new Collection(null, 0, 0);
+        rootCollection.reset();
         topCollection = rootCollection;
+        collectionUsage = 0;
         globalStack.clear();
         delimiterDepth = 0;
         parseIndex = 0;

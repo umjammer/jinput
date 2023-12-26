@@ -36,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.java.games.input.usb.UsagePage;
-import vavi.util.Debug;
 
 
 /**
@@ -78,6 +77,31 @@ public final class Collection {
         return type;
     }
 
+    public enum Type {
+        Physical,
+        Application,
+        Logical,
+        Report,
+        NamedArray,
+        UsageSwitch,
+        UsageModifier,
+        // 0x07 - 0x7F
+        ReservedForFutureUse,
+        // 0x80 - 0xFF
+        VendorDefined;
+        static Type valueOf(int type) {
+            if (type < 0x07) {
+                return values()[type];
+            } else if (type <= 0x7F) {
+                return ReservedForFutureUse;
+            } else if (type <= 0xff) {
+                return VendorDefined;
+            } else {
+                throw new IllegalArgumentException(String.valueOf(type));
+            }
+        }
+    }
+
     Collection(Collection parent, int usagePair, int type) {
         this.parent = parent;
         this.usagePair = usagePair;
@@ -88,6 +112,10 @@ public final class Collection {
         fields = new LinkedList<>();
     }
 
+    void reset() {
+        children.clear();
+    }
+
     void add(Field field) {
         fields.add(field);
     }
@@ -95,7 +123,7 @@ public final class Collection {
     void dump(PrintStream out, String tab) {
         if (parent != null) {
             UsagePage usagePage_ = UsagePage.map(getUsagePage());
-            out.printf(tab + "collection  type %d  usage 0x%04X:0x%04X %s:%s%n", type, getUsagePage(), getUsage(), usagePage_ == null ? "" : usagePage_, usagePage_ == null ? "" : usagePage_.mapUsage(getUsage()));
+            out.printf(tab + "collection  type %s(%d)  usage 0x%04X:0x%04X %s:%s%n", Type.valueOf(type), type, getUsagePage(), getUsage(), usagePage_ == null ? "" : usagePage_, usagePage_ == null ? "" : usagePage_.mapUsage(getUsage()));
             tab += "   ";
         }
         for (Collection c : children) {
@@ -122,7 +150,7 @@ public final class Collection {
                 ", children=" + children.size() +
                 ", fields=" + fields.size() +
                 ", usage=" + usagePair +
-                ", type=" + type +
+                ", type=" + Type.valueOf(type) +
                 '}';
     }
 }

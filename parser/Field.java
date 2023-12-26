@@ -33,9 +33,14 @@ package vavi.hid.parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.logging.Level;
 
 import net.java.games.input.usb.UsagePage;
 import vavi.hid.parser.HidParser.Feature;
+import vavi.util.Debug;
+import vavi.util.StringUtil;
+
+import static vavi.hid.parser.HidParser.Feature.BUFFERED_BYTE;
 
 
 /**
@@ -49,8 +54,11 @@ public final class Field {
     int logical;
     int application;
     int usage;
+    /** @see Feature */
     int flags;
+    /** unit depends on BUFFERED_BYTE of flags [bytes/bits] */
     int reportOffset;
+    /** unit depends on BUFFERED_BYTE of flags [bytes/bits] */
     int reportSize;
     int reportType;
     int logicalMinimum;
@@ -60,6 +68,10 @@ public final class Field {
     int unitExponent;
     int unit;
 
+    int mask;
+    int offsetByte;
+    int startBit;
+
     public int getUsagePage() {
         return (usage >> 16) & 0xffff;
     }
@@ -68,9 +80,47 @@ public final class Field {
         return usage & 0xffff;
     }
 
+    public int getFeature() {
+        return flags;
+    }
+
+    /** for parser */
     Field(Collection collection) {
         this.collection = collection;
         collection.add(this);
+    }
+
+    /** not good way (for performance) */
+    void init() {
+        this.offsetByte = reportOffset / 8;
+        this.startBit = reportOffset % 8;
+        this.mask = createMask(startBit, reportSize);
+    }
+
+    /** for plugin TODO adhoc */
+    public Field(int offset, int size) {
+        this.reportOffset = offset;
+        this.reportSize = size;
+
+        init();
+    }
+
+    /** */
+    static int createMask(int s, int l) {
+        int m = l % 8 != 0 ? l % 8 : 8;
+
+        int result = 0;
+        for (int i = s; i < s + m; i++) {
+            result += (1 << i);
+Debug.printf(Level.FINER, "%02x, %02x, %s", result, 1 << i, StringUtil.toBits(1 << i));
+        }
+        return result;
+    }
+
+    /** view */
+    static String toBit(int s, int l) {
+        int m = l % 8 != 0 ? l % 8 : 8;
+        return "_".repeat(s) + "*".repeat(m) + "_".repeat(8 - s - m);
     }
 
     //	int index;
@@ -81,14 +131,26 @@ public final class Field {
         out.printf(tab + "        flags: %s\n", Feature.asString(Feature.valueOf(flags)));
         out.printf(tab + "    report id: 0x%02X\n", report.id);
         out.printf(tab + "         type: %s\n", new String[] {"input", "output", "feature"}[report.type]);
-        out.printf(tab + "       offset: %d\n", reportOffset);
-        out.printf(tab + "         size: %d\n", reportSize);
+        out.printf(tab + "       offset: %d byte%s (%d)\n", offsetByte, startBit != 0 ? String.format(" and %d bit", startBit) : "", reportOffset);
+        out.printf(tab + "         size: %d: %s\n", reportSize, Feature.containsIn(BUFFERED_BYTE, flags) ? reportSize + " bytes" : toBit(startBit, reportSize));
         out.printf(tab + "  logical min: %d\n", logicalMinimum);
         out.printf(tab + "  logical max: %d\n", logicalMaximum);
         out.printf(tab + " physical min: %d\n", physicalMinimum);
         out.printf(tab + " physical max: %d\n", physicalMaximum);
         out.printf(tab + "         unit: %d\n", unit);
         out.printf(tab + "     unit exp: %d\n", unitExponent);
+    }
+
+    /** utility */
+    public int getValue(byte[] data) {
+        // TODO sign, bit/byte, bit size > 8
+Debug.printf(Level.FINER, "masked: 0x%02x, %s, moved: 0x%02x, %s", data[offsetByte] & mask, StringUtil.toBits(data[offsetByte] & mask), (data[offsetByte] & mask) >> startBit, StringUtil.toBits((data[offsetByte] & mask) >> startBit));
+        return (data[offsetByte] & mask) >> startBit;
+    }
+
+    /** utility */
+    public void setValue(byte[] data, byte v) {
+        data[offsetByte] = (byte) ((data[offsetByte] & ~mask) | ((v << startBit) & mask));
     }
 
     @Override

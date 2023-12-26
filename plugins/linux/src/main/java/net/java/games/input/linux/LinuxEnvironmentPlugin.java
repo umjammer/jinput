@@ -54,8 +54,6 @@ public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(LinuxEnvironmentPlugin.class.getName());
 
-    private final static String LIBNAME = "jinput-linux";
-    private final static String POSTFIX64BIT = "64";
     private static boolean supported = false;
 
     private List<Controller> controllers;

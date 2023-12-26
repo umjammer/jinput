@@ -36,9 +36,9 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
-import net.java.games.input.AbstractController;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
+import net.java.games.input.PollingController;
 
 import static com.sun.jna.platform.linux.ErrNo.EAGAIN;
 import static net.java.games.input.linux.LinuxIO.ABS_MAX;
@@ -97,7 +97,7 @@ final class LinuxJoystickDevice implements LinuxDevice {
             throw new IOException(String.format("Failed to open device %s (%d)", filename, Native.getLastError()));
         try {
             this.name = getDeviceName();
-            setBufferSize(AbstractController.EVENT_QUEUE_DEPTH);
+            setBufferSize(PollingController.EVENT_QUEUE_DEPTH);
             buttons = new LinuxJoystickButton[getNumDeviceButtons()];
             axes = new LinuxJoystickAxis[getNumDeviceAxes()];
             axisMap = getDeviceAxisMap();

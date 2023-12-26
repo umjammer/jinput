@@ -39,8 +39,8 @@ import net.java.games.input.Controller;
  */
 class LinuxNativeTypesMap {
 
-    private static LinuxNativeTypesMap INSTANCE = new LinuxNativeTypesMap();
-    private static Logger log = Logger.getLogger(LinuxNativeTypesMap.class.getName());
+    private static final LinuxNativeTypesMap INSTANCE = new LinuxNativeTypesMap();
+    private static final Logger log = Logger.getLogger(LinuxNativeTypesMap.class.getName());
 
     private final Component.Identifier[] relAxesIDs;
     private final Component.Identifier[] absAxesIDs;

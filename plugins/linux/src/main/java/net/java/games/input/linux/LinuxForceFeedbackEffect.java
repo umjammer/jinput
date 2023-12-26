@@ -56,11 +56,18 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
         return device;
     }
 
+    private float value;
+
     @Override
-    public synchronized final void rumble(float intensity) {
+    public final void setValue(float value) {
+        this.value = value;
+    }
+
+    /** */
+    synchronized final void rumble() {
         try {
-            if (intensity > 0) {
-                uploadTask.doUpload(ffId, intensity);
+            if (value > 0) {
+                uploadTask.doUpload(ffId, value);
                 writeTask.write(1);
             } else {
                 writeTask.write(0);
@@ -79,13 +86,13 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
 //    }
 
     @Override
-    public final String getAxisName() {
-        return null;
+    public final String getOutputName() {
+        return Component.Identifier.Output.BIG_RUMBLE.getName();
     }
 
     @Override
-    public final Component.Identifier getAxisIdentifier() {
-        return null;
+    public final Component.Identifier getOutputIdentifier() {
+        return Component.Identifier.Output.BIG_RUMBLE;
     }
 
     private final class UploadTask extends LinuxDeviceTask {

@@ -9,8 +9,8 @@ public class LinuxJoystickPOV extends LinuxJoystickAxis {
 
     private static final Logger log = Logger.getLogger(LinuxJoystickPOV.class.getName());
 
-    private LinuxJoystickAxis hatX;
-    private LinuxJoystickAxis hatY;
+    private final LinuxJoystickAxis hatX;
+    private final LinuxJoystickAxis hatY;
 
     LinuxJoystickPOV(Component.Identifier.Axis id, LinuxJoystickAxis hatX, LinuxJoystickAxis hatY) {
         super(id, false);

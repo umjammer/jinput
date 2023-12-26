@@ -84,7 +84,7 @@ public interface LinuxIO extends Library {
     static NativeLong HIDIOCSFEATURE(int len) { return _IOC(_IOC_WRITE|_IOC_READ, 'H', 0x06, len); }
     static NativeLong HIDIOCGFEATURE(int len) { return _IOC(_IOC_WRITE|_IOC_READ, 'H', 0x07, len); }
     static NativeLong HIDIOCGINPUT(int len) { return _IOC(_IOC_WRITE|_IOC_READ, 'H', 0x0A, len); }
-    static NativeLong HIDIOCGRDESCSIZE = _IOR('H', 0x01, Integer.BYTES);
+    NativeLong HIDIOCGRDESCSIZE = _IOR('H', 0x01, Integer.BYTES);
     static NativeLong HIDIOCGRDESC(int len) { return _IOR('H', 0x02, len /* struct hidraw_report_descriptor */); }
 
     class dirent extends Structure {

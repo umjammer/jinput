@@ -34,7 +34,7 @@ package net.java.games.input.linux;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.PollingComponent;
 
 
 /**
@@ -43,7 +43,7 @@ import net.java.games.input.AbstractComponent;
  * @author elias
  * @version 1.0
  */
-class LinuxComponent extends AbstractComponent {
+class LinuxComponent extends PollingComponent {
 
     private final LinuxEventComponent component;
 

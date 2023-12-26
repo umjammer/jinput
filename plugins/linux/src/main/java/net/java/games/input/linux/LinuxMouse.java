@@ -34,6 +34,7 @@ package net.java.games.input.linux;
 
 import java.io.IOException;
 
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
@@ -61,6 +62,11 @@ final class LinuxMouse extends Mouse implements LinuxController {
     @Override
     public PortType getPortType() {
         return port;
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 
     @Override

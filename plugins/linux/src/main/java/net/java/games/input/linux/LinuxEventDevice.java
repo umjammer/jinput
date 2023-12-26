@@ -339,7 +339,6 @@ final class LinuxEventDevice implements LinuxDevice {
         return numEffects.getValue();
     }
 
-
     private int getVersion() throws IOException {
         return nGetVersion(fd);
     }
@@ -351,7 +350,6 @@ final class LinuxEventDevice implements LinuxDevice {
         }
         return version.getValue();
     }
-
 
     public synchronized boolean getNextEvent(LinuxEvent linuxEvent) throws IOException {
         checkClosed();

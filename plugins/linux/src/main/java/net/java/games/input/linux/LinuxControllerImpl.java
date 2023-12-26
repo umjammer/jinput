@@ -38,6 +38,7 @@ import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
+import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 
 
@@ -47,7 +48,7 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class LinuxControllerImpl extends AbstractController implements LinuxController {
+final class LinuxControllerImpl extends PollingController implements LinuxController {
 
     private final PortType port;
     private final LinuxEventDevice device;
@@ -78,5 +79,10 @@ final class LinuxControllerImpl extends AbstractController implements LinuxContr
     @Override
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

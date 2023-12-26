@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,14 +28,13 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
 package net.java.games.input.linux;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.PollingComponent;
 
 
 /**
@@ -50,10 +43,10 @@ import net.java.games.input.AbstractComponent;
  * @author elias
  * @version 1.0
  */
-class LinuxJoystickAxis extends AbstractComponent {
+class LinuxJoystickAxis extends PollingComponent {
 
     private float value;
-    private boolean analog;
+    private final boolean analog;
 
     public LinuxJoystickAxis(Identifier.Axis axisId) {
         this(axisId, true);

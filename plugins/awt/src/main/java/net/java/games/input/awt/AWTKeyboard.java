@@ -36,11 +36,12 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 import net.java.games.input.Keyboard;
+import net.java.games.input.PollingComponent;
 import net.java.games.input.Rumbler;
 
 
@@ -153,7 +154,12 @@ final class AWTKeyboard extends Keyboard implements AWTEventListener {
         return true;
     }
 
-    private final static class Key extends AbstractComponent {
+    @Override
+    public void output(AbstractController.Report report) {
+
+    }
+
+    private final static class Key extends PollingComponent {
 
         private float value;
 

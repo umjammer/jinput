@@ -35,11 +35,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 import net.java.games.input.Mouse;
+import net.java.games.input.PollingComponent;
 import net.java.games.input.Rumbler;
 
 
@@ -170,7 +171,12 @@ final class AWTMouse extends Mouse implements AWTEventListener {
         awtEvents.add(event);
     }
 
-    final static class Axis extends AbstractComponent {
+    @Override
+    public void output(AbstractController.Report report) {
+
+    }
+
+    final static class Axis extends PollingComponent {
 
         private float value;
 
@@ -198,7 +204,7 @@ final class AWTMouse extends Mouse implements AWTEventListener {
         }
     }
 
-    final static class Button extends AbstractComponent {
+    final static class Button extends PollingComponent {
 
         private float value;
 

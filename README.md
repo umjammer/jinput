@@ -7,7 +7,7 @@
 
 🎮 Library for access to input devices.
 
-this is jna-nized version. [original](https://github.com/jinput/jinput)
+this is jna-ized and service-loader-ized version. [original](https://github.com/jinput/jinput)
 
 ## Install
 
@@ -15,7 +15,11 @@ this is jna-nized version. [original](https://github.com/jinput/jinput)
 
 ## References
 
-* https://github.com/code-orchestra/code-orchestra-core/tree/b2bbf8362be2e2173864c294c635badb2e27ecc6/core/actionScript/source/com/semaphore/jna/cf
+* https://github.com/bozjator/JInput-Joystick
+* mac
+    * https://github.com/code-orchestra/code-orchestra-core/tree/b2bbf8362be2e2173864c294c635badb2e27ecc6/core/actionScript/source/com/semaphore/jna/cf
+* windows
+  * https://github.com/StrikerX3/JXInput
 
 ## License
 
@@ -24,6 +28,10 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
 ## TODO
 
 * ~~use proper ServiceLoader instead of proprietary plugin system (backport from vavi-awt-joystick)~~
-* linux not tested
-* ~~windows wip, package name~~ not tested yet
+* linux spi not tested yet
+* ~~windows wip, package name~~ windows spi not tested yet
+* ~~deprecate polling, use event listener?~~
+* native parts
+  * backport cf lib to rococoa
+  * separate jna parts as jna-platform-extended?
 * ~~at windows, i mistake dword as 2byte~~

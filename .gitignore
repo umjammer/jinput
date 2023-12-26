@@ -12,3 +12,4 @@ eclipse_bin/
 .idea/
 dependency-reduced-pom.xml
 tmp/
+local.properties

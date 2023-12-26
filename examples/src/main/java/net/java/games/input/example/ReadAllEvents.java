@@ -1,10 +1,13 @@
 package net.java.games.input.example;
 
+import java.util.Arrays;
+
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
+import net.java.games.input.PollingController;
 
 
 /**
@@ -17,23 +20,24 @@ import net.java.games.input.EventQueue;
 public class ReadAllEvents {
 
     public void exec() {
+        // Create an event object for the underlying plugin to populate
+        Event event = new Event();
+        StringBuffer buffer = new StringBuffer();
+
         while (true) {
             // Get the available controllers
-            Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
+            PollingController[] controllers = Arrays.stream(ControllerEnvironment.getDefaultEnvironment().getControllers()).map(PollingController.class::cast).toArray(PollingController[]::new);
             if (controllers.length == 0) {
                 System.out.println("Found no controllers.");
                 System.exit(0);
             }
 
-            for (Controller controller : controllers) {
+            for (PollingController controller : controllers) {
                 // Remember to poll each one
                 controller.poll();
 
                 // Get the controllers event queue
                 EventQueue queue = controller.getEventQueue();
-
-                // Create an event object for the underlying plugin to populate
-                Event event = new Event();
 
                 // For each object in the queue
                 while (queue.getNextEvent(event)) {
@@ -46,7 +50,7 @@ public class ReadAllEvents {
                     // absolute, we can tell what order events happened in
                     // across controllers this way. We can not use it to tell
                     // exactly *when* an event happened just the order.
-                    StringBuffer buffer = new StringBuffer(controller.getName());
+                    buffer.setLength(0);
                     buffer.append(" at ");
                     buffer.append(event.getNanos()).append(", ");
                     Component comp = event.getComponent();

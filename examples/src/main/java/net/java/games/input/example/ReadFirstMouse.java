@@ -1,8 +1,12 @@
 package net.java.games.input.example;
 
+import java.util.Arrays;
+
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.PollingComponent;
+import net.java.games.input.PollingController;
 
 
 /**
@@ -21,11 +25,11 @@ public class ReadFirstMouse {
 
         // Loop through the controllers, check the type of each one, and save
         // the first mouse we find.
-        Controller firstMouse = null;
+        PollingController firstMouse = null;
         for (int i = 0; i < controllers.length && firstMouse == null; i++) {
             if (controllers[i].getType() == Controller.Type.MOUSE) {
                 // Found a mouse
-                firstMouse = controllers[i];
+                firstMouse = (PollingController) controllers[i];
             }
         }
         if (firstMouse == null) {
@@ -41,7 +45,7 @@ public class ReadFirstMouse {
             firstMouse.poll();
 
             // Get all the axis and buttons
-            Component[] components = firstMouse.getComponents();
+            PollingComponent[] components = Arrays.stream(firstMouse.getComponents()).map(PollingComponent.class::cast).toArray(PollingComponent[]::new);
             StringBuilder buffer = new StringBuilder();
 
             // For each component, get it's name, and it's current value

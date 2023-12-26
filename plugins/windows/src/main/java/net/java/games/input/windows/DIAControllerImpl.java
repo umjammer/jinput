@@ -33,11 +33,13 @@
 package net.java.games.input.windows;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
+import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 
 
@@ -45,7 +47,7 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class DIAControllerImpl extends AbstractController implements DIController {
+final class DIAControllerImpl extends PollingController implements DIController {
 
     private final IDirectInputDevice device;
     private final Type type;
@@ -74,5 +76,12 @@ final class DIAControllerImpl extends AbstractController implements DIController
     @Override
     public Controller.Type getType() {
         return type;
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+        for (IDirectInputEffect rumbler : Arrays.stream(getRumblers()).map(IDirectInputEffect.class::cast).toArray(IDirectInputEffect[]::new)) {
+            rumbler.rumble();
+        }
     }
 }

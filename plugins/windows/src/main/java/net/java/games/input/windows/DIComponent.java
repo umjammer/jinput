@@ -34,14 +34,14 @@ package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.PollingComponent;
 
 
 /**
  * @author elias
  * @version 1.0
  */
-final class DIComponent extends AbstractComponent {
+final class DIComponent extends PollingComponent {
 
     private final DIDeviceObject object;
 

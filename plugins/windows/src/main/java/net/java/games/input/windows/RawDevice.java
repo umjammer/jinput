@@ -39,7 +39,7 @@ import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
-import net.java.games.input.AbstractController;
+import net.java.games.input.PollingController;
 import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO;
 import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO_HID;
 import net.java.games.input.windows.WinAPI.RID_DEVICE_INFO_KEYBOARD;
@@ -138,7 +138,7 @@ final class RawDevice {
         this.queue = queue;
         this.handle = handle;
         this.type = type;
-        setBufferSize(AbstractController.EVENT_QUEUE_DEPTH);
+        setBufferSize(PollingController.EVENT_QUEUE_DEPTH);
     }
 
     /** Careful, this is called from the event queue thread */

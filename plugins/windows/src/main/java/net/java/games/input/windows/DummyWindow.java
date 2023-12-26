@@ -73,7 +73,7 @@ final class DummyWindow {
 
     private static final String DUMMY_WINDOW_NAME = "JInputControllerWindow";
 
-    private static Callback DummyWndProc = new Callback() {
+    private static final Callback DummyWndProc = new Callback() {
         public LRESULT apply(HWND hWnd, int message, WPARAM wParam, LPARAM lParam) {
             return User32.INSTANCE.DefWindowProc(hWnd, message, wParam, lParam);
         }

@@ -51,8 +51,8 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinDef.LPVOID;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
+import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 import net.java.games.input.windows.WinAPI.DIEFFECT;
 import net.java.games.input.windows.WinAPI.DIENVELOPE;
@@ -295,7 +295,7 @@ final class IDirectInputDevice {
             }
         } else
             setCooperativeLevel(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
-        setBufferSize(AbstractController.EVENT_QUEUE_DEPTH);
+        setBufferSize(PollingController.EVENT_QUEUE_DEPTH);
         acquire();
         this.deviceState = new int[objects.size()];
     }

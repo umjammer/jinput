@@ -40,11 +40,12 @@ import java.util.ArrayList;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 import net.java.games.input.Keyboard;
+import net.java.games.input.PollingComponent;
 import net.java.games.input.Rumbler;
 
 
@@ -111,7 +112,7 @@ final class RawKeyboard extends Keyboard {
         device.setBufferSize(size);
     }
 
-    final static class Key extends AbstractComponent {
+    final static class Key extends PollingComponent {
 
         private final RawDevice device;
         private final int vkeyCode;
@@ -131,5 +132,10 @@ final class RawKeyboard extends Keyboard {
         public boolean isRelative() {
             return false;
         }
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

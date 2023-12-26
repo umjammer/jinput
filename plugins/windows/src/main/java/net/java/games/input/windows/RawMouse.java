@@ -41,11 +41,12 @@ package net.java.games.input.windows;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 import net.java.games.input.Mouse;
+import net.java.games.input.PollingComponent;
 import net.java.games.input.Rumbler;
 
 
@@ -173,7 +174,7 @@ final class RawMouse extends Mouse {
         device.setBufferSize(size);
     }
 
-    final static class Axis extends AbstractComponent {
+    final static class Axis extends PollingComponent {
 
         private final RawDevice device;
 
@@ -205,7 +206,7 @@ final class RawMouse extends Mouse {
         }
     }
 
-    final static class Button extends AbstractComponent {
+    final static class Button extends PollingComponent {
 
         private final RawDevice device;
         private final int buttonId;
@@ -225,5 +226,10 @@ final class RawMouse extends Mouse {
         public boolean isRelative() {
             return false;
         }
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

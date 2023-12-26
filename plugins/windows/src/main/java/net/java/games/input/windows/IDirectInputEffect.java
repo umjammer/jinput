@@ -62,12 +62,18 @@ final class IDirectInputEffect implements Rumbler {
         this.info = info;
     }
 
+    private float value;
+
     @Override
-    public synchronized void rumble(float intensity) {
+    public void setValue(float value) {
+        this.value = value;
+    }
+
+    synchronized void rumble() {
         try {
             checkReleased();
-            if (intensity > 0) {
-                int intGain = Math.round(intensity * IDirectInputDevice.DI_FFNOMINALMAX);
+            if (value > 0) {
+                int intGain = Math.round(value * IDirectInputDevice.DI_FFNOMINALMAX);
                 setGain(intGain);
                 start(1, 0);
             } else
@@ -78,13 +84,13 @@ final class IDirectInputEffect implements Rumbler {
     }
 
     @Override
-    public Component.Identifier getAxisIdentifier() {
-        return null;
+    public Component.Identifier getOutputIdentifier() {
+        return Component.Identifier.Output.BIG_RUMBLE;
     }
 
     @Override
-    public String getAxisName() {
-        return null;
+    public String getOutputName() {
+        return Component.Identifier.Output.BIG_RUMBLE.getName();
     }
 
     public synchronized void release() {

@@ -41,8 +41,8 @@ import net.java.games.input.ControllerEnvironment;
  */
 public class DirectAndRawInputEnvironmentPlugin extends ControllerEnvironment {
 
-    private RawInputEnvironmentPlugin rawPlugin;
-    private DirectInputEnvironmentPlugin dinputPlugin;
+    private final RawInputEnvironmentPlugin rawPlugin;
+    private final DirectInputEnvironmentPlugin dinputPlugin;
     private Controller[] controllers = null;
 
     public DirectAndRawInputEnvironmentPlugin() {

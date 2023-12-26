@@ -34,6 +34,7 @@ package net.java.games.input.windows;
 
 import java.io.IOException;
 
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
@@ -67,5 +68,10 @@ final class DIMouse extends Mouse implements DIController {
     @Override
     protected void setDeviceEventQueueSize(int size) throws IOException {
         device.setBufferSize(size);
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

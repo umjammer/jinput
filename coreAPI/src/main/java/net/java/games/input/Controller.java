@@ -32,7 +32,6 @@
 
 package net.java.games.input;
 
-
 import java.io.IOException;
 
 
@@ -104,23 +103,6 @@ public interface Controller {
     void close() throws IOException;
 
     /**
-     * Polls axes for data.  Returns false if the controller is no longer valid.
-     * Polling reflects the current state of the device when polled.
-     */
-    boolean poll();
-
-    /**
-     * Initialized the controller event queue to a new size. Existing events
-     * in the queue are lost.
-     */
-    void setEventQueueSize(int size);
-
-    /**
-     * Get the device event queue
-     */
-    EventQueue getEventQueue();
-
-    /**
      * Returns the port type for this Controller.
      */
     PortType getPortType();
@@ -134,6 +116,11 @@ public interface Controller {
      * Returns a human-readable name for this Controller.
      */
     String getName();
+
+    /**
+     * Adds a input event listener.
+     */
+    void addInputEventListener(InputEventListener listener);
 
     /**
      * Types of controller objects.

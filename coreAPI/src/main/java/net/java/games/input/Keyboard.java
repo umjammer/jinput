@@ -38,7 +38,7 @@ package net.java.games.input;
  * they keypad, which contains several axes (the keys).  By default, all keys
  * are set to receive polling data.
  */
-public abstract class Keyboard extends AbstractController {
+public abstract class Keyboard extends PollingController {
 
     /**
      * Protected constructor.
@@ -59,7 +59,7 @@ public abstract class Keyboard extends AbstractController {
     }
 
     public final boolean isKeyDown(Component.Identifier.Key keyId) {
-        Component key = getComponent(keyId);
+        PollingComponent key = (PollingComponent) getComponent(keyId);
         if (key == null)
             return false;
         return key.getPollData() != 0;

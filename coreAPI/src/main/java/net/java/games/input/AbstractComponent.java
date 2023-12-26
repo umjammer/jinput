@@ -32,16 +32,11 @@
 
 package net.java.games.input;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-
 
 /**
  * Skeleton implementation of a named axis.
  */
 public abstract class AbstractComponent implements Component {
-
-    private static final Logger log = Logger.getLogger(AbstractComponent.class.getName());
 
     /**
      * Human-readable name for this Axis
@@ -50,8 +45,6 @@ public abstract class AbstractComponent implements Component {
 
     private final Identifier id;
 
-    private boolean hasPolled;
-    private float value;
     private float eventValue;
 
     /**
@@ -95,40 +88,13 @@ public abstract class AbstractComponent implements Component {
         return 0.0f;
     }
 
-    /**
-     * Returns the data from the last time the control has been polled.
-     * If this axis is a button, the value returned will be either 0.0f or 1.0f.
-     * If this axis is normalised, the value returned will be between -1.0f and
-     * 1.0f.
-     *
-     * @return The data from the last time the control has been polled.
-     */
-    @Override
-    public final float getPollData() {
-        if (!hasPolled && !isRelative()) {
-            hasPolled = true;
-            try {
-                setPollData(poll());
-            } catch (IOException e) {
-                log.fine("Failed to poll component: " + e);
-            }
-        }
-        return value;
-    }
-
-    protected final void resetHasPolled() {
-        hasPolled = false;
-    }
-
-    final void setPollData(float value) {
-        this.value = value;
-    }
-
-    final float getEventValue() {
+    /** */
+    protected final float getEventValue() {
         return eventValue;
     }
 
-    final void setEventValue(float eventValue) {
+    /** */
+    protected final void setEventValue(float eventValue) {
         this.eventValue = eventValue;
     }
 
@@ -146,6 +112,4 @@ public abstract class AbstractComponent implements Component {
     public String toString() {
         return name;
     }
-
-    protected abstract float poll() throws IOException;
 }

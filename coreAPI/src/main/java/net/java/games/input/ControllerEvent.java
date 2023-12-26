@@ -38,7 +38,7 @@ package net.java.games.input;
  */
 public class ControllerEvent {
 
-    private Controller controller;
+    private final Controller controller;
 
     /**
      * Creates a controller event object.

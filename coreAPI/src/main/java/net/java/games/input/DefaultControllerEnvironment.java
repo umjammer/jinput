@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  */
 class DefaultControllerEnvironment extends ControllerEnvironment {
 
-    private static Logger log = Logger.getLogger(DefaultControllerEnvironment.class.getName());
+    private static final Logger log = Logger.getLogger(DefaultControllerEnvironment.class.getName());
 
     /**
      * List of all controllers in this environment
@@ -77,10 +77,10 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
     }
 
     /** to avoid conflict we can specify package patterns to exclude */
-    private static boolean toBeExcluded(String packageName) {
+    static boolean toBeExcluded(String packageName) {
         String prop = System.getProperty("net.java.games.input.ControllerEnvironment.excludes", "");
         String[] excludes = prop.split(":");
-log.fine("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", " + packageName);
+log.finer("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", " + packageName);
         return !prop.isEmpty() && Arrays.stream(excludes).anyMatch(packageName::contains);
     }
 
@@ -90,12 +90,12 @@ log.fine("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", 
 log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
             for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
                 try {
-log.fine("@@@ ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
+log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
                     if (ce.isSupported() && !toBeExcluded(ce.getClass().getPackageName())) {
                         Controller[] c = ce.getControllers();
                         Collections.addAll(controllers, c);
                     } else {
-                        log.fine(ce.getClass().getName() + " is not supported");
+                        log.finer(ce.getClass().getName() + " is not supported");
                     }
                 } catch (Throwable e) {
                     log.log(Level.FINE, e.getMessage(), e);

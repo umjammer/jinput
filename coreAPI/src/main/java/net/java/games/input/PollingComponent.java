@@ -32,62 +32,57 @@
 
 package net.java.games.input;
 
+import java.io.IOException;
+import java.util.logging.Logger;
+
 
 /**
- * A FIFO queue for input events.
+ * Skeleton implementation of a named axis.
  */
 @Deprecated
-public final class EventQueue {
+public abstract class PollingComponent extends AbstractComponent {
 
-    private final Event[] queue;
+    private static final Logger log = Logger.getLogger(PollingComponent.class.getName());
 
-    private int head;
-    private int tail;
-
-    /**
-     * This is an internal method and should not be called by applications using the API
-     */
-    public EventQueue(int size) {
-        queue = new Event[size + 1];
-        for (int i = 0; i < queue.length; i++)
-            queue[i] = new Event();
-    }
+    private boolean hasPolled;
+    private float value;
 
     /**
-     * This is an internal method and should not be called by applications using the API
-     */
-    public synchronized void add(Event event) {
-        queue[tail].set(event);
-        tail = increase(tail);
-    }
-
-    /**
-     * Check if the queue is full
+     * Protected constructor
      *
-     * @return true if the queue is full
+     * @param name A name for the axis
      */
-    public synchronized boolean isFull() {
-        return increase(tail) == head;
+    protected PollingComponent(String name, Identifier id) {
+        super(name, id);
     }
 
     /**
-     * This is an internal method and should not be called by applications using the API
-     */
-    private int increase(int x) {
-        return (x + 1) % queue.length;
-    }
-
-    /**
-     * Populates the provided event with the details of the event on the head of the queue.
+     * Returns the data from the last time the control has been polled.
+     * If this axis is a button, the value returned will be either 0.0f or 1.0f.
+     * If this axis is normalised, the value returned will be between -1.0f and
+     * 1.0f.
      *
-     * @param event The event to populate
-     * @return false if there were no events left on the queue, otherwise true.
+     * @return The data from the last time the control has been polled.
      */
-    public synchronized boolean getNextEvent(Event event) {
-        if (head == tail)
-            return false;
-        event.set(queue[head]);
-        head = increase(head);
-        return true;
+    public final float getPollData() {
+        if (!hasPolled && !isRelative()) {
+            hasPolled = true;
+            try {
+                setPollData(poll());
+            } catch (IOException e) {
+                log.fine("Failed to poll component: " + e);
+            }
+        }
+        return value;
     }
+
+    protected final void resetHasPolled() {
+        hasPolled = false;
+    }
+
+    final void setPollData(float value) {
+        this.value = value;
+    }
+
+    protected abstract float poll() throws IOException;
 }

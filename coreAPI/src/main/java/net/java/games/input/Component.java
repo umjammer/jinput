@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 /**
  * An axis is a single button, slider, or dial, which has a single range.  An
  * axis can hold information for motion (linear or rotational), velocity,
@@ -61,20 +62,8 @@ public interface Component {
      * amount polled data can vary before considered a significant change
      * in value.  An application can safely ignore changes less than this
      * value in the positive or negative direction.
-     *
-     * @see #getPollData
      */
     float getDeadZone();
-
-    /**
-     * Returns the data from the last time the control has been polled.
-     * If this axis is a button, the value returned will be either 0.0f or 1.0f.
-     * If this axis is normalized, the value returned will be between -1.0f and
-     * 1.0f.
-     *
-     * @see Controller#poll
-     */
-    float getPollData();
 
     /**
      * Returns a human-readable name for this axis.
@@ -85,6 +74,11 @@ public interface Component {
      * Identifiers for different Axes.
      */
     interface Identifier {
+
+        /**
+         * Represents a value only component.
+         */
+        Identifier Value = () -> "Value";
 
         /**
          * Returns a non-localized string description of this axis type.
@@ -896,6 +890,33 @@ public interface Component {
              * Protected constructor
              */
             Key(String name) {
+                this.name = name;
+            }
+        }
+
+        /**
+         * KeyIDs for standard PC (LATIN-1) keyboards
+         */
+        enum Output implements Identifier {
+            SMALL_RUMBLE("smallRumble"),
+            BIG_RUMBLE("bigRumble"),
+            LED_RED("ledRed"),
+            LED_GREEN("ledGreen"),
+            LED_BLUE("ledBlue"),
+            FLASH_LED1("flashLed1"),
+            FLASH_LED2("flashLed2");
+
+            final String name;
+
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            /**
+             * Protected constructor
+             */
+            Output(String name) {
                 this.name = name;
             }
         }

@@ -185,14 +185,14 @@ public class ControllerEventTest extends JFrame {
 
         @Serial
         private static final long serialVersionUID = 8623977198558568961L;
-        transient Controller ca;
+        transient PollingController ca;
         transient Map<Component, AxisPanel> axesToPanels = new HashMap<>();
         boolean disabled = false;
 
         public ControllerWindow(JFrame frame, Controller ca) {
             super(ca.getName());
             this.setName(ca.getName());
-            this.ca = ca;
+            this.ca = (PollingController) ca;
             Container c = this.getContentPane();
             c.setLayout(new BorderLayout());
             Component[] components = ca.getComponents();

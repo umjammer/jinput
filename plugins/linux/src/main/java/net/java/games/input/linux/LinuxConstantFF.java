@@ -39,8 +39,8 @@ final class LinuxConstantFF extends LinuxForceFeedbackEffect {
     }
 
     @Override
-    protected final int upload(int id, float intensity) throws IOException {
-        int scaled_intensity = Math.round(intensity * 0x7fff);
-        return getDevice().uploadConstantEffect(id, 0, 0, 0, 0, 0, scaled_intensity, 0, 0, 0, 0);
+    protected int upload(int id, float intensity) throws IOException {
+        int scaledIntensity = Math.round(intensity * 0x7fff);
+        return getDevice().uploadConstantEffect(id, 0, 0, 0, 0, 0, scaledIntensity, 0, 0, 0, 0);
     }
 }

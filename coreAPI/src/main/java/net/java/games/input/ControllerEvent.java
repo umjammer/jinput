@@ -32,12 +32,13 @@
 
 package net.java.games.input;
 
+
 /**
  * An event that is fired when the state of a controller changes
  */
 public class ControllerEvent {
 
-    private Controller controller;
+    private final Controller controller;
 
     /**
      * Creates a controller event object.

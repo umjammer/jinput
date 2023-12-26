@@ -36,9 +36,9 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
-import net.java.games.input.AbstractController;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
+import net.java.games.input.PollingController;
 
 import static com.sun.jna.platform.linux.ErrNo.EAGAIN;
 import static net.java.games.input.linux.LinuxIO.ABS_MAX;
@@ -71,7 +71,7 @@ final class LinuxJoystickDevice implements LinuxDevice {
     private final long fd;
     private final String name;
 
-    private final LinuxJoystickEvent joystick_event = new LinuxJoystickEvent();
+    private final LinuxJoystickEvent joystickEvent = new LinuxJoystickEvent();
     private final Event event = new Event();
     private final LinuxJoystickButton[] buttons;
     private final LinuxJoystickAxis[] axes;
@@ -80,18 +80,24 @@ final class LinuxJoystickDevice implements LinuxDevice {
     private final byte[] axisMap;
     private final char[] buttonMap;
 
-    private EventQueue event_queue;
+    private EventQueue eventQueue;
 
-    /* Closed state variable that protects the validity of the file descriptor.
-     *  Access to the closed state must be synchronized
+    /**
+     * Closed state variable that protects the validity of the file descriptor.
+     * Access to the closed state must be synchronized
      */
     private boolean closed;
 
     public LinuxJoystickDevice(String filename) throws IOException {
-        this.fd = nOpen(filename);
+        if (filename == null)
+            this.fd = -1;
+        else
+            this.fd = LinuxIO.INSTANCE.open64(filename, O_RDONLY | O_NONBLOCK);
+        if (this.fd == -1)
+            throw new IOException(String.format("Failed to open device %s (%d)", filename, Native.getLastError()));
         try {
             this.name = getDeviceName();
-            setBufferSize(AbstractController.EVENT_QUEUE_DEPTH);
+            setBufferSize(PollingController.EVENT_QUEUE_DEPTH);
             buttons = new LinuxJoystickButton[getNumDeviceButtons()];
             axes = new LinuxJoystickAxis[getNumDeviceAxes()];
             axisMap = getDeviceAxisMap();
@@ -102,31 +108,22 @@ final class LinuxJoystickDevice implements LinuxDevice {
         }
     }
 
-    private static long nOpen(String filename) throws IOException {
-        if (filename == null)
-            return -1;
-        int fd = LinuxIO.INSTANCE.open64(filename, O_RDONLY | O_NONBLOCK);
-        if (fd == -1)
-            throw new IOException(String.format( "Failed to open device %s (%d)\n", filename, Native.getLastError()));
-        return fd;
-    }
-
     public synchronized void setBufferSize(int size) {
-        event_queue = new EventQueue(size);
+        eventQueue = new EventQueue(size);
     }
 
-    private void processEvent(LinuxJoystickEvent joystick_event) {
-        int index = joystick_event.getNumber();
+    private void processEvent(LinuxJoystickEvent joystickEvent) {
+        int index = joystickEvent.getNumber();
         // Filter synthetic init event flag
-        int type = joystick_event.getType() & ~JS_EVENT_INIT;
+        int type = joystickEvent.getType() & ~JS_EVENT_INIT;
         switch (type) {
         case JS_EVENT_BUTTON:
             if (index < getNumButtons()) {
                 LinuxJoystickButton button = buttons[index];
                 if (button != null) {
-                    float value = joystick_event.getValue();
+                    float value = joystickEvent.getValue();
                     button.setValue(value);
-                    event.set(button, value, joystick_event.getNanos());
+                    event.set(button, value, joystickEvent.getNanos());
                     break;
                 }
             }
@@ -135,18 +132,18 @@ final class LinuxJoystickDevice implements LinuxDevice {
             if (index < getNumAxes()) {
                 LinuxJoystickAxis axis = axes[index];
                 if (axis != null) {
-                    float value = (float) joystick_event.getValue() / AXIS_MAX_VALUE;
+                    float value = (float) joystickEvent.getValue() / AXIS_MAX_VALUE;
                     axis.setValue(value);
                     if (povXs.containsKey(index)) {
                         LinuxJoystickPOV pov = povXs.get(index);
                         pov.updateValue();
-                        event.set(pov, pov.getPollData(), joystick_event.getNanos());
+                        event.set(pov, pov.getPollData(), joystickEvent.getNanos());
                     } else if (povYs.containsKey(index)) {
                         LinuxJoystickPOV pov = povYs.get(index);
                         pov.updateValue();
-                        event.set(pov, pov.getPollData(), joystick_event.getNanos());
+                        event.set(pov, pov.getPollData(), joystickEvent.getNanos());
                     } else {
-                        event.set(axis, value, joystick_event.getNanos());
+                        event.set(axis, value, joystickEvent.getNanos());
                     }
                     break;
                 }
@@ -156,8 +153,8 @@ final class LinuxJoystickDevice implements LinuxDevice {
             // Unknown component type
             return;
         }
-        if (!event_queue.isFull()) {
-            event_queue.add(event);
+        if (!eventQueue.isFull()) {
+            eventQueue.add(event);
         }
     }
 
@@ -189,141 +186,108 @@ final class LinuxJoystickDevice implements LinuxDevice {
         povYs.put(yIndex, pov);
     }
 
-    public final synchronized boolean getNextEvent(Event event) throws IOException {
-        return event_queue.getNextEvent(event);
+    public synchronized boolean getNextEvent(Event event) throws IOException {
+        return eventQueue.getNextEvent(event);
     }
 
     public synchronized void poll() throws IOException {
         checkClosed();
-        while (getNextDeviceEvent(joystick_event)) {
-            processEvent(joystick_event);
+        while (getNextDeviceEvent(joystickEvent)) {
+            processEvent(joystickEvent);
         }
     }
 
-    private boolean getNextDeviceEvent(LinuxJoystickEvent joystick_event) throws IOException {
-        return nGetNextEvent(fd, joystick_event);
-    }
-
-    private static boolean nGetNextEvent(long fd, LinuxJoystickEvent joystick_event) throws IOException {
-        if (LinuxIO.INSTANCE.read((int) fd, joystick_event.getPointer(), new NativeLong(joystick_event.size())).intValue() == -1) {
+    private boolean getNextDeviceEvent(LinuxJoystickEvent joystickEvent) throws IOException {
+        if (LinuxIO.INSTANCE.read((int) fd, joystickEvent.getPointer(), new NativeLong(joystickEvent.size())).intValue() == -1) {
             if (Native.getLastError() == EAGAIN)
                 return false;
-            throw new IOException(String.format( "Failed to read next device event (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to read next device event (%d)", Native.getLastError()));
         }
-        joystick_event.read();
+        joystickEvent.read();
         return true;
     }
 
-    public final int getNumAxes() {
+    public int getNumAxes() {
         return axes.length;
     }
 
-    public final int getNumButtons() {
+    public int getNumButtons() {
         return buttons.length;
     }
 
-    public final byte[] getAxisMap() {
+    public byte[] getAxisMap() {
         return axisMap;
     }
 
-    public final char[] getButtonMap() {
+    public char[] getButtonMap() {
         return buttonMap;
     }
 
-    private final int getNumDeviceButtons() throws IOException {
-        return nGetNumButtons(fd);
-    }
-
-    private static int nGetNumButtons(long fd) throws IOException {
-        ByteByReference num_buttons = new ByteByReference();
-        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGBUTTONS, num_buttons.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to get number of buttons (%d)\n", Native.getLastError()));
+    private int getNumDeviceButtons() throws IOException {
+        ByteByReference numButtons = new ByteByReference();
+        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGBUTTONS, numButtons.getPointer()) == -1) {
+            throw new IOException(String.format( "Failed to get number of buttons (%d)", Native.getLastError()));
         }
-        return num_buttons.getValue();
+        return numButtons.getValue();
     }
 
     private int getNumDeviceAxes() throws IOException {
-        return nGetNumAxes(fd);
-    }
-
-    private static int nGetNumAxes(long fd) throws IOException {
-        ByteByReference num_axes = new ByteByReference();
-        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGAXES, num_axes.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to get number of buttons (%d)\n", Native.getLastError()));
+        ByteByReference numAxes = new ByteByReference();
+        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGAXES, numAxes.getPointer()) == -1) {
+            throw new IOException(String.format( "Failed to get number of buttons (%d)", Native.getLastError()));
         }
-        return num_axes.getValue();
+        return numAxes.getValue();
     }
 
 
-    private final byte[] getDeviceAxisMap() throws IOException {
-        return nGetAxisMap(fd);
-    }
-
-    private static byte[] nGetAxisMap(long fd) throws IOException {
-        Memory axis_map = new Memory(ABS_MAX + 1);
-        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGAXMAP, axis_map) == -1) {
-            throw new IOException(String.format( "Failed to get axis map (%d)\n", Native.getLastError()));
+    private byte[] getDeviceAxisMap() throws IOException {
+        Memory axisMap = new Memory(ABS_MAX + 1);
+        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGAXMAP, axisMap) == -1) {
+            throw new IOException(String.format( "Failed to get axis map (%d)", Native.getLastError()));
         }
 
-        return axis_map.getByteArray(0, ABS_MAX + 1);
+        return axisMap.getByteArray(0, ABS_MAX + 1);
     }
 
     private char[] getDeviceButtonMap() throws IOException {
-        return nGetButtonMap(fd);
-    }
-
-    private static char[] nGetButtonMap(long fd) throws IOException {
-        Memory button_map = new Memory((KEY_MAX - BTN_MISC + 1) * Character.BYTES);
-        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGBTNMAP, button_map) == -1) {
-            throw new IOException(String.format( "Failed to get button map (%d)\n", Native.getLastError()));
+        Memory buttonMap = new Memory((KEY_MAX - BTN_MISC + 1) * Character.BYTES);
+        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGBTNMAP, buttonMap) == -1) {
+            throw new IOException(String.format( "Failed to get button map (%d)", Native.getLastError()));
         }
 
-        return button_map.getCharArray(0, KEY_MAX - BTN_MISC + 1);
+        return buttonMap.getCharArray(0, KEY_MAX - BTN_MISC + 1);
     }
 
     private int getVersion() throws IOException {
-        return nGetVersion(fd);
-    }
-
-    private static int nGetVersion(long fd) throws IOException {
         IntByReference version = new IntByReference();
         if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGVERSION, version.getPointer()) == -1) {
-            throw new IOException(String.format( "Failed to get device version (%d)\n", Native.getLastError()));
+            throw new IOException(String.format( "Failed to get device version (%d)", Native.getLastError()));
         }
         return version.getValue();
     }
-
 
     public String getName() {
         return name;
     }
 
     private String getDeviceName() throws IOException {
-        return nGetName(fd);
-    }
-
-    private static String nGetName(long fd) throws IOException {
         int BUFFER_SIZE = 1024;
-        Memory device_name = new Memory(BUFFER_SIZE);
+        Memory deviceName = new Memory(BUFFER_SIZE);
 
-        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGNAME(BUFFER_SIZE), device_name) == -1) {
-            throw new IOException(String.format( "Failed to get device name (%d)\n", Native.getLastError()));
+        if (LinuxIO.INSTANCE.ioctl((int) fd, JSIOCGNAME(BUFFER_SIZE), deviceName) == -1) {
+            throw new IOException(String.format( "Failed to get device name (%d)", Native.getLastError()));
         }
-        return device_name.getString(0, StandardCharsets.UTF_8.name());
+        return deviceName.getString(0, StandardCharsets.UTF_8.name());
     }
 
     @Override
     public synchronized void close() throws IOException {
         if (!closed) {
             closed = true;
-            nClose(fd);
+            int result = LinuxIO.INSTANCE.close((int) fd);
+            if (result == -1)
+                throw new IOException(String.format( "Failed to close device (%d)", Native.getLastError()));
         }
-    }
-
-    private static void nClose(long fd) throws IOException {
-        int result = LinuxIO.INSTANCE.close((int) fd);
-        if (result == -1)
-            throw new IOException(String.format( "Failed to close device (%d)\n", Native.getLastError()));
     }
 
     private void checkClosed() throws IOException {

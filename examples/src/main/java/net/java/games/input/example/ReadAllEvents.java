@@ -1,10 +1,13 @@
 package net.java.games.input.example;
 
+import java.util.Arrays;
+
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
+import net.java.games.input.PollingController;
 
 
 /**
@@ -16,51 +19,46 @@ import net.java.games.input.EventQueue;
  */
 public class ReadAllEvents {
 
-    public ReadAllEvents() {
+    public void exec() {
+        // Create an event object for the underlying plugin to populate
+        Event event = new Event();
+        StringBuffer buffer = new StringBuffer();
+
         while (true) {
-            /* Get the available controllers */
-            Controller[] controllers = ControllerEnvironment
-                    .getDefaultEnvironment().getControllers();
+            // Get the available controllers
+            PollingController[] controllers = Arrays.stream(ControllerEnvironment.getDefaultEnvironment().getControllers()).map(PollingController.class::cast).toArray(PollingController[]::new);
             if (controllers.length == 0) {
                 System.out.println("Found no controllers.");
                 System.exit(0);
             }
 
-            for (Controller controller : controllers) {
-                /* Remember to poll each one */
+            for (PollingController controller : controllers) {
+                // Remember to poll each one
                 controller.poll();
 
-                /* Get the controllers event queue */
+                // Get the controllers event queue
                 EventQueue queue = controller.getEventQueue();
 
-                /* Create an event object for the underlying plugin to populate */
-                Event event = new Event();
-
-                /* For each object in the queue */
+                // For each object in the queue
                 while (queue.getNextEvent(event)) {
 
-                    /*
-                     * Create a string buffer and put in it, the controller name,
-                     * the time stamp of the event, the name of the component
-                     * that changed and the new value.
-                     *
-                     * Note that the timestamp is a relative thing, not
-                     * absolute, we can tell what order events happened in
-                     * across controllers this way. We can not use it to tell
-                     * exactly *when* an event happened just the order.
-                     */
-                    StringBuffer buffer = new StringBuffer(controller
-                            .getName());
+                    // Create a string buffer and put in it, the controller name,
+                    // the time stamp of the event, the name of the component
+                    // that changed and the new value.
+                    //
+                    // Note that the timestamp is a relative thing, not
+                    // absolute, we can tell what order events happened in
+                    // across controllers this way. We can not use it to tell
+                    // exactly *when* an event happened just the order.
+                    buffer.setLength(0);
                     buffer.append(" at ");
                     buffer.append(event.getNanos()).append(", ");
                     Component comp = event.getComponent();
                     buffer.append(comp.getName()).append(" changed to ");
                     float value = event.getValue();
 
-                    /*
-                     * Check the type of the component and display an
-                     * appropriate value
-                     */
+                    // Check the type of the component and display an
+                    // appropriate value
                     if (comp.isAnalog()) {
                         buffer.append(value);
                     } else {
@@ -74,10 +72,8 @@ public class ReadAllEvents {
                 }
             }
 
-            /*
-             * Sleep for 20 milliseconds, in here only so the example doesn't
-             * thrash the system.
-             */
+            // Sleep for 20 milliseconds, in here only so the example doesn't
+            // thrash the system.
             try {
                 Thread.sleep(20);
             } catch (InterruptedException ignore) {
@@ -86,6 +82,7 @@ public class ReadAllEvents {
     }
 
     public static void main(String[] args) {
-        new ReadAllEvents();
+        ReadAllEvents app = new ReadAllEvents();
+        app.exec();
     }
 }

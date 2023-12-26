@@ -33,6 +33,7 @@
 package net.java.games.input;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
@@ -47,7 +48,7 @@ import java.util.logging.Logger;
  */
 class DefaultControllerEnvironment extends ControllerEnvironment {
 
-    private static Logger log = Logger.getLogger(DefaultControllerEnvironment.class.getName());
+    private static final Logger log = Logger.getLogger(DefaultControllerEnvironment.class.getName());
 
     /**
      * List of all controllers in this environment
@@ -75,15 +76,26 @@ class DefaultControllerEnvironment extends ControllerEnvironment {
         return controllers.toArray(Controller[]::new);
     }
 
+    /** to avoid conflict we can specify package patterns to exclude */
+    static boolean toBeExcluded(String packageName) {
+        String prop = System.getProperty("net.java.games.input.ControllerEnvironment.excludes", "");
+        String[] excludes = prop.split(":");
+log.finer("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", " + packageName);
+        return !prop.isEmpty() && Arrays.stream(excludes).anyMatch(packageName::contains);
+    }
+
+    /** */
     private void scanControllers() {
         try {
+log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
             for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
                 try {
-log.fine("@@@ ControllerEnvironment " + ce.getClass().getName());
-                    if (ce.isSupported()) {
-                        addControllers(ce.getControllers());
+log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
+                    if (ce.isSupported() && !toBeExcluded(ce.getClass().getPackageName())) {
+                        Controller[] c = ce.getControllers();
+                        Collections.addAll(controllers, c);
                     } else {
-                        log.fine(ce.getClass().getName() + " is not supported");
+                        log.finer(ce.getClass().getName() + " is not supported");
                     }
                 } catch (Throwable e) {
                     log.log(Level.FINE, e.getMessage(), e);
@@ -92,13 +104,6 @@ log.fine("@@@ ControllerEnvironment " + ce.getClass().getName());
         } catch (Exception e) {
             log.log(Level.FINE, e.getMessage(), e);
         }
-    }
-
-    /**
-     * Add the array of controllers to our list of controllers.
-     */
-    private void addControllers(Controller[] c) {
-        Collections.addAll(controllers, c);
     }
 
     @Override

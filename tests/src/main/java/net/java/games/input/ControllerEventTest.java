@@ -181,19 +181,18 @@ public class ControllerEventTest extends JFrame {
         }
     }
 
-
     private static class ControllerWindow extends JFrame {
 
         @Serial
         private static final long serialVersionUID = 8623977198558568961L;
-        transient Controller ca;
-        transient Map<Component, AxisPanel> axes_to_panels = new HashMap<>();
+        transient PollingController ca;
+        transient Map<Component, AxisPanel> axesToPanels = new HashMap<>();
         boolean disabled = false;
 
         public ControllerWindow(JFrame frame, Controller ca) {
             super(ca.getName());
             this.setName(ca.getName());
-            this.ca = ca;
+            this.ca = (PollingController) ca;
             Container c = this.getContentPane();
             c.setLayout(new BorderLayout());
             Component[] components = ca.getComponents();
@@ -240,7 +239,7 @@ public class ControllerEventTest extends JFrame {
                 }
             }
             p.add(p2);
-            axes_to_panels.put(ax, p2);
+            axesToPanels.put(ax, p2);
         }
 
         public void poll() {
@@ -253,10 +252,10 @@ public class ControllerEventTest extends JFrame {
             if (disabled()) {
                 setDisabled(false);
             }
-            EventQueue event_queue = ca.getEventQueue();
+            EventQueue eventQueue = ca.getEventQueue();
             Event event = new Event();
-            while (event_queue.getNextEvent(event)) {
-                AxisPanel panel = axes_to_panels.get(event.getComponent());
+            while (eventQueue.getNextEvent(event)) {
+                AxisPanel panel = axesToPanels.get(event.getComponent());
                 panel.setPollData(event.getValue());
             }
         }

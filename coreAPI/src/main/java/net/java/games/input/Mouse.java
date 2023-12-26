@@ -32,12 +32,13 @@
 
 package net.java.games.input;
 
+
 /**
  * A Mouse is a type of controller consisting of two child controllers,
  * a ball and a button pad.  This includes devices such as touch pads,
  * trackballs, and fingersticks.
  */
-public abstract class Mouse extends AbstractController {
+public abstract class Mouse extends PollingController {
 
     protected Mouse(String name, Component[] components, Controller[] children, Rumbler[] rumblers) {
         super(name, components, children, rumblers);

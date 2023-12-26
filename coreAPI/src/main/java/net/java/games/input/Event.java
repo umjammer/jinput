@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 public final class Event {
 
     private Component component;

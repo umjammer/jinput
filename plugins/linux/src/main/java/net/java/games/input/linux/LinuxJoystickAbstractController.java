@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,8 +28,7 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
 package net.java.games.input.linux;
 
@@ -45,6 +38,7 @@ import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
+import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 
 
@@ -54,28 +48,37 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class LinuxJoystickAbstractController extends AbstractController {
+final class LinuxJoystickAbstractController extends PollingController {
 
     private final LinuxJoystickDevice device;
 
-    protected LinuxJoystickAbstractController(LinuxJoystickDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
+    LinuxJoystickAbstractController(LinuxJoystickDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) {
         super(device.getName(), components, children, rumblers);
         this.device = device;
     }
 
-    protected final void setDeviceEventQueueSize(int size) throws IOException {
+    @Override
+    protected void setDeviceEventQueueSize(int size) throws IOException {
         device.setBufferSize(size);
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.poll();
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
         return device.getNextEvent(event);
     }
 
+    @Override
     public Type getType() {
         return Controller.Type.STICK;
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

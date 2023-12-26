@@ -38,15 +38,15 @@ public class RumbleTest {
             Rumbler[] rumblers = controller.getRumblers();
             System.out.println("Found " + rumblers.length + " rumblers");
             for (Rumbler rumbler : rumblers) {
-                System.out.println("Rumbler " + rumbler.getAxisName() + " on axis " + rumbler.getAxisIdentifier());
+                System.out.println("Rumbler " + rumbler.getOutputName() + " on axis " + rumbler.getOutputIdentifier());
                 System.out.println("Rumbling with intensity: " + 0.5f);
-                rumbler.rumble(0.5f);
+                rumbler.setValue(0.5f);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored) {
                 }
                 System.out.println("Rumbling with intensity: " + 1.0f);
-                rumbler.rumble(1f);
+                rumbler.setValue(1f);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored) {
@@ -54,7 +54,7 @@ public class RumbleTest {
                 System.out.println("Fading rumble to -1");
                 for (float k = 1.0f; k > -1.0f; ) {
                     long startTime = System.currentTimeMillis();
-                    rumbler.rumble(k);
+                    rumbler.setValue(k);
                     try {
                         Thread.sleep(1);
                     } catch (InterruptedException ignored) {
@@ -66,7 +66,7 @@ public class RumbleTest {
                 } catch (InterruptedException ignored) {
                 }
                 System.out.println("Rumbling with intensity: " + 0.0f);
-                rumbler.rumble(0f);
+                rumbler.setValue(0f);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored) {

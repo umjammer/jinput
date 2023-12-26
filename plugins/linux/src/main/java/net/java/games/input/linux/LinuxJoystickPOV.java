@@ -9,8 +9,8 @@ public class LinuxJoystickPOV extends LinuxJoystickAxis {
 
     private static final Logger log = Logger.getLogger(LinuxJoystickPOV.class.getName());
 
-    private LinuxJoystickAxis hatX;
-    private LinuxJoystickAxis hatY;
+    private final LinuxJoystickAxis hatX;
+    private final LinuxJoystickAxis hatY;
 
     LinuxJoystickPOV(Component.Identifier.Axis id, LinuxJoystickAxis hatX, LinuxJoystickAxis hatY) {
         super(id, false);
@@ -18,40 +18,40 @@ public class LinuxJoystickPOV extends LinuxJoystickAxis {
         this.hatY = hatY;
     }
 
-    protected LinuxJoystickAxis getXAxis() {
+    LinuxJoystickAxis getXAxis() {
         return hatX;
     }
 
-    protected LinuxJoystickAxis getYAxis() {
+    LinuxJoystickAxis getYAxis() {
         return hatY;
     }
 
 
     protected void updateValue() {
-        float last_x = hatX.getPollData();
-        float last_y = hatY.getPollData();
+        float lastX = hatX.getPollData();
+        float lastY = hatY.getPollData();
 
         resetHasPolled();
-        if (last_x == -1 && last_y == -1)
+        if (lastX == -1 && lastY == -1)
             setValue(Component.POV.UP_LEFT);
-        else if (last_x == -1 && last_y == 0)
+        else if (lastX == -1 && lastY == 0)
             setValue(Component.POV.LEFT);
-        else if (last_x == -1 && last_y == 1)
+        else if (lastX == -1 && lastY == 1)
             setValue(Component.POV.DOWN_LEFT);
-        else if (last_x == 0 && last_y == -1)
+        else if (lastX == 0 && lastY == -1)
             setValue(Component.POV.UP);
-        else if (last_x == 0 && last_y == 0)
+        else if (lastX == 0 && lastY == 0)
             setValue(Component.POV.OFF);
-        else if (last_x == 0 && last_y == 1)
+        else if (lastX == 0 && lastY == 1)
             setValue(Component.POV.DOWN);
-        else if (last_x == 1 && last_y == -1)
+        else if (lastX == 1 && lastY == -1)
             setValue(Component.POV.UP_RIGHT);
-        else if (last_x == 1 && last_y == 0)
+        else if (lastX == 1 && lastY == 0)
             setValue(Component.POV.RIGHT);
-        else if (last_x == 1 && last_y == 1)
+        else if (lastX == 1 && lastY == 1)
             setValue(Component.POV.DOWN_RIGHT);
         else {
-            log.fine("Unknown values x = " + last_x + " | y = " + last_y);
+            log.fine("Unknown values x = " + lastX + " | y = " + lastY);
             setValue(Component.POV.OFF);
         }
     }

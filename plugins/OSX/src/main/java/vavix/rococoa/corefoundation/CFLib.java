@@ -9,6 +9,7 @@ package vavix.rococoa.corefoundation;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackReference;
@@ -29,6 +30,8 @@ import com.sun.jna.ptr.NativeLongByReference;
  * @version 0.00 2023-09-22 nsano initial version <br>
  */
 public interface CFLib extends Library {
+
+    Logger log = Logger.getLogger(CFLib.class.getName());
 
     CFLib INSTANCE = Native.load("CoreFoundation", CFLib.class);
 
@@ -65,6 +68,47 @@ public interface CFLib extends Library {
 
 //#region CFArray
 
+    class CFArrayCallBacks extends Structure {
+        public interface RetqinCallback extends Callback {
+            void fn(Pointer a, Pointer b);
+        }
+        public interface ReleaseCallback extends Callback {
+            void fn(Pointer a, Pointer b);
+        }
+        public interface CopyDescriptionCallback extends Callback {
+            Pointer fn(Pointer a);
+        }
+        public interface EqualCallback extends Callback {
+            boolean fn(Pointer a, Pointer b);
+        }
+        public NativeLong version;
+        public RetqinCallback retain;
+        public ReleaseCallback release;
+        public CopyDescriptionCallback copyDescription;
+        public EqualCallback equal;
+
+        public CFArrayCallBacks(Pointer p) {
+            super(p);
+            version = getPointer().getNativeLong(0);
+            retain = (RetqinCallback) CallbackReference.getCallback(RetqinCallback.class, p.getPointer(0x08));
+            release = (ReleaseCallback) CallbackReference.getCallback(ReleaseCallback.class, p.getPointer(0x10));
+            copyDescription = (CopyDescriptionCallback) CallbackReference.getCallback(CopyDescriptionCallback.class, p.getPointer(0x18));
+            equal = (EqualCallback) CallbackReference.getCallback(EqualCallback.class, p.getPointer(0x20));
+            log.fine(this.toString());
+        }
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList("version", "retain", "release", "copyDescription", "equal");
+        }
+    }
+
+    CFArrayCallBacks kCFTypeArrayCallBacks = new CFArrayCallBacks(NATIVE_LIBRARY
+            .getGlobalVariableAddress("kCFTypeArrayCallBacks"));
+
+    /** Creates a new immutable array with the given values. */
+    CFArray CFArrayCreate(CFAllocator allocator, Pointer[] values, CFIndex numValues, CFArrayCallBacks callBacks);
+
     NativeLong CFArrayGetCount(CFArray theArray);
 
     CFType CFArrayGetValueAtIndex(CFArray theArray, int idx);
@@ -91,6 +135,14 @@ public interface CFLib extends Library {
 //#endregion CFSet
 
 //#region CFString
+
+    interface CFComparatorFunction extends Callback {
+
+        /**
+         * @see CFComparisonResult
+         */
+        int invoke(Pointer val1, Pointer val2, Pointer context);
+    }
 
     interface CFComparisonResult {
 
@@ -238,49 +290,6 @@ public interface CFLib extends Library {
 
 //#region CFDictionary
 
-    interface CFComparatorFunction extends Callback {
-
-        /**
-         * @see CFComparisonResult
-         */
-        int invoke(Pointer val1, Pointer val2, Pointer context);
-    }
-
-    interface CFAllocatorRetainCallBack extends Callback {
-
-        Pointer invoke(Pointer info);
-    }
-
-    interface CFAllocatorReleaseCallBack extends Callback {
-
-        void invoke(Pointer info);
-    }
-
-    interface CFAllocatorCopyDescriptionCallBack extends Callback {
-
-        CFString invoke(Pointer info);
-    }
-
-    interface CFAllocatorAllocateCallBack extends Callback {
-
-        Pointer invoke(NativeLong allocSize, NativeLong hint, Pointer info);
-    }
-
-    interface CFAllocatorReallocateCallBack extends Callback {
-
-        Pointer invoke(Pointer ptr, NativeLong newsize, NativeLong hint, Pointer info);
-    }
-
-    interface CFAllocatorDeallocateCallBack extends Callback {
-
-        void invoke(Pointer ptr, Pointer info);
-    }
-
-    interface CFAllocatorPreferredSizeCallBack extends Callback {
-
-        NativeLong invoke(NativeLong size, NativeLong hint, Pointer info);
-    }
-
     interface CFDictionaryRetainCallBack extends Callback {
 
         Pointer invoke(CFAllocator allocator, CFType value);
@@ -308,7 +317,7 @@ public interface CFLib extends Library {
 
     interface CFDictionaryApplierFunction extends Callback {
 
-        void invoke(CFString key, CFType value, Pointer/*Structure.ByReference*/ context);
+        void invoke(CFString key, CFType value, Pointer /* Structure.ByReference */ context);
     }
 
     NativeLong CFDictionaryGetTypeID();
@@ -491,7 +500,7 @@ public interface CFLib extends Library {
 
     void CFDictionaryRemoveAllValues(CFDictionary theDict);
 
-    Pointer /*CFMutableDictionaryRef*/ CFDictionaryCreateMutable(CFAllocator allocator, CFIndex capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
+    Pointer /* CFMutableDictionaryRef */ CFDictionaryCreateMutable(CFAllocator allocator, CFIndex capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
 
 //#endregion CFDictionary
 
@@ -674,6 +683,41 @@ public interface CFLib extends Library {
 //#endregion CFRunLoop
 
 //#region CFAllocator
+
+    interface CFAllocatorRetainCallBack extends Callback {
+
+        Pointer invoke(Pointer info);
+    }
+
+    interface CFAllocatorReleaseCallBack extends Callback {
+
+        void invoke(Pointer info);
+    }
+
+    interface CFAllocatorCopyDescriptionCallBack extends Callback {
+
+        CFString invoke(Pointer info);
+    }
+
+    interface CFAllocatorAllocateCallBack extends Callback {
+
+        Pointer invoke(NativeLong allocSize, NativeLong hint, Pointer info);
+    }
+
+    interface CFAllocatorReallocateCallBack extends Callback {
+
+        Pointer invoke(Pointer ptr, NativeLong newsize, NativeLong hint, Pointer info);
+    }
+
+    interface CFAllocatorDeallocateCallBack extends Callback {
+
+        void invoke(Pointer ptr, Pointer info);
+    }
+
+    interface CFAllocatorPreferredSizeCallBack extends Callback {
+
+        NativeLong invoke(NativeLong size, NativeLong hint, Pointer info);
+    }
 
     class CFAllocatorContext extends Structure {
 

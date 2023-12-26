@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,13 +28,13 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
 package net.java.games.input.linux;
 
 import java.io.IOException;
 
+import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
@@ -54,26 +48,34 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @version 1.0
  */
-final class LinuxKeyboard extends Keyboard {
+final class LinuxKeyboard extends Keyboard implements LinuxController {
 
     private final PortType port;
     private final LinuxEventDevice device;
 
-    protected LinuxKeyboard(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) throws IOException {
+    LinuxKeyboard(LinuxEventDevice device, Component[] components, Controller[] children, Rumbler[] rumblers) throws IOException {
         super(device.getName(), components, children, rumblers);
         this.device = device;
         this.port = device.getPortType();
     }
 
-    public final PortType getPortType() {
+    @Override
+    public PortType getPortType() {
         return port;
     }
 
-    protected final boolean getNextDeviceEvent(Event event) throws IOException {
-        return LinuxControllers.getNextDeviceEvent(event, device);
+    @Override
+    protected boolean getNextDeviceEvent(Event event) throws IOException {
+        return getNextDeviceEvent(event, device);
     }
 
-    public final void pollDevice() throws IOException {
+    @Override
+    public void pollDevice() throws IOException {
         device.pollKeyStates();
+    }
+
+    @Override
+    public void output(AbstractController.Report report) {
+
     }
 }

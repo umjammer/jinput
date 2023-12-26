@@ -1,11 +1,5 @@
 /*
- * %W% %E%
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-/*****************************************************************************
- * Copyright (c) 2003 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright (c) 2002-2003 Sun Microsystems, Inc.  All Rights Reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -34,14 +28,13 @@
  *
  * You acknowledge that this software is not designed or intended for us in
  * the design, construction, operation or maintenance of any nuclear facility
- *
- *****************************************************************************/
+ */
 
 package net.java.games.input.linux;
 
 import java.io.IOException;
 
-import net.java.games.input.AbstractComponent;
+import net.java.games.input.PollingComponent;
 
 
 /**
@@ -50,7 +43,7 @@ import net.java.games.input.AbstractComponent;
  * @author elias
  * @version 1.0
  */
-class LinuxComponent extends AbstractComponent {
+class LinuxComponent extends PollingComponent {
 
     private final LinuxEventComponent component;
 
@@ -59,22 +52,42 @@ class LinuxComponent extends AbstractComponent {
         this.component = component;
     }
 
+    @Override
     public final boolean isRelative() {
         return component.isRelative();
     }
 
+    @Override
     public final boolean isAnalog() {
         return component.isAnalog();
     }
 
+    @Override
     protected float poll() throws IOException {
-        return convertValue(LinuxControllers.poll(component), component.getDescriptor());
+        return convertValue(poll(component), component.getDescriptor());
+    }
+
+    /** Declared synchronized to protect absInfo */
+    protected float poll(LinuxEventComponent eventComponent) throws IOException {
+        int nativeType = eventComponent.getDescriptor().getType();
+        switch (nativeType) {
+        case NativeDefinitions.EV_KEY:
+            int nativeCode = eventComponent.getDescriptor().getCode();
+            float state = eventComponent.getDevice().isKeySet(nativeCode) ? 1f : 0f;
+            return state;
+        case NativeDefinitions.EV_ABS:
+            eventComponent.getAbsInfo(eventComponent.absInfo);
+            return eventComponent.absInfo.getValue();
+        default:
+            throw new RuntimeException("Unknown nativeType: " + nativeType);
+        }
     }
 
     float convertValue(float value, LinuxAxisDescriptor descriptor) {
         return getComponent().convertValue(value);
     }
 
+    @Override
     public final float getDeadZone() {
         return component.getDeadZone();
     }

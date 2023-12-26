@@ -1,1 +1,1 @@
-net.java.games.input.AWTEnvironmentPlugin
+net.java.games.input.windows.DirectAndRawInputEnvironmentPlugin

@@ -48,52 +48,52 @@ final class LinuxPOV extends LinuxComponent {
 
     private static final Logger log = Logger.getLogger(LinuxPOV.class.getName());
     
-    private final LinuxEventComponent component_x;
-    private final LinuxEventComponent component_y;
+    private final LinuxEventComponent componentX;
+    private final LinuxEventComponent componentY;
 
-    private float last_x;
-    private float last_y;
+    private float lastX;
+    private float lastY;
 
-    public LinuxPOV(LinuxEventComponent component_x, LinuxEventComponent component_y) {
-        super(component_x);
-        this.component_x = component_x;
-        this.component_y = component_y;
+    public LinuxPOV(LinuxEventComponent componentX, LinuxEventComponent componentY) {
+        super(componentX);
+        this.componentX = componentX;
+        this.componentY = componentY;
     }
 
     @Override
     protected float poll() throws IOException {
-        last_x = LinuxControllers.poll(component_x);
-        last_y = LinuxControllers.poll(component_y);
+        lastX = poll(componentX);
+        lastY = poll(componentY);
         return convertValue(0f, null);
     }
 
     @Override
     public float convertValue(float value, LinuxAxisDescriptor descriptor) {
-        if (descriptor == component_x.getDescriptor())
-            last_x = value;
-        if (descriptor == component_y.getDescriptor())
-            last_y = value;
+        if (descriptor == componentX.getDescriptor())
+            lastX = value;
+        if (descriptor == componentY.getDescriptor())
+            lastY = value;
 
-        if (last_x == -1 && last_y == -1)
+        if (lastX == -1 && lastY == -1)
             return Component.POV.UP_LEFT;
-        else if (last_x == -1 && last_y == 0)
+        else if (lastX == -1 && lastY == 0)
             return Component.POV.LEFT;
-        else if (last_x == -1 && last_y == 1)
+        else if (lastX == -1 && lastY == 1)
             return Component.POV.DOWN_LEFT;
-        else if (last_x == 0 && last_y == -1)
+        else if (lastX == 0 && lastY == -1)
             return Component.POV.UP;
-        else if (last_x == 0 && last_y == 0)
+        else if (lastX == 0 && lastY == 0)
             return Component.POV.OFF;
-        else if (last_x == 0 && last_y == 1)
+        else if (lastX == 0 && lastY == 1)
             return Component.POV.DOWN;
-        else if (last_x == 1 && last_y == -1)
+        else if (lastX == 1 && lastY == -1)
             return Component.POV.UP_RIGHT;
-        else if (last_x == 1 && last_y == 0)
+        else if (lastX == 1 && lastY == 0)
             return Component.POV.RIGHT;
-        else if (last_x == 1 && last_y == 1)
+        else if (lastX == 1 && lastY == 1)
             return Component.POV.DOWN_RIGHT;
         else {
-            log.fine("Unknown values x = " + last_x + " | y = " + last_y);
+            log.fine("Unknown values x = " + lastX + " | y = " + lastY);
             return Component.POV.OFF;
         }
     }

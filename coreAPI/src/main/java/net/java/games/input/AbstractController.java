@@ -33,10 +33,10 @@
 package net.java.games.input;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -44,12 +44,6 @@ import java.util.logging.Logger;
  * contains a fixed number of axes, controllers, and rumblers.
  */
 public abstract class AbstractController implements Controller {
-
-    private static final Logger log = Logger.getLogger(AbstractController.class.getName());
-
-    public final static int EVENT_QUEUE_DEPTH = 32;
-
-    private final static Event event = new Event();
 
     /**
      * Human-readable name for this Controller
@@ -74,9 +68,7 @@ public abstract class AbstractController implements Controller {
     /**
      * Map from Component.Identifiers to Components
      */
-    private final Map<Component.Identifier, Component> id_to_components = new HashMap<>();
-
-    private EventQueue event_queue = new EventQueue(EVENT_QUEUE_DEPTH);
+    private final Map<Component.Identifier, Component> idToComponents = new HashMap<>();
 
     /**
      * Protected constructor for a controller containing the specified
@@ -94,7 +86,7 @@ public abstract class AbstractController implements Controller {
         this.rumblers = rumblers;
         // process from last to first to let earlier listed Components get higher priority
         for (int i = components.length - 1; i >= 0; i--) {
-            id_to_components.put(components[i].getIdentifier(), components[i]);
+            idToComponents.put(components[i].getIdentifier(), components[i]);
         }
     }
 
@@ -129,7 +121,7 @@ public abstract class AbstractController implements Controller {
      */
     @Override
     public final Component getComponent(Component.Identifier id) {
-        return id_to_components.get(id);
+        return idToComponents.get(id);
     }
 
     /**
@@ -139,6 +131,24 @@ public abstract class AbstractController implements Controller {
     @Override
     public final Rumbler[] getRumblers() {
         return rumblers;
+    }
+
+    /** */
+    protected boolean isOpen;
+
+    @Override
+    public void open() throws IOException {
+        isOpen = true;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    @Override
+    public void close() throws IOException {
+        isOpen = false;
     }
 
     /**
@@ -184,70 +194,29 @@ public abstract class AbstractController implements Controller {
         return Type.UNKNOWN;
     }
 
-    /**
-     * Creates a new EventQueue. Events in old queue are lost.
-     */
-    @Override
-    public final void setEventQueueSize(int size) {
-        try {
-            setDeviceEventQueueSize(size);
-            event_queue = new EventQueue(size);
-        } catch (IOException e) {
-            log.fine("Failed to create new event queue of size " + size + ": " + e);
-        }
-    }
+    /** input event listeners */
+    private final List<InputEventListener> listeners = new ArrayList<>();
 
     /**
-     * Plugins override this method to adjust their internal event queue size
+     * Adds an input event listener.
      */
-    protected void setDeviceEventQueueSize(int size) throws IOException {
-    }
-
     @Override
-    public final EventQueue getEventQueue() {
-        return event_queue;
+    public void addInputEventListener(InputEventListener listener) {
+        listeners.add(listener);
     }
 
-    protected abstract boolean getNextDeviceEvent(Event event) throws IOException;
-
-    protected void pollDevice() throws IOException {
-        // must override
+    /** fire an event */
+    protected void fireOnInput(InputEvent event) {
+        listeners.forEach(l -> l.onInput(event));
     }
 
-    /* poll() is synchronized to protect the static event */
-    @Override
-    public synchronized boolean poll() {
-        Component[] components = getComponents();
-        try {
-            pollDevice();
-            for (Component item : components) {
-                AbstractComponent component = (AbstractComponent) item;
-                if (component.isRelative()) {
-                    component.setPollData(0);
-                } else {
-                    // Let the component poll itself lazily
-                    component.resetHasPolled();
-                }
-            }
-            while (getNextDeviceEvent(event)) {
-                AbstractComponent component = (AbstractComponent) event.getComponent();
-                float value = event.getValue();
-                if (component.isRelative()) {
-                    if (value == 0)
-                        continue;
-                    component.setPollData(component.getPollData() + value);
-                } else {
-                    if (value == component.getEventValue())
-                        continue;
-                    component.setEventValue(value);
-                }
-                if (!event_queue.isFull())
-                    event_queue.add(event);
-            }
-            return true;
-        } catch (IOException e) {
-            log.log(Level.FINER, "Failed to poll device: " + e.getMessage(), e);
-            return false;
-        }
+    /** */
+    public interface Report {
+
+        /** */
+        void cascadeTo(Rumbler[] rumblers);
     }
+
+    /** */
+    public abstract void output(Report report) throws IOException;
 }

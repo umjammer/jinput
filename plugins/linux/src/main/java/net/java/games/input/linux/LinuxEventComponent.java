@@ -40,30 +40,31 @@ final class LinuxEventComponent {
 
     private final LinuxEventDevice device;
     private final Component.Identifier identifier;
-    private final Controller.Type button_trait;
-    private final boolean is_relative;
+    private final Controller.Type buttonTrait;
+    private final boolean isRelative;
     private final LinuxAxisDescriptor descriptor;
     private final int min;
     private final int max;
     private final int flat;
 
+    final LinuxAbsInfo absInfo = new LinuxAbsInfo();
 
-    public LinuxEventComponent(LinuxEventDevice device, Component.Identifier identifier, boolean is_relative, int native_type, int native_code) throws IOException {
+    public LinuxEventComponent(LinuxEventDevice device, Component.Identifier identifier, boolean isRelative, int nativeType, int nativeCode) throws IOException {
         this.device = device;
         this.identifier = identifier;
-        if (native_type == NativeDefinitions.EV_KEY)
-            this.button_trait = LinuxNativeTypesMap.guessButtonTrait(native_code);
+        if (nativeType == NativeDefinitions.EV_KEY)
+            this.buttonTrait = LinuxNativeTypesMap.guessButtonTrait(nativeCode);
         else
-            this.button_trait = Controller.Type.UNKNOWN;
-        this.is_relative = is_relative;
+            this.buttonTrait = Controller.Type.UNKNOWN;
+        this.isRelative = isRelative;
         this.descriptor = new LinuxAxisDescriptor();
-        descriptor.set(native_type, native_code);
-        if (native_type == NativeDefinitions.EV_ABS) {
-            LinuxAbsInfo.ByReference abs_info = new LinuxAbsInfo.ByReference();
-            getAbsInfo(abs_info);
-            this.min = abs_info.getMin();
-            this.max = abs_info.getMax();
-            this.flat = abs_info.getFlat();
+        descriptor.set(nativeType, nativeCode);
+        if (nativeType == NativeDefinitions.EV_ABS) {
+            LinuxAbsInfo.ByReference absInfo = new LinuxAbsInfo.ByReference();
+            getAbsInfo(absInfo);
+            this.min = absInfo.getMin();
+            this.max = absInfo.getMax();
+            this.flat = absInfo.getFlat();
         } else {
             this.min = Integer.MIN_VALUE;
             this.max = Integer.MAX_VALUE;
@@ -71,37 +72,37 @@ final class LinuxEventComponent {
         }
     }
 
-    public final LinuxEventDevice getDevice() {
+    public LinuxEventDevice getDevice() {
         return device;
     }
 
-    public final void getAbsInfo(LinuxAbsInfo abs_info) throws IOException {
+    public void getAbsInfo(LinuxAbsInfo absInfo) throws IOException {
         assert descriptor.getType() == NativeDefinitions.EV_ABS;
-        device.getAbsInfo(descriptor.getCode(), abs_info);
+        device.getAbsInfo(descriptor.getCode(), absInfo);
     }
 
-    public final Controller.Type getButtonTrait() {
-        return button_trait;
+    public Controller.Type getButtonTrait() {
+        return buttonTrait;
     }
 
-    public final Component.Identifier getIdentifier() {
+    public Component.Identifier getIdentifier() {
         return identifier;
     }
 
-    public final LinuxAxisDescriptor getDescriptor() {
+    public LinuxAxisDescriptor getDescriptor() {
         return descriptor;
     }
 
-    public final boolean isRelative() {
-        return is_relative;
+    public boolean isRelative() {
+        return isRelative;
     }
 
-    public final boolean isAnalog() {
+    public boolean isAnalog() {
         return identifier instanceof Component.Identifier.Axis && identifier != Component.Identifier.Axis.POV;
     }
 
-    final float convertValue(float value) {
-        if (identifier instanceof Component.Identifier.Axis && !is_relative) {
+    float convertValue(float value) {
+        if (identifier instanceof Component.Identifier.Axis && !isRelative) {
             // Some axes have min = max = 0
             if (min == max)
                 return 0;
@@ -115,7 +116,7 @@ final class LinuxEventComponent {
         }
     }
 
-    final float getDeadZone() {
+    float getDeadZone() {
         return flat / (2f * (max - min));
     }
 }

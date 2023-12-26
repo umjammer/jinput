@@ -46,6 +46,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Popup;
 import javax.swing.WindowConstants;
 
 
@@ -65,11 +66,11 @@ public class ControllerReadTest extends JFrame {
 
         @Serial
         private static final long serialVersionUID = -2117191506803328790L;
-        transient Component axis;
+        transient PollingComponent axis;
         float data;
 
         public AxisPanel(Component ax) {
-            axis = ax;
+            axis = (PollingComponent) ax;
             setLayout(new BorderLayout());
             add(new JLabel(ax.getName() + "(" + ax.getIdentifier() + ")"),
                     BorderLayout.NORTH);
@@ -188,14 +189,14 @@ public class ControllerReadTest extends JFrame {
 
         @Serial
         private static final long serialVersionUID = 5812903945250431578L;
-        transient Controller ca;
+        transient PollingController ca;
         transient List<AxisPanel> axisList = new ArrayList<>();
         boolean disabled = false;
 
         public ControllerWindow(JFrame frame, Controller ca) {
             super(ca.getName());
             this.setName(ca.getName());
-            this.ca = ca;
+            this.ca = (PollingController) ca;
             Container c = this.getContentPane();
             c.setLayout(new BorderLayout());
             Component[] components = ca.getComponents();

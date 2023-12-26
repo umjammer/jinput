@@ -32,12 +32,13 @@
 
 package net.java.games.input;
 
+
 /**
  * A Keyboard is a type of controller consisting of a single controller,
  * they keypad, which contains several axes (the keys).  By default, all keys
  * are set to receive polling data.
  */
-public abstract class Keyboard extends AbstractController {
+public abstract class Keyboard extends PollingController {
 
     /**
      * Protected constructor.
@@ -57,8 +58,8 @@ public abstract class Keyboard extends AbstractController {
         return Type.KEYBOARD;
     }
 
-    public final boolean isKeyDown(Component.Identifier.Key key_id) {
-        Component key = getComponent(key_id);
+    public final boolean isKeyDown(Component.Identifier.Key keyId) {
+        PollingComponent key = (PollingComponent) getComponent(keyId);
         if (key == null)
             return false;
         return key.getPollData() != 0;

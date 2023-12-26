@@ -32,6 +32,7 @@
 
 package net.java.games.input;
 
+
 /**
  * A Rumbler is a controller's mechanism for delivering feedback
  * to the user through the device.
@@ -39,21 +40,22 @@ package net.java.games.input;
 public interface Rumbler {
 
     /**
-     * Rumble with the specified intensity.
+     * set the specified value.
+     * if you want to rumble, use {@link AbstractController#output(AbstractController.Report)}
      */
-    void rumble(float intensity);
+    void setValue(float value);
 
     /**
-     * Get the string name of the axis the rumbler is attached to
+     * Get the string name of the output the rumbler is attached to
      *
-     * @return The axis name
+     * @return The output name
      */
-    String getAxisName();
+    String getOutputName();
 
     /**
      * Get the axis identifier the rumbler is attached to
      *
      * @return The axis identifier
      */
-    Component.Identifier getAxisIdentifier();
+    Component.Identifier getOutputIdentifier();
 }

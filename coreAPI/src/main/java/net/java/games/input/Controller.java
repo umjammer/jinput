@@ -32,12 +32,19 @@
 
 package net.java.games.input;
 
+import java.io.IOException;
+
+
 /**
  * A Controller represents a physical device, such as a keyboard, mouse,
  * or joystick, or a logical grouping of related controls, such as a button
  * pad or mouse ball.  A controller can be composed of multiple controllers.
  * For example, the ball of a mouse and its buttons are two separate
  * controllers.
+ * <ul>
+ *  <li>don't start event listener system in the constructor.</li>
+ *  <li>start event listener system in {@link #open} method.</li>
+ * </ul>
  */
 public interface Controller {
 
@@ -78,21 +85,22 @@ public interface Controller {
     Rumbler[] getRumblers();
 
     /**
-     * Polls axes for data.  Returns false if the controller is no longer valid.
-     * Polling reflects the current state of the device when polled.
+     * Starts the device.
+     * for start event listener system.
      */
-    boolean poll();
+    void open() throws IOException;
 
     /**
-     * Initialized the controller event queue to a new size. Existing events
-     * in the queue are lost.
+     * Tell the device is open.
+     * event listener system is working.
      */
-    void setEventQueueSize(int size);
+    boolean isOpen();
 
     /**
-     * Get the device event queue
+     * Closes the device.
+     * for start event listener system.
      */
-    EventQueue getEventQueue();
+    void close() throws IOException;
 
     /**
      * Returns the port type for this Controller.
@@ -108,6 +116,11 @@ public interface Controller {
      * Returns a human-readable name for this Controller.
      */
     String getName();
+
+    /**
+     * Adds a input event listener.
+     */
+    void addInputEventListener(InputEventListener listener);
 
     /**
      * Types of controller objects.

@@ -32,9 +32,11 @@
 
 package net.java.games.input;
 
+
 /**
  * A FIFO queue for input events.
  */
+@Deprecated
 public final class EventQueue {
 
     private final Event[] queue;

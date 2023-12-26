@@ -22,6 +22,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import vavix.rococoa.corefoundation.CFAllocator;
+import vavix.rococoa.corefoundation.CFArray;
 import vavix.rococoa.corefoundation.CFDictionary;
 import vavix.rococoa.corefoundation.CFIndex;
 import vavix.rococoa.corefoundation.CFLib;
@@ -31,7 +32,8 @@ import vavix.rococoa.corefoundation.CFType;
 
 
 /**
- * IOKitLib.
+ * The IOKit framework implements nonkernel access to IOKit objects such drivers and nubs through the device-interface
+ * mechanism.
  *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-09-22 nsano initial version <br>
@@ -99,20 +101,54 @@ public interface IOKitLib extends Library {
 
     String kIOHIDDeviceKey = "IOHIDDevice";
     String kIOServicePlane = "IOService";
-    String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
+    String kIOHIDReportDescriptorKey = "ReportDescriptor";
+
+    String kIOHIDTransportKey = "Transport";
     String kIOHIDVendorIDKey = "VendorID";
+    String kIOHIDVendorIDSourceKey = "VendorIDSource";
     String kIOHIDProductIDKey = "ProductID";
-    String kIOHIDMaxInputReportSizeKey = "MaxInputReportSize";
-    String kIOHIDSerialNumberKey = "SerialNumber";
+    String kIOHIDVersionNumberKey = "VersionNumber";
     String kIOHIDManufacturerKey = "Manufacturer";
     String kIOHIDProductKey = "Product";
-    String kIOHIDVersionNumberKey = "VersionNumber";
-    String kIOHIDTransportKey = "Transport";
-    String kIOHIDDeviceUsagePageKey = "DeviceUsagePage";
+    String kIOHIDSerialNumberKey = "SerialNumber";
+    String kIOHIDCountryCodeKey = "CountryCode";
+    String kIOHIDLocationIDKey = "LocationID";
     String kIOHIDDeviceUsageKey = "DeviceUsage";
-    String kIOHIDPrimaryUsagePageKey = "PrimaryUsagePage";
+    String kIOHIDDeviceUsagePageKey = "DeviceUsagePage";
+    String kIOHIDDeviceUsagePairsKey = "DeviceUsagePairs";
     String kIOHIDPrimaryUsageKey = "PrimaryUsage";
-    String kIOHIDReportDescriptorKey = "ReportDescriptor";
+    String kIOHIDPrimaryUsagePageKey = "PrimaryUsagePage";
+    String kIOHIDMaxInputReportSizeKey = "MaxInputReportSize";
+    String kIOHIDMaxOutputReportSizeKey = "MaxOutputReportSize";
+    String kIOHIDMaxFeatureReportSizeKey = "MaxFeatureReportSize";
+
+    String kIOHIDElementKey = "Elements";
+
+    String kIOHIDElementCookieKey = "ElementCookie";
+    String kIOHIDElementTypeKey = "Type";
+    String kIOHIDElementCollectionTypeKey = "CollectionType";
+    String kIOHIDElementUsageKey = "Usage";
+    String kIOHIDElementUsagePageKey = "UsagePage";
+    String kIOHIDElementMinKey = "Min";
+    String kIOHIDElementMaxKey = "Max";
+    String kIOHIDElementScaledMinKey = "ScaledMin";
+    String kIOHIDElementScaledMaxKey = "ScaledMax";
+    String kIOHIDElementSizeKey = "Size";
+    String kIOHIDElementReportSizeKey = "ReportSize";
+    String kIOHIDElementReportCountKey = "ReportCount";
+    String kIOHIDElementReportIDKey = "ReportID";
+    String kIOHIDElementIsArrayKey = "IsArray";
+    String kIOHIDElementIsRelativeKey = "IsRelative";
+    String kIOHIDElementIsWrappingKey = "IsWrapping";
+    String kIOHIDElementIsNonLinearKey = "IsNonLinear";
+    String kIOHIDElementHasPreferredStateKey = "HasPreferredState";
+    String kIOHIDElementHasNullStateKey = "HasNullState";
+    String kIOHIDElementUnitKey = "Unit";
+    String kIOHIDElementUnitExponentKey = "UnitExponent";
+    String kIOHIDElementNameKey = "Name";
+    String kIOHIDElementValueLocationKey = "ValueLocation";
+    String kIOHIDElementDuplicateIndexKey = "DuplicateIndex";
+    String kIOHIDElementParentCollectionKey = "ParentCollection";
 
     /** @see "https://opensource.apple.com/source/IOHIDFamily/IOHIDFamily-1035.1.4/IOHIDFamily/IOHIDKeys.h" */
     String kIOHIDTransportUSBValue = "USB";
@@ -120,7 +156,7 @@ public interface IOKitLib extends Library {
     String kIOHIDTransportI2CValue = "I2C";
     String kIOHIDTransportSPIValue = "SPI";
 
-    /** @see "https://opensource.apple.com/source/IOHIDFamily/IOHIDFamily-86/IOHIDLib/IOHIDLib.h.auto.html" */
+    // @see "https://opensource.apple.com/source/IOHIDFamily/IOHIDFamily-86/IOHIDLib/IOHIDLib.h.auto.html"
 
     Pointer/* CFUUIDRef */ kIOHIDDeviceUserClientTypeID = CFLib.INSTANCE.CFUUIDCreateFromString(CFAllocator.kCFAllocatorDefault,
             CFString.buildString("FA12FA38-6F1A-11D4-BA0C-0005028F18D5"));
@@ -132,80 +168,146 @@ public interface IOKitLib extends Library {
     Pointer/* CFUUIDRef */ kIOCFPlugInInterfaceID = CFLib.INSTANCE.CFUUIDCreateFromString(CFAllocator.kCFAllocatorDefault,
             CFString.buildString("C244E858-109C-11D4-91D4-0050E4C6426F"));
 
+    int kIOHIDElementTypeInput_Misc = 1;
+    int kIOHIDElementTypeInput_Button = 2;
+    int kIOHIDElementTypeInput_Axis = 3;
+
+    int kHIDPage_GenericDesktop = 0x01;
+
+    int kHIDUsage_GD_Joystick = 0x04;
+    int kHIDUsage_GD_GamePad = 0x05;
+    int kHIDUsage_GD_MultiAxisController = 0x08;
+    int kHIDUsage_GD_Hatswitch = 0x39;
+
+    /** Returns the element value associated with this IOHIDValueRef. */
+    Pointer /* IOHIDElementRef */ IOHIDValueGetElement(Pointer /* IOHIDValueRef */ value);
+
+    /** Returns the size, in bytes, of the value contained in this IOHIDValueRef. */
+    CFIndex IOHIDValueGetLength(Pointer /* IOHIDValueRef */ value);
+
+    /** Returns the timestamp value contained in this IOHIDValueRef. */
+    long IOHIDValueGetTimeStamp(Pointer /* IOHIDValueRef */ value);
+
+    /** Returns an integer representaion of the value contained in this IOHIDValueRef. */
+    CFIndex IOHIDValueGetIntegerValue(Pointer /* IOHIDValueRef */ value);
+
+    /** Retrieves the cookie for the element. */
+    int /* IOHIDElementCookie */ IOHIDElementGetCookie(Pointer /* IOHIDElementRef */ element);
+
+    /** Retrieves the type for the element. */
+    int /* IOHIDElementType */ IOHIDElementGetType(Pointer /* IOHIDElementRef */ element);
+
+    /** Returns the minimum value possible for the element. */
+    CFIndex IOHIDElementGetLogicalMin(Pointer /* IOHIDElementRef */ element);
+
+    /** Returns the maximum value possible for the element. */
+    CFIndex IOHIDElementGetLogicalMax(Pointer /* IOHIDElementRef */ element);
+
+    /** Returns the null state property for the element. */
+    boolean IOHIDElementHasNullState(Pointer /* IOHIDElementRef */ element);
+
+    /** Retrieves the usage for an element. */
+    int IOHIDElementGetUsage(Pointer /* IOHIDElementRef */ element);
+
     /** Creates an IOHIDManager object. */
-    Pointer /*IOHIDManagerRef*/ IOHIDManagerCreate(CFAllocator allocator, int /*IOOptionBits*/ options);
+    Pointer /* IOHIDManagerRef */ IOHIDManagerCreate(CFAllocator allocator, int /* IOOptionBits */ options);
+
+    /** Opens the IOHIDManager. */
+    int /* IOReturn */ IOHIDManagerOpen(Pointer /* IOHIDManagerRef */ manager, int /* IOOptionBits */ options);
 
     /** Closes the IOHIDManager. */
-    int /*IOReturn*/ IOHIDManagerClose(Pointer/*IOHIDManagerRef*/ manager, int /*IOOptionBits*/ options);
+    int /* IOReturn */ IOHIDManagerClose(Pointer /* IOHIDManagerRef */ manager, int /* IOOptionBits */ options);
 
     /** Obtains currently enumerated devices. */
-    CFType /*CFSetRef*/ IOHIDManagerCopyDevices(Pointer/*IOHIDManagerRef*/ manager);
+    CFType /* CFSetRef */ IOHIDManagerCopyDevices(Pointer /* IOHIDManagerRef */ manager);
 
     /** Sets matching criteria for device enumeration. */
-    void IOHIDManagerSetDeviceMatching(Pointer /*IOHIDManagerRef*/ manager, CFDictionary matching);
+    void IOHIDManagerSetDeviceMatching(Pointer /* IOHIDManagerRef */ manager, CFDictionary matching);
 
     /** Schedules HID manager with run loop. */
-    void IOHIDManagerScheduleWithRunLoop(Pointer/*IOHIDManagerRef*/ manager, CFRunLoop runLoop, CFString runLoopMode);
+    void IOHIDManagerScheduleWithRunLoop(Pointer /* IOHIDManagerRef */ manager, CFRunLoop runLoop, CFString runLoopMode);
+
+    /** Sets multiple matching criteria for device enumeration. */
+    void IOHIDManagerSetDeviceMatchingMultiple(Pointer /* IOHIDManagerRef */ manager, CFArray multiple);
+
+    interface IOHIDDeviceCallback extends Callback {
+        void apply(Pointer context, int /* IOReturn */ result, Pointer sender, Pointer /* IOHIDDeviceRef */ device);
+    }
+
+    /** Registers a callback to be used a device is enumerated. */
+    void IOHIDManagerRegisterDeviceMatchingCallback(Pointer /* IOHIDManagerRef */ manager, IOHIDDeviceCallback callback, Structure.ByReference context);
+
+    /** Registers a callback to be used when any enumerated device is removed. */
+    void IOHIDManagerRegisterDeviceRemovalCallback(Pointer /* IOHIDManagerRef */ manager, IOHIDDeviceCallback callback, Structure.ByReference context);
+
+    /** Unschedules HID manager with run loop. */
+    void IOHIDManagerUnscheduleFromRunLoop(Pointer /* IOHIDManagerRef */ manager, CFRunLoop runLoop, CFString runLoopMode);
 
     /** Registers a callback to be used when an input report is issued by the device. */
-    void IOHIDDeviceRegisterInputReportCallback(Pointer/*IOHIDDeviceRef*/ device, Pointer report, CFIndex reportLength, IOHIDReportCallback callback, Structure.ByReference context);
+    void IOHIDDeviceRegisterInputReportCallback(Pointer /* IOHIDDeviceRef */ device, Pointer report, CFIndex reportLength, IOHIDReportCallback callback, Structure.ByReference context);
 
     /** Registers a callback to be used when a IOHIDDevice is removed. */
-    void IOHIDDeviceRegisterRemovalCallback(Pointer/*IOHIDDeviceRef*/ device, IOHIDCallback callback, Structure.ByReference context);
+    void IOHIDDeviceRegisterRemovalCallback(Pointer /* IOHIDDeviceRef */ device, IOHIDCallback callback, Structure.ByReference context);
 
     /** Unschedules HID device with run loop. */
-    void IOHIDDeviceUnscheduleFromRunLoop(Pointer/*IOHIDDeviceRef*/ device, CFRunLoop runLoop, CFString runLoopMode);
+    void IOHIDDeviceUnscheduleFromRunLoop(Pointer /* IOHIDDeviceRef */ device, CFRunLoop runLoop, CFString runLoopMode);
 
     /** Schedules HID device with run loop. */
-    void IOHIDDeviceScheduleWithRunLoop(Pointer /*IOHIDDeviceRef*/ device, CFRunLoop runLoop, CFString runLoopMode);
+    void IOHIDDeviceScheduleWithRunLoop(Pointer /* IOHIDDeviceRef */ device, CFRunLoop runLoop, CFString runLoopMode);
 
     /** Creates an element from an io_service_t. */
-    Pointer /*IOHIDDeviceRef*/ IOHIDDeviceCreate(CFAllocator allocator, Pointer/*io_service_t*/ service);
+    Pointer /* IOHIDDeviceRef */ IOHIDDeviceCreate(CFAllocator allocator, Pointer /* io_service_t */ service);
 
     /** Opens a HID device for communication. */
-    int /*IOReturn*/ IOHIDDeviceOpen(Pointer /*IOHIDDeviceRef*/ device, int /*IOOptionBits*/ options);
+    int /* IOReturn */ IOHIDDeviceOpen(Pointer /* IOHIDDeviceRef */ device, int /* IOOptionBits */ options);
 
     /** Closes communication with a HID device. */
-    int /*IOReturn*/ IOHIDDeviceClose(Pointer/*IOHIDDeviceRef*/ device, int/*IOOptionBits*/ options);
+    int /* IOReturn */ IOHIDDeviceClose(Pointer /* IOHIDDeviceRef */ device, int /* IOOptionBits */ options);
 
     /** Sends a report to the device. */
-    int /*IOReturn*/ IOHIDDeviceSetReport(Pointer/*IOHIDDeviceRef*/ device, int /*IOHIDReportType*/ reportType, CFIndex reportID, byte[] report, CFIndex reportLength);
+    int /* IOReturn */ IOHIDDeviceSetReport(Pointer /* IOHIDDeviceRef */ device, int /* IOHIDReportType */ reportType, CFIndex reportID, byte[] report, CFIndex reportLength);
 
     /** Obtains a report from the device. */
-    int/*IOReturn*/ IOHIDDeviceGetReport(Pointer/*IOHIDDeviceRef*/ device, int/*IOHIDReportType*/ reportType, CFIndex reportID, byte[] report, CFIndex[] pReportLength);
+    int /* IOReturn */ IOHIDDeviceGetReport(Pointer /* IOHIDDeviceRef */ device, int /* IOHIDReportType */ reportType, CFIndex reportID, byte[] report, CFIndex[] pReportLength);
 
     /** Returns the io_service_t for an IOHIDDevice, if it has one. */
-    Pointer/*io_service_t*/ IOHIDDeviceGetService(Pointer/*IOHIDDeviceRef*/ device);
+    Pointer /* io_service_t */ IOHIDDeviceGetService(Pointer /* IOHIDDeviceRef */ device);
 
     /** Obtains a property from an IOHIDDevice. */
-    CFType IOHIDDeviceGetProperty(Pointer/*IOHIDDeviceRef*/ device, CFString key);
+    CFType IOHIDDeviceGetProperty(Pointer /* IOHIDDeviceRef */ device, CFString key);
+
+    /** Obtains HID elements that match the criteria contained in the matching dictionary. */
+    CFArray IOHIDDeviceCopyMatchingElements(Pointer /* IOHIDDeviceRef */ device, CFDictionary matching, int /* IOOptionBits */ options);
+
+    /** Registers a callback to be used when an input value is issued by the device. */
+    void IOHIDDeviceRegisterInputValueCallback(Pointer /* IOHIDDeviceRef */ device, IOHIDValueCallback callback, Structure.ByReference context);
 
     interface IOHIDCallback extends Callback {
 
-        void invoke(Pointer context, int/*IOReturn*/ result, Pointer sender);
+        void invoke(Pointer context, int /* IOReturn */ result, Pointer sender);
     }
 
     interface IOHIDCallbackFunction extends Callback {
 
-        void invoke(Pointer target, int/*IOReturn*/ result, Pointer refcon, Pointer sender);
+        void invoke(Pointer target, int /* IOReturn */ result, Pointer refcon, Pointer sender);
     }
 
     interface IOHIDValueCallback extends Callback {
 
-        void invoke(Pointer context, int/*IOReturn*/ result, Pointer sender, Pointer/*IOHIDValueRef*/ value);
+        void invoke(Pointer context, int /* IOReturn */ result, Pointer sender, Pointer /* IOHIDValueRef */ value);
     }
 
     interface IOHIDReportCallback extends Callback {
 
-        void invoke(Pointer context, int/*IOReturn*/ result, Pointer sender, int /*IOHIDReportType*/ type, int reportID, Pointer report, CFIndex reportLength);
+        void invoke(Pointer context, int /* IOReturn */ result, Pointer sender, int /* IOHIDReportType */ type, int reportID, Pointer report, CFIndex reportLength);
     }
 
     class IOHIDEventStruct extends Structure {
 
-        public int/*IOHIDElementType*/ type;
-        public int/*IOHIDElementCookie*/ elementCookie;
+        public int /* IOHIDElementType */ type;
+        public int /* IOHIDElementCookie */ elementCookie;
         public int value;
-        public long/*AbsoluteTime*/ timestamp;
+        public long /* AbsoluteTime */ timestamp;
         public int longValueSize;
         public Pointer longValue;
 
@@ -217,11 +319,9 @@ public interface IOKitLib extends Library {
         }
 
         public static class ByReference extends IOHIDEventStruct implements Structure.ByReference {
-
         }
 
         public static class ByValue extends IOHIDEventStruct implements Structure.ByValue {
-
         }
 
         @Override
@@ -246,12 +346,12 @@ public interface IOKitLib extends Library {
 
         public interface GetAsyncEventSourceCallback extends Callback {
 
-            int invoke(Pointer self, PointerByReference/*CFTypeRef */ pSource);
+            int invoke(Pointer self, PointerByReference /* CFTypeRef */ pSource);
         }
 
         public interface SetDepthCallback extends Callback {
 
-            int invoke(Pointer self, int depth, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, int depth, int /* IOOptionBits */ options);
         }
 
         public interface GetDepthCallback extends Callback {
@@ -261,27 +361,27 @@ public interface IOKitLib extends Library {
 
         public interface AddElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDElementRef*/ element, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, Pointer /* IOHIDElementRef */ element, int /* IOOptionBits */ options);
         }
 
         public interface RemoveElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /*IOHIDElementRef*/ element, int /*IOOptionBits*/ options);
+            int invoke(Pointer self, Pointer /* IOHIDElementRef */ element, int /* IOOptionBits */ options);
         }
 
         public interface ContainsElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /*IOHIDElementRef*/ element, IntByReference /*Boolean*/pValue, int /*IOOptionBits*/ options);
+            int invoke(Pointer self, Pointer /* IOHIDElementRef */ element, IntByReference /* Boolean */ pValue, int /* IOOptionBits */ options);
         }
 
         public interface StartCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOOptionBits*/ options);
+            int invoke(Pointer self, int /* IOOptionBits */ options);
         }
 
         public interface StopCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOOptionBits*/ options);
+            int invoke(Pointer self, int /* IOOptionBits */ options);
         }
 
         public interface SetValueAvailableCallbackCallback extends Callback {
@@ -291,7 +391,7 @@ public interface IOKitLib extends Library {
 
         public interface CopyNextValueCallback extends Callback {
 
-            int invoke(Pointer self, PointerByReference/*IOHIDValueRef*/ pValue, int timeout, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, PointerByReference /* IOHIDValueRef */ pValue, int timeout, int /* IOOptionBits */ options);
         }
 
         // IUNKNOWN_C_GUTS
@@ -369,12 +469,12 @@ public interface IOKitLib extends Library {
 
         public interface OpenCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOOptionBits*/options);
+            int invoke(Pointer self, int /* IOOptionBits */ options);
         }
 
         public interface CloseCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOOptionBits*/options);
+            int invoke(Pointer self, int /* IOOptionBits */options);
         }
 
         public interface GetPropertyCallback extends Callback {
@@ -389,40 +489,40 @@ public interface IOKitLib extends Library {
 
         public interface GetAsyncEventSourceCallback extends Callback {
 
-            Pointer invoke(Pointer self, PointerByReference/*CFTypeRef*/ pSource);
+            Pointer invoke(Pointer self, PointerByReference /* CFTypeRef */ pSource);
         }
 
         public interface CopyMatchingElementsCallback extends Callback {
 
-            int invoke(Pointer self, CFDictionary matchingDict, PointerByReference/*CFArrayRef*/ pElements, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, CFDictionary matchingDict, PointerByReference /* CFArrayRef */ pElements, int /* IOOptionBits */ options);
         }
 
         public interface SetValueCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDElementRef*/ element, Pointer/*IOHIDValueRef*/ value,
-                       int timeout, IOHIDValueCallback callback, Pointer context, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, Pointer /* IOHIDElementRef */ element, Pointer /* IOHIDValueRef*/ value,
+                       int timeout, IOHIDValueCallback callback, Pointer context, int /* IOOptionBits*/ options);
         }
 
         public interface GetValueCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDElementRef*/ element, PointerByReference/*IOHIDValueRef*/ pValue,
-                       int timeout, IOHIDValueCallback callback, Pointer context, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, Pointer /* IOHIDElementRef */ element, PointerByReference /* IOHIDValueRef */ pValue,
+                       int timeout, IOHIDValueCallback callback, Pointer context, int /* IOOptionBits */ options);
         }
 
         public interface SetInputReportCallbackCallback extends Callback {
 
             int invoke(Pointer self, byte[] report, CFIndex reportLength,
-                       IOHIDReportCallback callback, Pointer context, int /*IOOptionBits*/ options);
+                       IOHIDReportCallback callback, Pointer context, int /* IOOptionBits */ options);
         }
 
         public interface SetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDReportType*/ reportType, int reportID, Pointer report, CFIndex reportLength, int timeout, IOHIDReportCallback callback, Pointer context, int options);
+            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer report, CFIndex reportLength, int timeout, IOHIDReportCallback callback, Pointer context, int options);
         }
 
         public interface GetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDReportType*/ reportType, int reportID, Pointer report, PointerByReference/*CFIndex*/ pReportLength, int timeout, IOHIDReportCallback callback, Pointer context, int options);
+            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer report, PointerByReference /* CFIndex */ pReportLength, int timeout, IOHIDReportCallback callback, Pointer context, int options);
         }
 
         // IUNKNOWN_C_GUTS
@@ -493,24 +593,24 @@ public interface IOKitLib extends Library {
 
         public interface ReportCallbackFunction extends Callback {
 
-            void invoke(Pointer target, int /*IOReturn*/ result, Pointer refcon, Pointer sender, int bufferSize);
+            void invoke(Pointer target, int /* IOReturn */ result, Pointer refcon, Pointer sender, int bufferSize);
         }
 
         public interface ElementCallbackFunction extends Callback {
 
-            void invoke(Pointer target, int /*IOReturn*/ result, Pointer refcon, Pointer sender, int/*IOHIDElementCookie*/ elementCookie);
+            void invoke(Pointer target, int /* IOReturn */ result, Pointer refcon, Pointer sender, int /* IOHIDElementCookie */ elementCookie);
         }
 
         //
 
         public interface CreateAsyncEventSourceCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /* CFRunLoopSourceRef */source);
+            int invoke(Pointer self, Pointer /* CFRunLoopSourceRef */ source);
         }
 
         public interface GetAsyncEventSourceCallback extends Callback {
 
-            Pointer /* CFRunLoopSourceRef*/ invoke(Pointer self);
+            Pointer /* CFRunLoopSourceRef */ invoke(Pointer self);
         }
 
         public interface CreateAsyncPortCallback extends Callback {
@@ -525,7 +625,7 @@ public interface IOKitLib extends Library {
 
         public interface OpenCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOOptionBits*/flags);
+            int invoke(Pointer self, int /* IOOptionBits */ flags);
         }
 
         public interface CloseCallback extends Callback {
@@ -540,17 +640,17 @@ public interface IOKitLib extends Library {
 
         public interface GetElementValueCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /*IOHIDElementCookie*/ elementCookie, IOHIDEventStruct.ByReference valueEvent);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, IOHIDEventStruct.ByReference valueEvent);
         }
 
         public interface SetElementValueCallback extends Callback {
 
-            int invoke(Pointer self, int/*IOHIDElementCookie*/ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         public interface QueryElementValueCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDElementCookie*/ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, IOHIDEventStruct.ByReference valueEvent, int timeoutMS, ElementCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         public interface StartAllQueuesCallback extends Callback {
@@ -570,32 +670,32 @@ public interface IOKitLib extends Library {
 
         public interface AllocOutputTransactionCallback extends Callback {
 
-            PointerByReference/*IOHIDOutputTransactionInterface.ByReference*/ invoke(Pointer self);
+            PointerByReference /* IOHIDOutputTransactionInterface.ByReference */ invoke(Pointer self);
         }
 
         // since 1.2.1
 
         public interface SetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDReportType*/ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         public interface GetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /*IOHIDReportType*/ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         // since 1.2.2
 
         public interface CopyMatchingElementsCallback extends Callback {
 
-            int invoke(Pointer self, CFDictionary matchingDict, PointerByReference/*CFArrayRef*/ pElements, int/*IOOptionBits*/ options);
+            int invoke(Pointer self, CFDictionary matchingDict, PointerByReference /* CFArrayRef */ pElements, int /* IOOptionBits */ options);
         }
 
         public interface SetInputReportCallbackCallback extends Callback {
 
             int invoke(Pointer self, Pointer report, CFIndex reportLength,
-                       IOHIDReportCallback callback, Pointer context, int /*IOOptionBits*/ options);
+                       IOHIDReportCallback callback, Pointer context, int /* IOOptionBits */ options);
         }
 
         // IUNKNOWN_C_GUTS
@@ -662,11 +762,9 @@ log.finer("IOHIDDeviceInterface:\n" + this);
         }
 
         public static class ByReference extends IOHIDDeviceInterface implements Structure.ByReference {
-
         }
 
         public static class ByValue extends IOHIDDeviceInterface implements Structure.ByValue {
-
         }
 
         @Override
@@ -689,22 +787,22 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface CreateAsyncEventSourceCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*CFRunLoopSourceRef*/ source);
+            int invoke(Pointer self, Pointer /* CFRunLoopSourceRef */ source);
         }
 
         public interface GetAsyncEventSourceCallback extends Callback {
 
-            int invoke(Pointer self, PointerByReference/*CFTypeRef */ pSource);
+            int invoke(Pointer self, PointerByReference /* CFTypeRef */ pSource);
         }
 
         public interface CreateAsyncPortCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*mach_port_t*/port);
+            int invoke(Pointer self, Pointer /* mach_port_t */ port);
         }
 
         public interface GetAsyncPortCallback extends Callback {
 
-            Pointer/*mach_port_t*/ invoke(Pointer self);
+            Pointer /* mach_port_t */ invoke(Pointer self);
         }
 
         public interface CreateCallback extends Callback {
@@ -719,17 +817,17 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface AddElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDElementCookie*/ elementCookie, int/*IOOptionBits*/ flags);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, int /* IOOptionBits */ flags);
         }
 
         public interface RemoveElementCallback extends Callback {
 
-            int invoke(Pointer self, Pointer /*IOHIDElementCookie*/ elementCookie, int /*IOOptionBits*/ flags);
+            int invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie, int /* IOOptionBits */ flags);
         }
 
         public interface HasElementCallback extends Callback {
 
-            boolean invoke(Pointer self, int/*IOHIDElementCookie*/ elementCookie);
+            boolean invoke(Pointer self, int /* IOHIDElementCookie */ elementCookie);
         }
 
         public interface StartCallback extends Callback {
@@ -744,7 +842,7 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface GetNextEventCallback extends Callback {
 
-            int invoke(Pointer self, IOHIDEventStruct.ByReference event, long/*AbsoluteTime*/ maxTime, int timeoutMS);
+            int invoke(Pointer self, IOHIDEventStruct.ByReference event, long /* AbsoluteTime */ maxTime, int timeoutMS);
         }
 
         public interface SetEventCalloutCallback extends Callback {
@@ -754,7 +852,7 @@ log.finer("IOHIDDeviceInterface:\n" + this);
 
         public interface GetEventCalloutCallback extends Callback {
 
-            int invoke(Pointer self, Pointer/*IOHIDCallbackFunction*/ outCallback, PointerByReference outCallbackTarget, PointerByReference outCallbackRefcon);
+            int invoke(Pointer self, Pointer/* IOHIDCallbackFunction */ outCallback, PointerByReference outCallbackTarget, PointerByReference outCallbackRefcon);
         }
 
         // IUNKNOWN_C_GUTS
@@ -871,28 +969,28 @@ log.finer("IOHIDQueueInterface:\n" + this);
 
 //#region PlugIn
 
-    int /*kern_return_t*/ IOCreatePlugInInterfaceForService(
-            Pointer/*io_service_t*/ service,
-            Pointer/*CFUUIDRef*/ pluginType,
-            Pointer/*CFUUIDRef*/ interfaceType,
-            PointerByReference/*IOCFPlugInInterface*/theInterface,
+    int /* kern_return_t */ IOCreatePlugInInterfaceForService(
+            Pointer /* io_service_t */ service,
+            Pointer /* CFUUIDRef */ pluginType,
+            Pointer /* CFUUIDRef */ interfaceType,
+            PointerByReference /* IOCFPlugInInterface */ theInterface,
             IntByReference theScore);
 
     // https://opensource.apple.com/source/CF/CF-635/CFPlugInCOM.h.auto.html
 
     interface QueryInterfaceCallback extends Callback {
 
-        int /*HRESULT*/ invoke(Pointer thisPointer, CFLib.CFUUIDBytes.ByValue iid, PointerByReference ppv);
+        int /* HRESULT */ invoke(Pointer thisPointer, CFLib.CFUUIDBytes.ByValue iid, PointerByReference ppv);
     }
 
     interface AddRefCallback extends Callback {
 
-        NativeLong /*ULONG*/ invoke(Pointer thisPointer);
+        NativeLong /* ULONG */ invoke(Pointer thisPointer);
     }
 
     interface ReleaseCallback extends Callback {
 
-        NativeLong /*ULONG*/ invoke(Pointer thisPointer);
+        NativeLong /* ULONG */ invoke(Pointer thisPointer);
     }
 
     /**
@@ -905,12 +1003,12 @@ log.finer("IOHIDQueueInterface:\n" + this);
 
         public interface ProbeCallback extends Callback {
 
-            void invoke(Pointer thisPointer, Pointer /*CFDictionaryRef*/ propertyTable, Pointer/*io_service_t*/ service, IntByReference order);
+            void invoke(Pointer thisPointer, Pointer /* CFDictionaryRef */ propertyTable, Pointer /* io_service_t */ service, IntByReference order);
         }
 
         public interface StartCallback extends Callback {
 
-            void invoke(Pointer thisPointer, Pointer /*CFDictionaryRef*/ propertyTable, Pointer/*io_service_t*/ service);
+            void invoke(Pointer thisPointer, Pointer /* CFDictionaryRef */ propertyTable, Pointer /* io_service_t */ service);
         }
 
         public interface StopCallback extends Callback {

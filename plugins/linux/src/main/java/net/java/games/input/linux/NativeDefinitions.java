@@ -4,7 +4,7 @@ package net.java.games.input.linux;
 /**
  * This file is generated from /usr/src/linux-headers-3.2.0-38-generic/include/linux/input.h please do not edit
  */
-class NativeDefinitions {
+public class NativeDefinitions {
 
     public static final int EV_VERSION = 0x010001;
     public static final int EV_SYN = 0x00;

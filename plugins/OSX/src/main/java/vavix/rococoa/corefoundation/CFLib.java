@@ -70,18 +70,23 @@ public interface CFLib extends Library {
 //#region CFArray
 
     class CFArrayCallBacks extends Structure {
+
         public interface RetqinCallback extends Callback {
             void fn(Pointer a, Pointer b);
         }
+
         public interface ReleaseCallback extends Callback {
             void fn(Pointer a, Pointer b);
         }
+
         public interface CopyDescriptionCallback extends Callback {
             Pointer fn(Pointer a);
         }
+
         public interface EqualCallback extends Callback {
             boolean fn(Pointer a, Pointer b);
         }
+
         public NativeLong version;
         public RetqinCallback retain;
         public ReleaseCallback release;
@@ -299,6 +304,9 @@ log.fine(this.toString());
 
 //#region CFDictionary
 
+    // https://opensource.apple.com/source/CF/CF-635/CFDictionary.h.auto.html
+    // https://github.com/code-orchestra/code-orchestra-core/blob/master/core/actionScript/source/com/semaphore/jna/cf/CFLibrary.java
+
     interface CFDictionaryRetainCallBack extends Callback {
 
         Pointer invoke(CFAllocator allocator, CFType value);
@@ -356,47 +364,7 @@ log.fine(this.toString());
             copyDescription = (CFDictionaryCopyDescriptionCallBack) CallbackReference.getCallback(CFDictionaryCopyDescriptionCallBack.class, p.getPointer(0x18));
             equal = (CFDictionaryEqualCallBack) CallbackReference.getCallback(CFDictionaryEqualCallBack.class, p.getPointer(0x20));
             hash = (CFDictionaryHashCallBack) CallbackReference.getCallback(CFDictionaryHashCallBack.class, p.getPointer(0x28));
-        }
-
-        public CFDictionaryKeyCallBacks(NativeLong version, CFDictionaryRetainCallBack retain, CFDictionaryReleaseCallBack release, CFDictionaryCopyDescriptionCallBack copyDescription, CFDictionaryEqualCallBack equal, CFDictionaryHashCallBack hash) {
-            this.version = version;
-            this.retain = retain;
-            this.release = release;
-            this.copyDescription = copyDescription;
-            this.equal = equal;
-            this.hash = hash;
-        }
-
-        protected ByReference newByReference() {
-            ByReference s = new ByReference();
-            s.useMemory(getPointer());
             write();
-            s.read();
-            return s;
-        }
-
-        protected ByValue newByValue() {
-            ByValue s = new ByValue();
-            s.useMemory(getPointer());
-            write();
-            s.read();
-            return s;
-        }
-
-        protected CFDictionaryKeyCallBacks newInstance() {
-            CFDictionaryKeyCallBacks s = new CFDictionaryKeyCallBacks();
-            s.useMemory(getPointer());
-            write();
-            s.read();
-            return s;
-        }
-
-        public static class ByReference extends CFDictionaryKeyCallBacks implements Structure.ByReference {
-
-        }
-
-        public static class ByValue extends CFDictionaryKeyCallBacks implements Structure.ByValue {
-
         }
 
         @Override
@@ -428,47 +396,7 @@ log.fine(this.toString());
             release = (CFDictionaryReleaseCallBack) CallbackReference.getCallback(CFDictionaryReleaseCallBack.class, p.getPointer(0x10));
             copyDescription = (CFDictionaryCopyDescriptionCallBack) CallbackReference.getCallback(CFDictionaryCopyDescriptionCallBack.class, p.getPointer(0x18));
             equal = (CFDictionaryEqualCallBack) CallbackReference.getCallback(CFDictionaryEqualCallBack.class, p.getPointer(0x20));
-        }
-
-        public CFDictionaryValueCallBacks(NativeLong version, CFDictionaryRetainCallBack retain, CFDictionaryReleaseCallBack release, CFDictionaryCopyDescriptionCallBack copyDescription, CFDictionaryEqualCallBack equal) {
-            super();
-            this.version = version;
-            this.retain = retain;
-            this.release = release;
-            this.copyDescription = copyDescription;
-            this.equal = equal;
-        }
-
-        protected ByReference newByReference() {
-            ByReference s = new ByReference();
-            s.useMemory(getPointer());
             write();
-            s.read();
-            return s;
-        }
-
-        protected ByValue newByValue() {
-            ByValue s = new ByValue();
-            s.useMemory(getPointer());
-            write();
-            s.read();
-            return s;
-        }
-
-        protected CFDictionaryValueCallBacks newInstance() {
-            CFDictionaryValueCallBacks s = new CFDictionaryValueCallBacks();
-            s.useMemory(getPointer());
-            write();
-            s.read();
-            return s;
-        }
-
-        public static class ByReference extends CFDictionaryValueCallBacks implements Structure.ByReference {
-
-        }
-
-        public static class ByValue extends CFDictionaryValueCallBacks implements Structure.ByValue {
-
         }
 
         @Override
@@ -479,15 +407,17 @@ log.fine(this.toString());
 
     CFDictionaryKeyCallBacks kCFTypeDictionaryKeyCallBacks = new CFDictionaryKeyCallBacks(NATIVE_LIBRARY.getGlobalVariableAddress("kCFTypeDictionaryKeyCallBacks"));
 
+    CFDictionaryKeyCallBacks kCFCopyStringDictionaryKeyCallBacks = new CFDictionaryKeyCallBacks(NATIVE_LIBRARY.getGlobalVariableAddress("kCFCopyStringDictionaryKeyCallBacks"));
+
     CFDictionaryValueCallBacks kCFTypeDictionaryValueCallBacks = new CFDictionaryValueCallBacks(NATIVE_LIBRARY.getGlobalVariableAddress("kCFTypeDictionaryValueCallBacks"));
 
-    CFDictionary CFDictionaryCreate(CFAllocator allocator, CFString[] keys, CFType[] values, NativeLong numValues, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
+    CFDictionary CFDictionaryCreate(CFAllocator allocator, CFString[] keys, CFType[] values, CFIndex numValues, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
 
     CFDictionary CFDictionaryCreateCopy(CFAllocator allocator, CFDictionary theDict);
 
-    CFDictionary CFDictionaryCreateMutable(CFAllocator allocator, NativeLong capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
+    CFDictionary CFDictionaryCreateMutable(CFAllocator allocator, CFIndex capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
 
-    CFDictionary CFDictionaryCreateMutableCopy(CFAllocator allocator, NativeLong capacity, CFDictionary theDict);
+    CFDictionary CFDictionaryCreateMutableCopy(CFAllocator allocator, CFIndex capacity, CFDictionary theDict);
 
     NativeLong CFDictionaryGetCount(CFDictionary theDict);
 
@@ -516,8 +446,6 @@ log.fine(this.toString());
     void CFDictionaryRemoveValue(CFDictionary theDict, CFString key);
 
     void CFDictionaryRemoveAllValues(CFDictionary theDict);
-
-    Pointer /* CFMutableDictionaryRef */ CFDictionaryCreateMutable(CFAllocator allocator, CFIndex capacity, CFDictionaryKeyCallBacks keyCallBacks, CFDictionaryValueCallBacks valueCallBacks);
 
 //#endregion CFDictionary
 

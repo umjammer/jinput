@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackReference;
 import com.sun.jna.Library;
+import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.NativeLong;
@@ -87,14 +88,23 @@ public interface CFLib extends Library {
         public CopyDescriptionCallback copyDescription;
         public EqualCallback equal;
 
+        Memory memory;
+
+        public CFArrayCallBacks() {
+            setAutoWrite(false);
+            memory = new Memory(8 * 5);
+            useMemory(memory);
+        }
+
         public CFArrayCallBacks(Pointer p) {
-            super(p);
+            this();
             version = getPointer().getNativeLong(0);
             retain = (RetqinCallback) CallbackReference.getCallback(RetqinCallback.class, p.getPointer(0x08));
             release = (ReleaseCallback) CallbackReference.getCallback(ReleaseCallback.class, p.getPointer(0x10));
             copyDescription = (CopyDescriptionCallback) CallbackReference.getCallback(CopyDescriptionCallback.class, p.getPointer(0x18));
             equal = (EqualCallback) CallbackReference.getCallback(EqualCallback.class, p.getPointer(0x20));
-            log.fine(this.toString());
+            write();
+log.fine(this.toString());
         }
 
         @Override
@@ -103,8 +113,7 @@ public interface CFLib extends Library {
         }
     }
 
-    CFArrayCallBacks kCFTypeArrayCallBacks = new CFArrayCallBacks(NATIVE_LIBRARY
-            .getGlobalVariableAddress("kCFTypeArrayCallBacks"));
+    CFArrayCallBacks kCFTypeArrayCallBacks = new CFArrayCallBacks(NATIVE_LIBRARY.getGlobalVariableAddress("kCFTypeArrayCallBacks"));
 
     /** Creates a new immutable array with the given values. */
     CFArray CFArrayCreate(CFAllocator allocator, Pointer[] values, CFIndex numValues, CFArrayCallBacks callBacks);
@@ -324,20 +333,24 @@ public interface CFLib extends Library {
 
     class CFDictionaryKeyCallBacks extends Structure {
 
-        public NativeLong version;
+        public CFIndex version;
         public CFDictionaryRetainCallBack retain;
         public CFDictionaryReleaseCallBack release;
         public CFDictionaryCopyDescriptionCallBack copyDescription;
         public CFDictionaryEqualCallBack equal;
         public CFDictionaryHashCallBack hash;
 
+        Memory memory;
+
         public CFDictionaryKeyCallBacks() {
+            setAutoWrite(false);
+            memory = new Memory(8 * 6);
+            useMemory(memory);
         }
 
         public CFDictionaryKeyCallBacks(Pointer p) {
-            super(p);
-
-            version = getPointer().getNativeLong(0);
+            this();
+            version = CFIndex.of(p.getNativeLong(0));
             retain = (CFDictionaryRetainCallBack) CallbackReference.getCallback(CFDictionaryRetainCallBack.class, p.getPointer(0x08));
             release = (CFDictionaryReleaseCallBack) CallbackReference.getCallback(CFDictionaryReleaseCallBack.class, p.getPointer(0x10));
             copyDescription = (CFDictionaryCopyDescriptionCallBack) CallbackReference.getCallback(CFDictionaryCopyDescriptionCallBack.class, p.getPointer(0x18));
@@ -394,19 +407,23 @@ public interface CFLib extends Library {
 
     class CFDictionaryValueCallBacks extends Structure {
 
-        public NativeLong version;
+        public CFIndex version;
         public CFDictionaryRetainCallBack retain;
         public CFDictionaryReleaseCallBack release;
         public CFDictionaryCopyDescriptionCallBack copyDescription;
         public CFDictionaryEqualCallBack equal;
 
+        Memory memory;
+
         public CFDictionaryValueCallBacks() {
+            setAutoWrite(false);
+            memory = new Memory(8 * 5);
+            useMemory(memory);
         }
 
         public CFDictionaryValueCallBacks(Pointer p) {
-            super(p);
-
-            version = getPointer().getNativeLong(0);
+            this();
+            version = CFIndex.of(p.getNativeLong(0));
             retain = (CFDictionaryRetainCallBack) CallbackReference.getCallback(CFDictionaryRetainCallBack.class, p.getPointer(0x08));
             release = (CFDictionaryReleaseCallBack) CallbackReference.getCallback(CFDictionaryReleaseCallBack.class, p.getPointer(0x10));
             copyDescription = (CFDictionaryCopyDescriptionCallBack) CallbackReference.getCallback(CFDictionaryCopyDescriptionCallBack.class, p.getPointer(0x18));

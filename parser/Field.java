@@ -56,7 +56,7 @@ public final class Field {
     int usage;
     /** @see Feature */
     int flags;
-    /** unit depends on BUFFERED_BYTE of flags [bytes/bits] */
+    /** bits TODO really ??? */
     int reportOffset;
     /** unit depends on BUFFERED_BYTE of flags [bytes/bits] */
     int reportSize;
@@ -71,6 +71,8 @@ public final class Field {
     int mask;
     int offsetByte;
     int startBit;
+    /** data size considered startBits shift */
+    int dataBytes;
 
     public int getUsagePage() {
         return (usage >> 16) & 0xffff;
@@ -94,10 +96,18 @@ public final class Field {
     void init() {
         this.offsetByte = reportOffset / 8;
         this.startBit = reportOffset % 8;
-        this.mask = createMask(startBit, reportSize);
+        this.mask = createMask();
+        this.dataBytes = isBytes() ? reportSize : (reportSize + startBit + 7) / 8;
+        if (dataBytes > 8) {
+            throw new IllegalArgumentException(String.format("bad descriptor: isBytes: %s, reportSize: %d, startBit: %d", isBytes(), reportSize, startBit));
+        }
     }
 
-    /** for plugin TODO adhoc */
+    /**
+     * for plugin TODO adhoc
+     * @param offset in bits
+     * @param size in bits
+     */
     public Field(int offset, int size) {
         this.reportOffset = offset;
         this.reportSize = size;
@@ -106,21 +116,33 @@ public final class Field {
     }
 
     /** */
-    static int createMask(int s, int l) {
-        int m = l % 8 != 0 ? l % 8 : 8;
-
-        int result = 0;
-        for (int i = s; i < s + m; i++) {
-            result += (1 << i);
-Debug.printf(Level.FINER, "%02x, %02x, %s", result, 1 << i, StringUtil.toBits(1 << i));
-        }
-        return result;
+    boolean isBytes() {
+        return Feature.containsIn(BUFFERED_BYTE, flags);
     }
 
-    /** view */
-    static String toBit(int s, int l) {
-        int m = l % 8 != 0 ? l % 8 : 8;
-        return "_".repeat(s) + "*".repeat(m) + "_".repeat(8 - s - m);
+    /** */
+    int createMask() {
+        String x = new StringBuilder(toBit()).reverse().toString(); // MSB <- LSB
+Debug.println(Level.FINER, x);
+        return Integer.parseInt(x, 2);
+    }
+
+    /** LSB -> MSB */
+    String toBit() {
+        return toBit("1", "0");
+    }
+
+    /** view LSB -> MSB */
+    String toBit(String on, String off) {
+        int bits;
+        if (isBytes()) {
+            bits = reportSize * 8;
+        } else {
+            bits = reportSize;
+        }
+        return  off.repeat(startBit) +
+                on.repeat(bits) +
+                off.repeat((startBit + bits) % 8 == 0 ? 0 : 8 - (startBit + bits) % 8);
     }
 
     //	int index;
@@ -132,7 +154,7 @@ Debug.printf(Level.FINER, "%02x, %02x, %s", result, 1 << i, StringUtil.toBits(1 
         out.printf(tab + "    report id: 0x%02X\n", report.id);
         out.printf(tab + "         type: %s\n", new String[] {"input", "output", "feature"}[report.type]);
         out.printf(tab + "       offset: %d byte%s (%d)\n", offsetByte, startBit != 0 ? String.format(" and %d bit", startBit) : "", reportOffset);
-        out.printf(tab + "         size: %d: %s\n", reportSize, Feature.containsIn(BUFFERED_BYTE, flags) ? reportSize + " bytes" : toBit(startBit, reportSize));
+        out.printf(tab + "         size: %d: %s\n", reportSize, isBytes() ? reportSize + " bytes" : toBit("*", "_"));
         out.printf(tab + "  logical min: %d\n", logicalMinimum);
         out.printf(tab + "  logical max: %d\n", logicalMaximum);
         out.printf(tab + " physical min: %d\n", physicalMinimum);
@@ -141,16 +163,51 @@ Debug.printf(Level.FINER, "%02x, %02x, %s", result, 1 << i, StringUtil.toBits(1 
         out.printf(tab + "     unit exp: %d\n", unitExponent);
     }
 
+    /** TODO when length + startBits > 64bit */
+    private int getValueInternal(byte[] data) {
+        int value = 0;
+
+        int p = reportOffset / 8;
+
+        switch (dataBytes) {
+        case 8: value |= (data[p + 7]) << 56; // fall-through
+        case 7: value |= (data[p + 6]) << 48; // fall-through
+        case 6: value |= (data[p + 5]) << 40; // fall-through
+        case 5: value |= (data[p + 4]) << 32; // fall-through
+        case 4: value |= (data[p + 3]) << 24; // fall-through
+        case 3: value |= (data[p + 2]) << 16; // fall-through
+        case 2: value |= (data[p + 1]) << 8;  // fall-through
+        case 1: value |=  data[p + 0];
+        }
+
+        return value;
+    }
+
+    /** TODO when length + startBits > 64bit */
+    private void setValueInternal(byte[] data, int value) {
+        int p = reportOffset / 8;
+
+        switch (dataBytes) {
+        case 8: data[p + 7] = (byte) ((value >> 56) & 0xff); // fall-through
+        case 7: data[p + 6] = (byte) ((value >> 48) & 0xff); // fall-through
+        case 6: data[p + 5] = (byte) ((value >> 40) & 0xff); // fall-through
+        case 5: data[p + 4] = (byte) ((value >> 32) & 0xff); // fall-through
+        case 4: data[p + 3] = (byte) ((value >> 24) & 0xff); // fall-through
+        case 3: data[p + 2] = (byte) ((value >> 16) & 0xff); // fall-through
+        case 2: data[p + 1] = (byte) ((value >> 8 ) & 0xff); // fall-through
+        case 1: data[p + 0] = (byte) ( value        & 0xff); // fall-through
+        }
+    }
+
     /** utility */
     public int getValue(byte[] data) {
-        // TODO sign, bit/byte, bit size > 8
-Debug.printf(Level.FINER, "masked: 0x%02x, %s, moved: 0x%02x, %s", data[offsetByte] & mask, StringUtil.toBits(data[offsetByte] & mask), (data[offsetByte] & mask) >> startBit, StringUtil.toBits((data[offsetByte] & mask) >> startBit));
-        return (data[offsetByte] & mask) >> startBit;
+Debug.printf(Level.FINER, "masked: 0x%02x, %s, moved: 0x%02x, %s", getValueInternal(data) & mask, StringUtil.toBits(getValueInternal(data) & mask), (getValueInternal(data) & mask) >> startBit, StringUtil.toBits((getValueInternal(data) & mask) >> startBit));
+        return (getValueInternal(data) & mask) >> startBit;
     }
 
     /** utility */
     public void setValue(byte[] data, byte v) {
-        data[offsetByte] = (byte) ((data[offsetByte] & ~mask) | ((v << startBit) & mask));
+        setValueInternal(data, ((getValueInternal(data) & ~mask) | ((v << startBit) & mask)));
     }
 
     @Override

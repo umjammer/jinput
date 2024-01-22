@@ -20,6 +20,7 @@ import net.java.games.input.osx.OSXRumbler;
 import net.java.games.input.usb.ElementType;
 import net.java.games.input.usb.GenericDesktopUsageId;
 import net.java.games.input.usb.HidController;
+import net.java.games.input.usb.HidRumbler;
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.UsagePair;
 import vavi.util.ByteUtil;
@@ -31,10 +32,36 @@ import static net.java.games.input.osx.OSXHIDDevice.AXIS_DEFAULT_MIN_VALUE;
 /**
  * DualShock4Plugin.
  *
+ * TODO extract osx independent part
+ *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-10-24 nsano initial version <br>
  */
 public class DualShock4Plugin implements DeviceSupportPlugin {
+
+    public enum DualShock4Output implements Component.Identifier.Output {
+        SMALL_RUMBLE("smallRumble"),
+        BIG_RUMBLE("bigRumble"),
+        LED_RED("ledRed"),
+        LED_GREEN("ledGreen"),
+        LED_BLUE("ledBlue"),
+        FLASH_LED1("flashLed1"),
+        FLASH_LED2("flashLed2");
+
+        final String name;
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Protected constructor
+         */
+        DualShock4Output(String name) {
+            this.name = name;
+        }
+    }
 
     /** @param object OSXHIDDevice */
     @Override
@@ -73,18 +100,18 @@ public class DualShock4Plugin implements DeviceSupportPlugin {
         if (!(object instanceof OSXHIDDevice device)) return Collections.emptyList();
 
         return List.of(
-                new OSXRumbler(device, Component.Identifier.Output.SMALL_RUMBLE, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 3, ElementType.OUTPUT, 0, 255, false)),
-                new OSXRumbler(device, Component.Identifier.Output.BIG_RUMBLE, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 4, ElementType.OUTPUT, 0, 255, false)),
-                new OSXRumbler(device, Component.Identifier.Output.LED_RED, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 5, ElementType.OUTPUT, 0, 255, false)),
-                new OSXRumbler(device, Component.Identifier.Output.LED_GREEN, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 6, ElementType.OUTPUT, 0, 255, false)),
-                new OSXRumbler(device, Component.Identifier.Output.LED_GREEN, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 7, ElementType.OUTPUT, 0, 255, false)),
-                new OSXRumbler(device, Component.Identifier.Output.FLASH_LED1, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 8, ElementType.OUTPUT, 0, 255, false)),
-                new OSXRumbler(device, Component.Identifier.Output.FLASH_LED2, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 9, ElementType.OUTPUT, 0, 255, false))
+                new OSXRumbler(device, 5, DualShock4Output.SMALL_RUMBLE, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 3, ElementType.OUTPUT, 0, 255, false)),
+                new OSXRumbler(device, 5, DualShock4Output.BIG_RUMBLE, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 4, ElementType.OUTPUT, 0, 255, false)),
+                new OSXRumbler(device, 5, DualShock4Output.LED_RED, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 5, ElementType.OUTPUT, 0, 255, false)),
+                new OSXRumbler(device, 5, DualShock4Output.LED_GREEN, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 6, ElementType.OUTPUT, 0, 255, false)),
+                new OSXRumbler(device, 5, DualShock4Output.LED_GREEN, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 7, ElementType.OUTPUT, 0, 255, false)),
+                new OSXRumbler(device, 5, DualShock4Output.FLASH_LED1, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 8, ElementType.OUTPUT, 0, 255, false)),
+                new OSXRumbler(device, 5, DualShock4Output.FLASH_LED2, new OSXHIDElement(device, new UsagePair(UsagePage.GAME, GenericDesktopUsageId.GAME_PAD), BASE_OFFSET + 9, ElementType.OUTPUT, 0, 255, false))
         );
     }
 
     /** */
-    public static class Report5 implements HidController.HidReport {
+    public static class Report5 extends HidController.HidReport {
         private final byte[] data = new byte[31];
 
         public int smallRumble;
@@ -107,19 +134,17 @@ public class DualShock4Plugin implements DeviceSupportPlugin {
             return data;
         }
 
-        @Override public void cascadeTo(Rumbler[] rumblers) {
-            for (Rumbler rumbler : rumblers) {
-                float value = switch ((Component.Identifier.Output) rumbler.getOutputIdentifier()) {
-                    case SMALL_RUMBLE -> smallRumble;
-                    case BIG_RUMBLE -> bigRumble;
-                    case LED_RED -> ledRed;
-                    case LED_GREEN -> ledGreen;
-                    case LED_BLUE -> ledBlue;
-                    case FLASH_LED1 -> flashLed1;
-                    case FLASH_LED2 -> flashLed2;
-                };
-                rumbler.setValue(value);
-            }
+        @Override protected void cascadeTo(HidRumbler rumbler) {
+            float value = switch ((DualShock4Output) rumbler.getOutputIdentifier()) {
+                case SMALL_RUMBLE -> smallRumble;
+                case BIG_RUMBLE -> bigRumble;
+                case LED_RED -> ledRed;
+                case LED_GREEN -> ledGreen;
+                case LED_BLUE -> ledBlue;
+                case FLASH_LED1 -> flashLed1;
+                case FLASH_LED2 -> flashLed2;
+            };
+            rumbler.setValue(value);
         }
     }
 

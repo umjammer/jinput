@@ -895,31 +895,9 @@ public interface Component {
         }
 
         /**
-         * KeyIDs for standard PC (LATIN-1) keyboards
+         * for write
          */
-        enum Output implements Identifier {
-            SMALL_RUMBLE("smallRumble"),
-            BIG_RUMBLE("bigRumble"),
-            LED_RED("ledRed"),
-            LED_GREEN("ledGreen"),
-            LED_BLUE("ledBlue"),
-            FLASH_LED1("flashLed1"),
-            FLASH_LED2("flashLed2");
-
-            final String name;
-
-            @Override
-            public String getName() {
-                return name;
-            }
-
-            /**
-             * Protected constructor
-             */
-            Output(String name) {
-                this.name = name;
-            }
-        }
+        interface Output extends Identifier {}
     }
 
     /**

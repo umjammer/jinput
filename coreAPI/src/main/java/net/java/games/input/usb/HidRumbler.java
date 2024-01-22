@@ -17,6 +17,9 @@ import net.java.games.input.Rumbler;
  */
 public interface HidRumbler extends Rumbler {
 
+    /** @since 2.0.15v */
+    int getReportId();
+
     /** */
     void fill(byte[] data);
 }

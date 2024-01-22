@@ -210,13 +210,13 @@ public abstract class AbstractController implements Controller {
         listeners.forEach(l -> l.onInput(event));
     }
 
-    /** */
+    /** data structure to output */
     public interface Report {
 
-        /** */
+        /** set value for each rumbler from this report class fields */
         void cascadeTo(Rumbler[] rumblers);
     }
 
-    /** */
+    /** do output */
     public abstract void output(Report report) throws IOException;
 }

@@ -39,6 +39,8 @@ import net.java.games.input.usb.UsagePage;
 
 
 /**
+ * Represents a collection of {@link Field}.
+ *
  * @see "https://github.com/nyholku/purejavahidapi"
  */
 public final class Collection {

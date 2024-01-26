@@ -30,11 +30,12 @@
 
 package vavi.hid.parser;
 
-
 import java.io.PrintStream;
 
 
 /**
+ * Represents a hid device descriptor.
+ *
  * @see "https://github.com/nyholku/purejavahidapi"
  */
 public final class Report {

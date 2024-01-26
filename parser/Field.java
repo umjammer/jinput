@@ -30,7 +30,6 @@
 
 package vavi.hid.parser;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.logging.Level;
@@ -44,6 +43,10 @@ import static vavi.hid.parser.HidParser.Feature.BUFFERED_BYTE;
 
 
 /**
+ * Represents one field in a hid device descriptor.
+ * <p>
+ * TODO hid value is little endian???
+ *
  * @see "https://github.com/nyholku/purejavahidapi"
  */
 public final class Field {
@@ -56,7 +59,7 @@ public final class Field {
     int usage;
     /** @see Feature */
     int flags;
-    /** bits TODO really ??? */
+    /** bits (first one byte (report id) is excluded) TODO really ??? */
     int reportOffset;
     /** unit depends on BUFFERED_BYTE of flags [bytes/bits] */
     int reportSize;
@@ -86,6 +89,22 @@ public final class Field {
         return flags;
     }
 
+    public int getLogicalMinimum() {
+        return logicalMinimum;
+    }
+
+    public int getLogicalMaximum() {
+        return logicalMaximum;
+    }
+
+    public int getPhysicalMinimum() {
+        return physicalMinimum;
+    }
+
+    public int getPhysicalMaximum() {
+        return physicalMaximum;
+    }
+
     /** for parser */
     Field(Collection collection) {
         this.collection = collection;
@@ -105,7 +124,7 @@ public final class Field {
 
     /**
      * for plugin TODO adhoc
-     * @param offset in bits
+     * @param offset in bits (must be excluded first one byte (8 bits) for report id)
      * @param size in bits
      */
     public Field(int offset, int size) {
@@ -145,7 +164,7 @@ Debug.println(Level.FINER, x);
                 off.repeat((startBit + bits) % 8 == 0 ? 0 : 8 - (startBit + bits) % 8);
     }
 
-    //	int index;
+    // int index;
     void dump(PrintStream out, String tab) {
         UsagePage usagePage = UsagePage.map(getUsagePage());
         out.printf(tab + "-FIELD-------------------------%n");
@@ -167,7 +186,7 @@ Debug.println(Level.FINER, x);
     private int getValueInternal(byte[] data) {
         int value = 0;
 
-        int p = reportOffset / 8;
+        int p = offsetByte + 1; // + 1 for the report id at the first byte
 
         switch (dataBytes) {
         case 8: value |= (data[p + 7]) << 56; // fall-through
@@ -185,7 +204,7 @@ Debug.println(Level.FINER, x);
 
     /** TODO when length + startBits > 64bit */
     private void setValueInternal(byte[] data, int value) {
-        int p = reportOffset / 8;
+        int p = offsetByte + 1; // + 1 for the report id at the first byte
 
         switch (dataBytes) {
         case 8: data[p + 7] = (byte) ((value >> 56) & 0xff); // fall-through
@@ -206,7 +225,7 @@ Debug.printf(Level.FINER, "masked: 0x%02x, %s, moved: 0x%02x, %s", getValueInter
     }
 
     /** utility */
-    public void setValue(byte[] data, byte v) {
+    public void setValue(byte[] data, int v) {
         setValueInternal(data, ((getValueInternal(data) & ~mask) | ((v << startBit) & mask)));
     }
 
@@ -215,5 +234,10 @@ Debug.printf(Level.FINER, "masked: 0x%02x, %s, moved: 0x%02x, %s", getValueInter
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         dump(new PrintStream(baos), "");
         return baos.toString();
+    }
+
+    /** */
+    public String getDump(byte[] data) {
+        return StringUtil.getDump(data, offsetByte + 1, dataBytes);
     }
 }

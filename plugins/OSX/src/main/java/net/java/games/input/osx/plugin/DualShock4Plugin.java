@@ -6,6 +6,7 @@
 
 package net.java.games.input.osx.plugin;
 
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +40,7 @@ import static net.java.games.input.osx.OSXHIDDevice.AXIS_DEFAULT_MIN_VALUE;
  */
 public class DualShock4Plugin implements DeviceSupportPlugin {
 
+    // TODO should have report id???
     public enum DualShock4Output implements Component.Identifier.Output {
         SMALL_RUMBLE("smallRumble"),
         BIG_RUMBLE("bigRumble"),
@@ -93,6 +95,7 @@ public class DualShock4Plugin implements DeviceSupportPlugin {
         return Collections.emptyList();
     }
 
+    /** TODO for bluetooth */
     private static final int BASE_OFFSET = 0;
 
     @Override
@@ -110,7 +113,7 @@ public class DualShock4Plugin implements DeviceSupportPlugin {
         );
     }
 
-    /** */
+    /** Represents report id 5 data */
     public static class Report5 extends HidController.HidReport {
         private final byte[] data = new byte[31];
 
@@ -148,8 +151,11 @@ public class DualShock4Plugin implements DeviceSupportPlugin {
         }
     }
 
-    /** @see "https://www.psdevwiki.com/ps4/DS4-USB" */
-    public static void display(byte[] data) {
+    /**
+     * @param data includes the first byte (report id)
+     * @see "https://www.psdevwiki.com/ps4/DS4-USB"
+     */
+    public static void display(byte[] data, PrintStream pr) {
         int l3x = data[1] & 0xff;
         int l3y = data[2] & 0xff;
         int r3x = data[3] & 0xff;
@@ -195,11 +201,59 @@ public class DualShock4Plugin implements DeviceSupportPlugin {
         boolean headphone = (data[30] & 0x40) != 0;
         boolean mic = (data[30] & 0x20) != 0;
 
-        int touchX = (data[36] & 0xff) | ((data[37] & 0x0f) << 8);
-        int touchY = ((data[38] & 0xff) << 4) | (data[37] & 0xf);
+        int touch1X = (data[36] & 0xff) | ((data[37] & 0x0f) << 8);
+        int touch1Y = ((data[38] & 0xff) << 4) | (data[37] & 0xf);
 
-        System.out.printf("L3 x:%02x y:%02x R3 x:%02x y:%02x (%d,%d)%n", l3x, l3y, r3x, r3y, counter, timeStump);
-        System.out.printf("%3s %3s %3s %3s %5s %2s %s %s %s%n", tri ? "▲" : "", cir ? "●" : "", x ? "✖" : "", sqr ? "■" : "", tPad ? "T-PAD" : "", ps ? "PS" : "", Hat.values()[dPad].s, headphone ? "\uD83C\uDFA7" : "", mic ? "🎤" : "");
-        System.out.printf("touch x:%d y:%d gyro x:%04x y:%04x z:%04x, accel x:%04x y:%04x z:%04x%n%n", touchX, touchY, gyroX, gyroY, gyroZ, accelX, accelY, accelZ);
+        int touch2X = (data[40] & 0xff) | ((data[41] & 0x0f) << 8);
+        int touch2Y = ((data[42] & 0xff) << 4) | (data[41] & 0xf);
+
+        pr.printf("L3 x: %02x%n", l3x);
+        pr.printf("L3 y: %02x%n", l3y);
+        pr.printf("R3 x: %02x%n", r3x);
+        pr.printf("R3 y: %02x%n", r3y);
+        pr.printf("hat: %s%n", Hat.values()[dPad].s);
+
+        pr.printf("counter: %d%n", counter);
+
+        pr.printf("▲: %s%n", tri ? "●" : "◯");
+        pr.printf("●: %s%n", cir ? "●" : "◯");
+        pr.printf("✖: %s%n", x ? "●" : "◯");
+        pr.printf("■: %s%n", sqr ? "●" : "◯");
+
+        pr.printf("L1: %s%n", l1 ? "●" : "◯");
+        pr.printf("R1: %s%n", r1 ? "●" : "◯");
+        pr.printf("L2: %s%n", l2 ? "●" : "◯");
+        pr.printf("R2: %s%n", r2 ? "●" : "◯");
+        pr.printf("Share: %s%n", share ? "●" : "◯");
+        pr.printf("Opt: %s%n", opt ? "●" : "◯");
+        pr.printf("L3: %s%n", l3 ? "●" : "◯");
+        pr.printf("R3: %s%n", r3 ? "●" : "◯");
+
+        pr.printf("T-PAD: %s%n", tPad ? "●" : "◯");
+        pr.printf("PS: %s%n", ps ? "●" : "◯");
+
+        pr.printf("lTrigger: %02x%n", lTrigger);
+        pr.printf("rTrigger: %02x%n", rTrigger);
+
+        pr.printf("timeStump: %04x%n", timeStump);
+        pr.printf("batteryLevel: %d%n", batteryLevel);
+
+        pr.printf("\uD83C\uDFA7: %s%n", headphone ? "●" : "◯");
+        pr.printf("🎤: %s%n", mic ? "●" : "◯");
+
+        pr.printf("gyro x: %04x%n", gyroX);
+        pr.printf("gyro y: %04x%n", gyroY);
+        pr.printf("gyro z: %04x%n", gyroZ);
+
+        pr.printf("accel x: %04x%n", accelX);
+        pr.printf("accel y: %04x%n", accelY);
+        pr.printf("accel z: %04x%n", accelZ);
+
+        pr.printf("touch1 x: %d%n", touch1X);
+        pr.printf("touch1 y: %d%n", touch1Y);
+
+        pr.printf("touch2 x: %d%n", touch2X);
+        pr.printf("touch2 y: %d%n", touch2Y);
+        pr.println();
     }
 }

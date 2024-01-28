@@ -28,7 +28,7 @@
  * OF SUCH DAMAGE.
  */
 
-package vavi.hid.parser;
+package net.java.games.input.usb.parser;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

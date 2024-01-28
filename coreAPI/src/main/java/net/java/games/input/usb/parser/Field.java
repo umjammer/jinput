@@ -28,18 +28,18 @@
  * OF SUCH DAMAGE.
  */
 
-package vavi.hid.parser;
+package net.java.games.input.usb.parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.logging.Level;
 
 import net.java.games.input.usb.UsagePage;
-import vavi.hid.parser.HidParser.Feature;
+import net.java.games.input.usb.parser.HidParser.Feature;
 import vavi.util.Debug;
 import vavi.util.StringUtil;
 
-import static vavi.hid.parser.HidParser.Feature.BUFFERED_BYTE;
+import static net.java.games.input.usb.parser.HidParser.Feature.BUFFERED_BYTE;
 
 
 /**

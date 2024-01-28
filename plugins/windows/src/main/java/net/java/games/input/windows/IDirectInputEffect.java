@@ -53,6 +53,21 @@ final class IDirectInputEffect implements Rumbler {
 
     private static final Logger log = Logger.getLogger(IDirectInputEffect.class.getName());
 
+    enum DirectInputEffectOutput implements Component.Identifier.Output {
+        DirectInputEffect("directInputEffect");
+
+        final String name;
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        DirectInputEffectOutput(String name) {
+            this.name = name;
+        }
+    }
+
     private final Pointer address;
     private final DIEffectInfo info;
     private boolean released;
@@ -85,12 +100,12 @@ final class IDirectInputEffect implements Rumbler {
 
     @Override
     public Component.Identifier getOutputIdentifier() {
-        return Component.Identifier.Output.BIG_RUMBLE;
+        return DirectInputEffectOutput.DirectInputEffect;
     }
 
     @Override
     public String getOutputName() {
-        return Component.Identifier.Output.BIG_RUMBLE.getName();
+        return DirectInputEffectOutput.DirectInputEffect.getName();
     }
 
     public synchronized void release() {

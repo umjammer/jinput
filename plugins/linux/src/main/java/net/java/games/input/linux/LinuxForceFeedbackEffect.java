@@ -40,6 +40,21 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
 
     private static final Logger log = Logger.getLogger(LinuxForceFeedbackEffect.class.getName());
 
+    enum ForceFeedbackEffectOutput implements Component.Identifier.Output {
+        ForceFeedbackEffect("forceFeedbackEffect");
+
+        final String name;
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        ForceFeedbackEffectOutput(String name) {
+            this.name = name;
+        }
+    }
+
     private final LinuxEventDevice device;
     private final int ffId;
     private final WriteTask writeTask = new WriteTask();
@@ -87,12 +102,12 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
 
     @Override
     public final String getOutputName() {
-        return Component.Identifier.Output.BIG_RUMBLE.getName();
+        return ForceFeedbackEffectOutput.ForceFeedbackEffect.getName();
     }
 
     @Override
     public final Component.Identifier getOutputIdentifier() {
-        return Component.Identifier.Output.BIG_RUMBLE;
+        return ForceFeedbackEffectOutput.ForceFeedbackEffect;
     }
 
     private final class UploadTask extends LinuxDeviceTask {

@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import net.java.games.input.ControllerEnvironment;
-import net.java.games.input.osx.plugin.DualShock4Plugin.Report5;
+import net.java.games.input.plugin.DualShock4PluginBase.Report5;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

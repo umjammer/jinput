@@ -25,12 +25,14 @@ public class OSXRumbler implements HidRumbler {
     private final OSXHIDDevice device;
     private final Component.Identifier id;
     private final OSXHIDElement element;
+    private final int reportId;
 
     /**
      * @param element element#cookieId is used as data offset
      */
-    public OSXRumbler(OSXHIDDevice device, Component.Identifier id, OSXHIDElement element) {
+    public OSXRumbler(OSXHIDDevice device, int reportId, Component.Identifier id, OSXHIDElement element) {
         this.device = device;
+        this.reportId = reportId;
         this.id = id;
         this.element = element;
     }
@@ -55,6 +57,11 @@ public class OSXRumbler implements HidRumbler {
     @Override
     public Component.Identifier getOutputIdentifier() {
         return id;
+    }
+
+    @Override
+    public int getReportId() {
+        return reportId;
     }
 
     @Override

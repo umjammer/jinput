@@ -29,8 +29,6 @@ import static net.java.games.input.osx.OSXHIDDevice.AXIS_DEFAULT_MIN_VALUE;
 /**
  * DualShock4Plugin.
  *
- * TODO extract osx independent part
- *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2023-10-24 nsano initial version <br>
  */

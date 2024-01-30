@@ -59,9 +59,9 @@ public class OSXPluginTest {
 
     @Test
     void test1() throws Exception {
-        OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
-Debug.println("getControllers: " + plugin.getControllers().length);
-        Arrays.stream(plugin.getControllers()).forEach(System.err::println);
+        OSXEnvironmentPlugin environment = new OSXEnvironmentPlugin();
+Debug.println("getControllers: " + environment.getControllers().length);
+        Arrays.stream(environment.getControllers()).forEach(System.err::println);
     }
 
     @Test
@@ -73,12 +73,8 @@ Debug.println("getControllers: " + plugin.getControllers().length);
     @EnabledIf("localPropertiesExists")
     @DisplayName("components count")
     void test3() throws Exception {
-        OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
-        OSXController controller = Arrays.stream(plugin.getControllers())
-                .filter(c -> c instanceof OSXController)
-                .map(c -> (OSXController) c)
-                .filter(c -> c.getProductId() == productId && c.getVendorId() == vendorId)
-                .findFirst().get();
+        OSXEnvironmentPlugin environment = new OSXEnvironmentPlugin();
+        OSXController controller = environment.getController(vendorId, productId);
         assertEquals(21, controller.getComponents().length);
     }
 
@@ -86,12 +82,8 @@ Debug.println("getControllers: " + plugin.getControllers().length);
     @EnabledIf("localPropertiesExists")
     @DisplayName("rumbler")
     void test4() throws Exception {
-        OSXEnvironmentPlugin plugin = new OSXEnvironmentPlugin();
-        OSXController controller = Arrays.stream(plugin.getControllers())
-                .filter(c -> c instanceof OSXController)
-                .map(c -> (OSXController) c)
-                .filter(c -> c.getProductId() == productId && c.getVendorId() == vendorId)
-                .findFirst().get();
+        OSXEnvironmentPlugin environment = new OSXEnvironmentPlugin();
+        OSXController controller = environment.getController(vendorId, productId);
 
         Report5 report = new Report5();
         report.smallRumble = 255;

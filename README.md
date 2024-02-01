@@ -35,3 +35,4 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
   * backport cf lib to rococoa
   * separate jna parts as jna-platform-extended?
 * ~~at windows, i mistake dword as 2byte~~
+* component value should be generics? (currently float fixed)

@@ -35,6 +35,7 @@ package net.java.games.input.osx;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -50,6 +51,7 @@ import net.java.games.input.Mouse;
 import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 import net.java.games.input.usb.GenericDesktopUsageId;
+import net.java.games.input.usb.HidControllerEnvironment;
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.UsagePair;
 
@@ -61,7 +63,7 @@ import net.java.games.input.usb.UsagePair;
  * @author gregorypierce
  * @version 1.0
  */
-public final class OSXEnvironmentPlugin extends ControllerEnvironment {
+public final class OSXEnvironmentPlugin extends ControllerEnvironment implements HidControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(OSXEnvironmentPlugin.class.getName());
 
@@ -255,5 +257,14 @@ log.fine("gamepad device: '" + device.getProductName() + "' --------");
         } catch (IOException e) {
             log.log(Level.FINE, "Failed to enumerate devices: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public OSXController getController(int mid, int pid) {
+        return Arrays.stream(getControllers())
+                .filter(c -> c instanceof OSXController)
+                .map(c -> (OSXController) c)
+                .filter(c -> c.getProductId() == pid && c.getVendorId() == mid)
+                .findFirst().get();
     }
 }

@@ -48,6 +48,7 @@ import com.sun.jna.platform.win32.WinUser.RAWINPUTDEVICELIST;
 import com.sun.jna.ptr.IntByReference;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerListenerSupport;
 import net.java.games.input.windows.WinAPI.SetupApiEx;
 
 import static com.sun.jna.platform.win32.SetupApi.DIGCF_PRESENT;
@@ -65,7 +66,7 @@ import static net.java.games.input.windows.WinAPI.SetupApiEx.GUID_DEVCLASS_MOUSE
  * @author elias
  * @version 1.0
  */
-final class RawInputEnvironmentPlugin extends ControllerEnvironment {
+final class RawInputEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(RawInputEnvironmentPlugin.class.getName());
 

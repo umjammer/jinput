@@ -7,11 +7,8 @@
 package net.java.games.input.plugin;
 
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.Collections;
 
 import net.java.games.input.Component;
-import net.java.games.input.Controller;
 import net.java.games.input.DeviceSupportPlugin;
 import net.java.games.input.usb.HidController;
 import net.java.games.input.usb.HidRumbler;

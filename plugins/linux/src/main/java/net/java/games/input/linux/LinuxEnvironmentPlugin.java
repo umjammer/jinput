@@ -39,6 +39,7 @@ import net.java.games.input.AbstractComponent;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerListenerSupport;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
 import net.java.games.input.Rumbler;
@@ -50,7 +51,7 @@ import net.java.games.input.Rumbler;
  * @author elias
  * @author Jeremy Booth (jeremy@newdawnsoftware.com)
  */
-public final class LinuxEnvironmentPlugin extends ControllerEnvironment {
+public final class LinuxEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(LinuxEnvironmentPlugin.class.getName());
 

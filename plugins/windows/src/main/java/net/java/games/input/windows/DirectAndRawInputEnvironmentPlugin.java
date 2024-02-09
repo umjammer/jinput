@@ -31,6 +31,7 @@ import java.util.List;
 
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerListenerSupport;
 
 
 /**
@@ -39,7 +40,7 @@ import net.java.games.input.ControllerEnvironment;
  *
  * @author Jeremy
  */
-public class DirectAndRawInputEnvironmentPlugin extends ControllerEnvironment {
+public class DirectAndRawInputEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
     private final RawInputEnvironmentPlugin rawPlugin;
     private final DirectInputEnvironmentPlugin dinputPlugin;

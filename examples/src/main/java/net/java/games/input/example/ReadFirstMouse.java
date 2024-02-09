@@ -2,7 +2,6 @@ package net.java.games.input.example;
 
 import java.util.Arrays;
 
-import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.PollingComponent;
@@ -37,6 +36,7 @@ public class ReadFirstMouse {
             System.out.println("Found no mouse");
             System.exit(0);
         }
+        PollingComponent[] components = Arrays.stream(firstMouse.getComponents()).map(PollingComponent.class::cast).toArray(PollingComponent[]::new);
 
         System.out.println("First mouse is: " + firstMouse.getName());
 
@@ -45,7 +45,6 @@ public class ReadFirstMouse {
             firstMouse.poll();
 
             // Get all the axis and buttons
-            PollingComponent[] components = Arrays.stream(firstMouse.getComponents()).map(PollingComponent.class::cast).toArray(PollingComponent[]::new);
             StringBuilder buffer = new StringBuilder();
 
             // For each component, get it's name, and it's current value

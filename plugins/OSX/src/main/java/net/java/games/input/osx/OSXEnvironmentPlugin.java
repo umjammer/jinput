@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerListenerSupport;
 import net.java.games.input.DeviceSupportPlugin;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
@@ -63,7 +63,7 @@ import net.java.games.input.usb.UsagePair;
  * @author gregorypierce
  * @version 1.0
  */
-public final class OSXEnvironmentPlugin extends ControllerEnvironment implements HidControllerEnvironment {
+public final class OSXEnvironmentPlugin extends ControllerListenerSupport implements HidControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(OSXEnvironmentPlugin.class.getName());
 
@@ -232,7 +232,7 @@ log.fine("gamepad device: '" + device.getProductName() + "' --------");
             OSXHIDDeviceIterator it = new OSXHIDDeviceIterator();
             try {
                 while (true) {
-                    OSXHIDDevice device;
+                    OSXHIDDevice device = null;
                     try {
                         device = it.next();
                         if (device == null)
@@ -248,7 +248,11 @@ log.fine("gamepad device: '" + device.getProductName() + "' --------");
                         if (!deviceUsed)
                             device.release();
                     } catch (IOException e) {
-                        log.log(Level.FINE, "Failed to enumerate device: ", e);
+                        if (log.isLoggable(Level.FINER)) {
+                            log.log(Level.FINE, "Failed to enumerate device :" + e.getMessage(), e);
+                        } else {
+                            log.log(Level.FINE, "Failed to enumerate device: " + e.getMessage());
+                        }
                     }
                 }
             } finally {

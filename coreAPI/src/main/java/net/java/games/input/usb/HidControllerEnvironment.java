@@ -7,13 +7,16 @@
 package net.java.games.input.usb;
 
 
+import net.java.games.input.ControllerEnvironment;
+
+
 /**
  * HidControllerEnvironment.
  *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2024-01-24 nsano initial version <br>
  */
-public interface HidControllerEnvironment {
+public interface HidControllerEnvironment extends ControllerEnvironment {
 
     /**
      * throw NoSuchElementException when there is no matched device of mid and pid.

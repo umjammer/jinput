@@ -11,7 +11,7 @@ import java.util.ServiceLoader;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-import static net.java.games.input.DefaultControllerEnvironment.toBeExcluded;
+import static net.java.games.input.ControllerEnvironment.toBeExcluded;
 
 
 /**

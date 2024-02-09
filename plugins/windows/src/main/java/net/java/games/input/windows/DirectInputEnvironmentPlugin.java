@@ -41,6 +41,7 @@ import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerListenerSupport;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
 
@@ -52,7 +53,7 @@ import net.java.games.input.Mouse;
  * @author elias
  * @version 1.0
  */
-final class DirectInputEnvironmentPlugin extends ControllerEnvironment {
+final class DirectInputEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
     private static final Logger log = Logger.getLogger(DirectInputEnvironmentPlugin.class.getName());
 

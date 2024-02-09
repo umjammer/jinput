@@ -32,7 +32,9 @@
 
 package net.java.games.input;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.ServiceLoader;
+import java.util.logging.Logger;
 
 
 /**
@@ -52,76 +54,53 @@ import java.util.ArrayList;
  *  <li>don't collect controllers in the constructor.</li>
  *  <li>collect controllers in {@link #getControllers} method.</li>
  * </ul>
+ *
+ * @author Michael Martak
+ * @version %I% %G%
  */
-public abstract class ControllerEnvironment {
+public interface ControllerEnvironment {
 
-    /**
-     * The default controller environment
-     */
-    private static final ControllerEnvironment defaultEnvironment =
-            new DefaultControllerEnvironment();
-
-    /**
-     * List of controller listeners
-     */
-    protected final ArrayList<ControllerListener> controllerListeners = new ArrayList<>();
-
-    /**
-     * Returns a list of all controllers available to this environment,
-     * or an empty array if there are no controllers in this environment.
-     */
-    public abstract Controller[] getControllers();
-
-    /**
-     * Adds a listener for controller state change events.
-     */
-    public void addControllerListener(ControllerListener l) {
-        assert l != null;
-        controllerListeners.add(l);
-    }
+    Logger log = Logger.getLogger(ControllerEnvironment.class.getName());
 
     /**
      * Returns the isSupported status of this environment.
      * What makes an environment supported or not is up to the
      * particular plugin, but may include OS or available hardware.
      */
-    public abstract boolean isSupported();
+    boolean isSupported();
 
     /**
-     * Removes a listener for controller state change events.
+     * Returns a list of all controllers available to this environment,
+     * or an empty array if there are no controllers in this environment.
      */
-    public void removeControllerListener(ControllerListener l) {
-        assert l != null;
-        controllerListeners.remove(l);
-    }
+    Controller[] getControllers();
 
-    /**
-     * Creates and sends an event to the controller listeners that a controller
-     * has been added.
-     */
-    protected void fireControllerAdded(Controller c) {
-        ControllerEvent ev = new ControllerEvent(c);
-        for (ControllerListener controllerListener : controllerListeners) {
-            controllerListener.controllerAdded(ev);
-        }
-    }
-
-    /**
-     * Creates and sends an event to the controller listeners that a controller
-     * has been lost.
-     */
-    protected void fireControllerRemoved(Controller c) {
-        ControllerEvent ev = new ControllerEvent(c);
-        for (ControllerListener controllerListener : controllerListeners) {
-            controllerListener.controllerRemoved(ev);
-        }
+    /** to avoid conflict we can specify package patterns to exclude */
+    static boolean toBeExcluded(String packageName) {
+        String prop = System.getProperty("net.java.games.input.ControllerEnvironment.excludes", "");
+        String[] excludes = prop.split(":");
+log.finer("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", " + packageName);
+        return !prop.isEmpty() && Arrays.stream(excludes).anyMatch(packageName::contains);
     }
 
     /**
      * Returns the default environment for input controllers.
      * This usually corresponds to the environment for the local machine.
      */
-    public static ControllerEnvironment getDefaultEnvironment() {
-        return defaultEnvironment;
+    static ControllerEnvironment getDefaultEnvironment() {
+        try {
+log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
+            for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
+log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
+                if (ce.isSupported() && !toBeExcluded(ce.getClass().getPackageName())) {
+                    return ce;
+                } else {
+                    log.finer(ce.getClass().getName() + " is excluded");
+                }
+            }
+            throw new IllegalStateException("no suitable environment");
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

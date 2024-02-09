@@ -28,13 +28,14 @@ package net.java.games.input.awt;
 
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerListenerSupport;
 
 
 /**
  * @author Jeremy
  * @author elias
  */
-public class AWTEnvironmentPlugin extends ControllerEnvironment {
+public class AWTEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
     private final Controller[] controllers;
 

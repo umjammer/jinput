@@ -3,7 +3,6 @@ package net.java.games.input.example;
 import java.util.Arrays;
 
 import net.java.games.input.Component;
-import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
@@ -24,13 +23,14 @@ public class ReadAllEvents {
         Event event = new Event();
         StringBuffer buffer = new StringBuffer();
 
+        // Get the available controllers
+        PollingController[] controllers = Arrays.stream(ControllerEnvironment.getDefaultEnvironment().getControllers()).map(PollingController.class::cast).toArray(PollingController[]::new);
+        if (controllers.length == 0) {
+            System.out.println("Found no controllers.");
+            return;
+        }
+
         while (true) {
-            // Get the available controllers
-            PollingController[] controllers = Arrays.stream(ControllerEnvironment.getDefaultEnvironment().getControllers()).map(PollingController.class::cast).toArray(PollingController[]::new);
-            if (controllers.length == 0) {
-                System.out.println("Found no controllers.");
-                System.exit(0);
-            }
 
             for (PollingController controller : controllers) {
                 // Remember to poll each one

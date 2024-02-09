@@ -9,7 +9,6 @@ package net.java.games.input.osx;
 import java.util.logging.Level;
 
 import net.java.games.input.Component;
-import net.java.games.input.Rumbler;
 import net.java.games.input.usb.HidRumbler;
 import vavi.util.Debug;
 

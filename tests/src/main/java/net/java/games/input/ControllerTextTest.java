@@ -40,7 +40,7 @@ package net.java.games.input;
  */
 public class ControllerTextTest {
 
-    ControllerEnvironment ce;
+     ControllerEnvironment ce;
 
     /** Creates a new instance of ControllerScanner */
     public ControllerTextTest() {

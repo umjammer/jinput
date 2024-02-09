@@ -75,6 +75,16 @@ public interface ControllerEnvironment {
      */
     Controller[] getControllers();
 
+    /**
+     * Adds a listener for controller state change events.
+     */
+    void addControllerListener(ControllerListener l);
+
+    /**
+     * Removes a listener for controller state change events.
+     */
+    void removeControllerListener(ControllerListener l);
+
     /** to avoid conflict we can specify package patterns to exclude */
     static boolean toBeExcluded(String packageName) {
         String prop = System.getProperty("net.java.games.input.ControllerEnvironment.excludes", "");

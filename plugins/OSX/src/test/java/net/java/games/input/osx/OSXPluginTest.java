@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.ControllerEvent;
+import net.java.games.input.ControllerListener;
 import net.java.games.input.plugin.DualShock4PluginBase.Report5;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -95,5 +97,21 @@ Debug.println("getControllers: " + environment.getControllers().length);
         report.flashLed2 = 0;
 
         controller.output(report);
+    }
+
+    @Test
+    void test5() throws Exception {
+        ControllerEnvironment ce = new OSXEnvironmentPlugin();
+        ce.addControllerListener(new ControllerListener() {
+            @Override
+            public void controllerRemoved(ControllerEvent ev) {
+Debug.println("➖ controllerRemoved: " + ev.getController());
+            }
+
+            @Override
+            public void controllerAdded(ControllerEvent ev) {
+Debug.println("➕ controllerAdded: " + ev.getController());
+            }
+        });
     }
 }

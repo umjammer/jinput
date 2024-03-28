@@ -113,4 +113,33 @@ log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + 
             throw new IllegalStateException(e);
         }
     }
+
+    /**
+     * Returns the environment by the specified name.
+     * @param name name for match (partial is acceptable)
+     */
+    static ControllerEnvironment getEnvironmentByName(String name) {
+        try {
+log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
+            for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
+log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
+                if (ce.isSupported()) {
+                    if (!toBeExcluded(ce.getClass().getPackageName())) {
+                        if (ce.getClass().getPackageName().contains(name)) {
+                            return ce;
+                        } else  {
+log.finer(ce.getClass().getName() + " is not match");
+                        }
+                    } else {
+log.finer(ce.getClass().getName() + " is excluded");
+                    }
+                } else {
+log.finer(ce.getClass().getName() + " is not supported");
+                }
+            }
+            throw new IllegalStateException("no suitable environment for: " + name);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }

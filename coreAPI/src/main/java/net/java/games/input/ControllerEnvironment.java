@@ -102,10 +102,14 @@ log.finer("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ",
 log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
             for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
 log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
-                if (ce.isSupported() && !toBeExcluded(ce.getClass().getPackageName())) {
-                    return ce;
+                if (ce.isSupported()) {
+                    if (!toBeExcluded(ce.getClass().getPackageName())) {
+                        return ce;
+                    } else {
+log.finer(ce.getClass().getName() + " is excluded");
+                    }
                 } else {
-                    log.finer(ce.getClass().getName() + " is excluded");
+log.finer(ce.getClass().getName() + " is not supported");
                 }
             }
             throw new IllegalStateException("no suitable environment");

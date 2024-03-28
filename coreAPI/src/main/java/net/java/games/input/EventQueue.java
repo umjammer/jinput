@@ -33,6 +33,10 @@
 package net.java.games.input;
 
 
+import java.util.Arrays;
+import java.util.StringJoiner;
+
+
 /**
  * A FIFO queue for input events.
  */
@@ -89,5 +93,14 @@ public final class EventQueue {
         event.set(queue[head]);
         head = increase(head);
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", EventQueue.class.getSimpleName() + "[", "]")
+                .add("queue=" + queue.length)
+                .add("head=" + head)
+                .add("tail=" + tail)
+                .toString();
     }
 }

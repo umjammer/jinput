@@ -5,7 +5,7 @@
   <parent>
     <groupId>net.java.jinput</groupId>
     <artifactId>plugins</artifactId>
-    <version>2.0.18v</version>
+    <version>2.0.19</version>
   </parent>
 
   <artifactId>osx-plugin</artifactId>
@@ -20,12 +20,15 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
       <plugin>
@@ -54,7 +57,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.10.1</version>
+        <version>5.10.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -77,7 +80,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId>
       <artifactId>vavi-commons</artifactId>
-      <version>1.1.10</version>
+      <version>1.1.11</version>
     </dependency>
 
     <dependency>

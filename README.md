@@ -11,7 +11,7 @@
 
 this library is
 
- - using jna directly instead of over hidapi
+ - using jna directly instead of jni
  - using service-loader instead of proprietary plugin mechanism
 
 and this is a fork of [original](https://github.com/jinput/jinput)

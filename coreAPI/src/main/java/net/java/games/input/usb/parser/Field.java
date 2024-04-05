@@ -32,13 +32,14 @@ package net.java.games.input.usb.parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.logging.Level;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.parser.HidParser.Feature;
-import vavi.util.Debug;
 import vavi.util.StringUtil;
 
+import static java.lang.System.getLogger;
 import static net.java.games.input.usb.parser.HidParser.Feature.BUFFERED_BYTE;
 
 
@@ -50,6 +51,8 @@ import static net.java.games.input.usb.parser.HidParser.Feature.BUFFERED_BYTE;
  * @see "https://github.com/nyholku/purejavahidapi"
  */
 public final class Field {
+
+    private static final Logger logger = getLogger(Field.class.getName());
 
     Report report;
     Collection collection;
@@ -142,7 +145,7 @@ public final class Field {
     /** */
     int createMask() {
         String x = new StringBuilder(toBit()).reverse().toString(); // MSB <- LSB
-Debug.println(Level.FINER, x);
+logger.log(Level.DEBUG, x);
         return Integer.parseInt(x, 2);
     }
 
@@ -220,7 +223,7 @@ Debug.println(Level.FINER, x);
 
     /** utility */
     public int getValue(byte[] data) {
-Debug.printf(Level.FINER, "masked: 0x%02x, %s, moved: 0x%02x, %s", getValueInternal(data) & mask, StringUtil.toBits(getValueInternal(data) & mask), (getValueInternal(data) & mask) >> startBit, StringUtil.toBits((getValueInternal(data) & mask) >> startBit));
+logger.log(Level.TRACE, () -> String.format("masked: 0x%02x, %s, moved: 0x%02x, %s", getValueInternal(data) & mask, StringUtil.toBits(getValueInternal(data) & mask), (getValueInternal(data) & mask) >> startBit, StringUtil.toBits((getValueInternal(data) & mask) >> startBit)));
         return (getValueInternal(data) & mask) >> startBit;
     }
 

@@ -33,6 +33,7 @@
 package net.java.games.input.windows;
 
 import java.io.IOException;
+import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,7 @@ final class RawInputEnvironmentPlugin extends ControllerListenerSupport implemen
                 queue = new RawInputEventQueue();
                 enumControllers(queue);
             } catch (IOException e) {
-                log.fine("Failed to enumerate devices: " + e.getMessage());
+                logger.log(Level.DEBUG, "Failed to enumerate devices: " + e.getMessage());
             }
         }
         return controllers.toArray(Controller[]::new);
@@ -129,7 +130,7 @@ final class RawInputEnvironmentPlugin extends ControllerListenerSupport implemen
         IntByReference numDevices = new IntByReference();
         int res = User32.INSTANCE.GetRawInputDeviceList(null, numDevices, 12 /* sizeof(RAWINPUTDEVICELIST) */);
         if (-1 == res) {
-            throw new IOException(String.format("Failed to get number of devices (%d)", Native.getLastError()));
+            throw new IOException("Failed to get number of devices (%d)".formatted(Native.getLastError()));
         }
         RAWINPUTDEVICELIST[] devices = new RAWINPUTDEVICELIST[numDevices.getValue()];
         User32.INSTANCE.GetRawInputDeviceList(devices, numDevices, devices[0].size() /* sizeof(RAWINPUTDEVICELIST) */);
@@ -193,7 +194,7 @@ final class RawInputEnvironmentPlugin extends ControllerListenerSupport implemen
                 DIGCF_PRESENT);
 
         if (hDevInfo == INVALID_HANDLE_VALUE) {
-            throw new IOException(String.format("Failed to create device enumerator (%d)", Native.getLastError()));
+            throw new IOException("Failed to create device enumerator (%d)".formatted(Native.getLastError()));
         }
 
         DeviceInfoData.cbSize = DeviceInfoData.size();
@@ -215,7 +216,7 @@ final class RawInputEnvironmentPlugin extends ControllerListenerSupport implemen
                     buffer = new Memory(buffersize.getValue());
                 } else {
                     SetupApiEx.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
-                    throw new IOException(String.format("Failed to get device description (%x)", Native.getLastError()));
+                    throw new IOException("Failed to get device description (%x)".formatted(Native.getLastError()));
                 }
             }
 
@@ -233,7 +234,7 @@ final class RawInputEnvironmentPlugin extends ControllerListenerSupport implemen
                     buffer = new Memory(buffersize.getValue());
                 } else {
                     SetupApiEx.INSTANCE.SetupDiDestroyDeviceInfoList(hDevInfo);
-                    throw new IOException(String.format("Failed to get device instance id (%x)", Native.getLastError()));
+                    throw new IOException("Failed to get device instance id (%x)".formatted(Native.getLastError()));
                 }
             }
 

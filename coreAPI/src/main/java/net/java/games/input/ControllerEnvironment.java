@@ -32,9 +32,12 @@
 
 package net.java.games.input;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Arrays;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -60,7 +63,7 @@ import java.util.logging.Logger;
  */
 public interface ControllerEnvironment {
 
-    Logger log = Logger.getLogger(ControllerEnvironment.class.getName());
+    Logger logger = getLogger(ControllerEnvironment.class.getName());
 
     /**
      * Returns the isSupported status of this environment.
@@ -89,7 +92,7 @@ public interface ControllerEnvironment {
     static boolean toBeExcluded(String packageName) {
         String prop = System.getProperty("net.java.games.input.ControllerEnvironment.excludes", "");
         String[] excludes = prop.split(":");
-log.finer("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", " + packageName);
+logger.log(Level.TRACE, "excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ", " + packageName);
         return !prop.isEmpty() && Arrays.stream(excludes).anyMatch(packageName::contains);
     }
 
@@ -99,17 +102,17 @@ log.finer("excludes: " + excludes.length + ", " + Arrays.toString(excludes) + ",
      */
     static ControllerEnvironment getDefaultEnvironment() {
         try {
-log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
+logger.log(Level.TRACE, "count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
             for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
-log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
+logger.log(Level.TRACE, "ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
                 if (ce.isSupported()) {
                     if (!toBeExcluded(ce.getClass().getPackageName())) {
                         return ce;
                     } else {
-log.finer(ce.getClass().getName() + " is excluded");
+logger.log(Level.TRACE, ce.getClass().getName() + " is excluded");
                     }
                 } else {
-log.finer(ce.getClass().getName() + " is not supported");
+logger.log(Level.TRACE, ce.getClass().getName() + " is not supported");
                 }
             }
             throw new IllegalStateException("no suitable environment");
@@ -124,21 +127,21 @@ log.finer(ce.getClass().getName() + " is not supported");
      */
     static ControllerEnvironment getEnvironmentByName(String name) {
         try {
-log.finer("count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
+logger.log(Level.TRACE, "count: " + ServiceLoader.load(ControllerEnvironment.class).stream().count());
             for (ControllerEnvironment ce : ServiceLoader.load(ControllerEnvironment.class)) {
-log.finer("ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
+logger.log(Level.TRACE, "ControllerEnvironment " + ce.getClass().getName() + ", exclude?: " + toBeExcluded(ce.getClass().getPackageName()));
                 if (ce.isSupported()) {
                     if (!toBeExcluded(ce.getClass().getPackageName())) {
                         if (ce.getClass().getPackageName().contains(name)) {
                             return ce;
                         } else  {
-log.finer(ce.getClass().getName() + " is not match");
+logger.log(Level.TRACE, ce.getClass().getName() + " is not match");
                         }
                     } else {
-log.finer(ce.getClass().getName() + " is excluded");
+logger.log(Level.TRACE, ce.getClass().getName() + " is excluded");
                     }
                 } else {
-log.finer(ce.getClass().getName() + " is not supported");
+logger.log(Level.TRACE, ce.getClass().getName() + " is not supported");
                 }
             }
             throw new IllegalStateException("no suitable environment for: " + name);

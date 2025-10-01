@@ -327,7 +327,7 @@ final class RawDevice {
         Memory name = new Memory(nameLength.getValue());
         res = User32Ex.INSTANCE.GetRawInputDeviceInfoA(handle, RIDI_DEVICENAME, name, nameLength);
         if (-1 == res) {
-            throw new IOException(String.format("Failed to get device name (%d)", Native.getLastError()));
+            throw new IOException("Failed to get device name (%d)".formatted(Native.getLastError()));
         }
         return name.getString(0, StandardCharsets.UTF_8.name());
     }
@@ -357,13 +357,13 @@ final class RawDevice {
         deviceInfo.cbSize = size.getValue();
         int res = User32Ex.INSTANCE.GetRawInputDeviceInfoA(handle, RIDI_DEVICEINFO, deviceInfo.getPointer(), size);
         if (-1 == res) {
-            throw new IOException(String.format("Failed to get device info (%d)", Native.getLastError()));
+            throw new IOException("Failed to get device info (%d)".formatted(Native.getLastError()));
         }
         return switch (deviceInfo.dwType) {
             case RIM_TYPEHID -> createHIDInfo(deviceObj, deviceInfo.u.hid);
             case RIM_TYPEKEYBOARD -> createKeyboardInfo(deviceObj, deviceInfo.u.keyboard);
             case RIM_TYPEMOUSE -> createMouseInfo(deviceObj, deviceInfo.u.mouse);
-            default -> throw new IOException(String.format("Unknown device type: %d", deviceInfo.dwType));
+            default -> throw new IOException("Unknown device type: %d".formatted(deviceInfo.dwType));
         };
     }
 }

@@ -31,13 +31,15 @@
 package net.java.games.input.usb.parser;
 
 import java.io.PrintStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -57,7 +59,7 @@ import java.util.stream.Collectors;
  */
 public class HidParser {
 
-    private static final Logger logger = Logger.getLogger(HidParser.class.getName());
+    private static final Logger logger = getLogger(HidParser.class.getName());
 
     private static final Collection rootCollection = new Collection(null, 0, 0xff);
     private Collection topCollection;
@@ -140,7 +142,7 @@ public class HidParser {
         };
         static Tag valueOf(int tag) {
             if (tag < 8 || tag >= values().length)
-                throw new IllegalStateException(String.format("illegal/unsupported main tag %d", tag));
+                throw new IllegalStateException("illegal/unsupported main tag %d".formatted(tag));
             return values()[tag];
         }
     }
@@ -154,18 +156,18 @@ public class HidParser {
                 int usage = item.uValue;
                 if (item.size <= 2) { // FIXME is this in the spec?
                     usage = (context.global.usagePage << 16) + usage;
-logger.finer(String.format("item.size <= 2: %08x", usage));
+logger.log(Level.TRACE, "item.size <= 2: %08x".formatted(usage));
                 }
 
                 if (context.topCollection == rootCollection) { // TODO adhoc
                     // rootCollection usage ignored
                     context.collectionUsage = usage;
-logger.finer(String.format("topCollection is rootCollection: %08x", usage));
+logger.log(Level.TRACE, "topCollection is rootCollection: %08x".formatted(usage));
                     return;
                 }
                 if (context.local.delimiterBranch > 1) {
                     // alternative usage ignored
-logger.finer(String.format("context.local.delimiterBranch > 1: %08x", usage));
+logger.log(Level.TRACE, "context.local.delimiterBranch > 1: %08x".formatted(usage));
                     return;
                 }
                 context.addUsage(usage);
@@ -173,15 +175,15 @@ logger.finer(String.format("context.local.delimiterBranch > 1: %08x", usage));
         },
         USAGE_MINIMUM {
             @Override public void parse(HidParser context, Item item) {
-logger.finer("USAGE_MAXIMUM: " + item.uValue + ", " + context.local.delimiterBranch);
+logger.log(Level.TRACE, "USAGE_MAXIMUM: " + item.uValue + ", " + context.local.delimiterBranch);
                 context.local.usageMinimum = item.uValue;
             }
         },
         USAGE_MAXIMUM {
             @Override public void parse(HidParser context, Item item) {
-logger.finer("USAGE_MAXIMUM: " + item.uValue + ", " + context.local.delimiterBranch);
+logger.log(Level.TRACE, "USAGE_MAXIMUM: " + item.uValue + ", " + context.local.delimiterBranch);
                 for (int n = context.local.usageMinimum; n <= item.uValue; n++) {
-logger.finer("USAGE_MAXIMUM: " + n);
+logger.log(Level.TRACE, "USAGE_MAXIMUM: " + n);
                     context.addUsage(context.global.usagePage << 16 | n);
                 }
             }
@@ -208,7 +210,7 @@ logger.finer("USAGE_MAXIMUM: " + n);
         };
         static Tag valueOf(int tag) {
             if (tag < 0 || tag >= values().length)
-                throw new IllegalStateException(String.format("illegal/unsupported local tag %d", tag));
+                throw new IllegalStateException("illegal/unsupported local tag %d".formatted(tag));
             return values()[tag];
         }
     }
@@ -237,7 +239,7 @@ logger.finer("USAGE_MAXIMUM: " + n);
         PHYSICAL_MAXIMUM {
             @Override public void parse(HidParser context, Item item) {
                 context.global.physicalMaximum = item.sValue;
-logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
+logger.log(Level.TRACE, "global.physicalMaximum " + context.global.physicalMaximum);
             }
         },
         UNIT_EXPONENT {
@@ -253,7 +255,7 @@ logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
         REPORT_SIZE {
             @Override public void parse(HidParser context, Item item) {
                 if (item.uValue < 0 || item.uValue > 32)
-                    throw new IllegalStateException(String.format("invalid report size %d", item.uValue));
+                    throw new IllegalStateException("invalid report size %d".formatted(item.uValue));
                 context.global.reportSize = item.uValue;
             }
         },
@@ -267,7 +269,7 @@ logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
         REPORT_COUNT {
             @Override public void parse(HidParser context, Item item) {
                 if (item.uValue < 0 || item.uValue > HID_MAX_USAGES)
-                    throw new IllegalStateException(String.format("invalid report count %d", item.uValue));
+                    throw new IllegalStateException("invalid report count %d".formatted(item.uValue));
                 context.global.reportCount = item.uValue;
             }
         },
@@ -285,7 +287,7 @@ logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
         };
         static Tag valueOf(int tag) {
             if (tag < 0 || tag >= values().length)
-                throw new IllegalStateException(String.format("illegal/unsupported global tag %d", tag));
+                throw new IllegalStateException("illegal/unsupported global tag %d".formatted(tag));
             return values()[tag];
         }
     }
@@ -400,7 +402,7 @@ logger.finer("global.physicalMaximum " + context.global.physicalMaximum);
         /** */
         static boolean processNext(HidParser context) {
             if (context.parseIndex >= context.descriptorLength) {
-logger.finer("EOD");
+logger.log(Level.TRACE, "EOD");
                 return false;
             }
             Item item;
@@ -454,11 +456,11 @@ logger.finer("EOD");
 
                 if (tag == 0 && type == 0) throw new EORException();
                 if (type >= ItemType.values().length)
-                    throw new IllegalStateException(String.format("illegal/unsupported type %d", type));
+                    throw new IllegalStateException("illegal/unsupported type %d".formatted(type));
                 item = new Item(size, ItemType.values()[type], tag, value);
             }
 
-            if (logger.isLoggable(Level.FINEST)) {
+            if (logger.isLoggable(Level.TRACE)) {
                 String tags = "?";
                 if (item.tag != null)
                     tags = item.tag.toString();
@@ -500,7 +502,7 @@ logger.finer("EOD");
     private void addUsage(int usagePair) {
         if (local.usageIndex >= local.usages.length)
             throw new IllegalStateException("usage index exceeded");
-logger.finer(String.format("usage: %08x", usagePair));
+logger.log(Level.TRACE, "usage: %08x".formatted(usagePair));
         local.usages[local.usageIndex++] = usagePair;
     }
 
@@ -517,7 +519,7 @@ logger.finer(String.format("usage: %08x", usagePair));
 //            return;
 //        }
 
-logger.finer(String.format("ADD FIELD: global: %d", global.reportCount));
+logger.log(Level.TRACE, "ADD FIELD: global: %d".formatted(global.reportCount));
         int j = 0;
         for (int i = 0; i < global.reportCount; i++) {
             if (i < local.usageIndex)
@@ -542,7 +544,7 @@ logger.finer(String.format("ADD FIELD: global: %d", global.reportCount));
             field.unitExponent = global.unitExponent;
             field.unit = global.unit;
             field.init();
-logger.finer(String.format("ADD FIELD(%d): %08x (%d)", i, field.usage, j));
+logger.log(Level.TRACE, "ADD FIELD(%d): %08x (%d)".formatted(i, field.usage, j));
         }
     }
 
@@ -568,7 +570,7 @@ logger.finer(String.format("ADD FIELD(%d): %08x (%d)", i, field.usage, j));
         try {
             while (Item.processNext(this));
         } catch (EORException e) {
-logger.finer("end of report");
+logger.log(Level.TRACE, "end of report");
         }
         if (topCollection.getParent() != null)
             throw new IllegalStateException("unbalanced collection at end of report description");
@@ -580,10 +582,10 @@ logger.finer("end of report");
     }
 
     public void dump() {
-logger.finer("rootCollection: c:" + rootCollection.getChildren().size() + ", f:" + rootCollection.getFields().size());
+logger.log(Level.TRACE, "rootCollection: c:" + rootCollection.getChildren().size() + ", f:" + rootCollection.getFields().size());
         rootCollection.dump(out, "");
 
-//logger.finer("reports:");
+//logger.log(Level.TRACE, "reports:");
 //        for (Report r : reports) {
 //            r.dump(out, "");
 //        }

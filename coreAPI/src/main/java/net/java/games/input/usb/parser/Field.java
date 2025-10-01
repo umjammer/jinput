@@ -121,7 +121,7 @@ public final class Field {
         this.mask = createMask();
         this.dataBytes = isBytes() ? reportSize : (reportSize + startBit + 7) / 8;
         if (dataBytes > 8) {
-            throw new IllegalArgumentException(String.format("bad descriptor: isBytes: %s, reportSize: %d, startBit: %d", isBytes(), reportSize, startBit));
+            throw new IllegalArgumentException("bad descriptor: isBytes: %s, reportSize: %d, startBit: %d".formatted(isBytes(), reportSize, startBit));
         }
     }
 
@@ -175,7 +175,7 @@ logger.log(Level.DEBUG, x);
         out.printf(tab + "        flags: %s\n", Feature.asString(Feature.valueOf(flags)));
         out.printf(tab + "    report id: 0x%02X\n", report.id);
         out.printf(tab + "         type: %s\n", new String[] {"input", "output", "feature"}[report.type]);
-        out.printf(tab + "       offset: %d byte%s (%d)\n", offsetByte, startBit != 0 ? String.format(" and %d bit", startBit) : "", reportOffset);
+        out.printf(tab + "       offset: %d byte%s (%d)\n", offsetByte, startBit != 0 ? " and %d bit".formatted(startBit) : "", reportOffset);
         out.printf(tab + "         size: %d: %s\n", reportSize, isBytes() ? reportSize + " bytes" : toBit("*", "_"));
         out.printf(tab + "  logical min: %d\n", logicalMinimum);
         out.printf(tab + "  logical max: %d\n", logicalMaximum);
@@ -223,7 +223,7 @@ logger.log(Level.DEBUG, x);
 
     /** utility */
     public int getValue(byte[] data) {
-logger.log(Level.TRACE, () -> String.format("masked: 0x%02x, %s, moved: 0x%02x, %s", getValueInternal(data) & mask, StringUtil.toBits(getValueInternal(data) & mask), (getValueInternal(data) & mask) >> startBit, StringUtil.toBits((getValueInternal(data) & mask) >> startBit)));
+logger.log(Level.TRACE, () -> "masked: 0x%02x, %s, moved: 0x%02x, %s".formatted(getValueInternal(data) & mask, StringUtil.toBits(getValueInternal(data) & mask), (getValueInternal(data) & mask) >> startBit, StringUtil.toBits((getValueInternal(data) & mask) >> startBit)));
         return (getValueInternal(data) & mask) >> startBit;
     }
 

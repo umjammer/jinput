@@ -33,8 +33,10 @@
 package net.java.games.input;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -44,7 +46,7 @@ import java.util.logging.Logger;
 @Deprecated
 public abstract class PollingController extends AbstractController {
 
-    private static final Logger log = Logger.getLogger(PollingController.class.getName());
+    private static final Logger logger = getLogger(PollingController.class.getName());
 
     public final static int EVENT_QUEUE_DEPTH = 32;
 
@@ -74,7 +76,7 @@ public abstract class PollingController extends AbstractController {
             setDeviceEventQueueSize(size);
             eventQueue = new EventQueue(size);
         } catch (IOException e) {
-            log.fine("Failed to create new event queue of size " + size + ": " + e);
+            logger.log(Level.DEBUG, "Failed to create new event queue of size " + size + ": " + e);
         }
     }
 
@@ -133,7 +135,7 @@ public abstract class PollingController extends AbstractController {
             }
             return true;
         } catch (IOException e) {
-            log.log(Level.FINER, "Failed to poll device: " + e.getMessage(), e);
+            logger.log(Level.TRACE, "Failed to poll device: " + e.getMessage(), e);
             return false;
         }
     }

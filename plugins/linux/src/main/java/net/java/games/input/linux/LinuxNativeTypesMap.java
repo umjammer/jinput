@@ -26,10 +26,13 @@
 
 package net.java.games.input.linux;
 
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -39,14 +42,16 @@ import net.java.games.input.Controller;
  */
 class LinuxNativeTypesMap {
 
+    private static final Logger logger = getLogger(LinuxNativeTypesMap.class.getName());
+
     private static final LinuxNativeTypesMap INSTANCE = new LinuxNativeTypesMap();
-    private static final Logger log = Logger.getLogger(LinuxNativeTypesMap.class.getName());
 
     private final Component.Identifier[] relAxesIDs;
     private final Component.Identifier[] absAxesIDs;
     private final Component.Identifier[] buttonIDs;
 
-    /** create an empty, uninitialsed map
+    /**
+     * create an empty, uninitialized map
      */
     private LinuxNativeTypesMap() {
         buttonIDs = new Component.Identifier[NativeDefinitions.KEY_MAX];
@@ -55,7 +60,8 @@ class LinuxNativeTypesMap {
         reInit();
     }
 
-    /** Do the work.
+    /**
+     * Do the work.
      */
     private void reInit() {
         buttonIDs[NativeDefinitions.KEY_ESC] = Component.Identifier.Key.ESCAPE;
@@ -428,7 +434,8 @@ class LinuxNativeTypesMap {
         };
     }
 
-    /** Return port type from a native port type int id
+    /**
+     * Return port type from a native port type int id
      * @param nativeid The native port type
      * @return The jinput port type
      */
@@ -444,7 +451,8 @@ class LinuxNativeTypesMap {
         };
     }
 
-    /** Gets the identifier for a relative axis
+    /**
+     * Gets the identifier for a relative axis
      * @param nativeID The axis type ID
      * @return The jinput id
      */
@@ -453,7 +461,7 @@ class LinuxNativeTypesMap {
         try {
             retval = INSTANCE.relAxesIDs[nativeID];
         } catch (ArrayIndexOutOfBoundsException e) {
-            log.warning("INSTANCE.relAxesIDis only " + INSTANCE.relAxesIDs.length + " long, so " + nativeID + " not contained");
+            logger.log(Level.WARNING, "INSTANCE.relAxesIDis only " + INSTANCE.relAxesIDs.length + " long, so " + nativeID + " not contained");
             //ignore, pretend it was null
         }
         if (retval == null) {
@@ -471,7 +479,7 @@ class LinuxNativeTypesMap {
         try {
             retval = INSTANCE.absAxesIDs[nativeID];
         } catch (ArrayIndexOutOfBoundsException e) {
-            log.warning("INSTANCE.absAxesIDs is only " + INSTANCE.absAxesIDs.length + " long, so " + nativeID + " not contained");
+            logger.log(Level.WARNING, "INSTANCE.absAxesIDs is only " + INSTANCE.absAxesIDs.length + " long, so " + nativeID + " not contained");
             //ignore, pretend it was null
         }
         if (retval == null) {
@@ -489,7 +497,7 @@ class LinuxNativeTypesMap {
         try {
             retval = INSTANCE.buttonIDs[nativeID];
         } catch (ArrayIndexOutOfBoundsException e) {
-            log.warning("INSTANCE.buttonIDs is only " + INSTANCE.buttonIDs.length + " long, so " + nativeID + " not contained");
+            logger.log(Level.WARNING, "INSTANCE.buttonIDs is only " + INSTANCE.buttonIDs.length + " long, so " + nativeID + " not contained");
             //ignore, pretend it was null
         }
         if (retval == null) {

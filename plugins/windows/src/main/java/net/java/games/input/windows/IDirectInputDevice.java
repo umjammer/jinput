@@ -34,6 +34,8 @@
 package net.java.games.input.windows;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -42,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -65,6 +66,7 @@ import net.java.games.input.windows.WinAPI.DIPROPDWORD;
 import net.java.games.input.windows.WinAPI.IDirectInputDevice8;
 
 import static com.sun.jna.platform.win32.COM.COMUtils.S_FALSE;
+import static java.lang.System.getLogger;
 import static net.java.games.input.windows.WinAPI.DIENUM_CONTINUE;
 import static net.java.games.input.windows.WinAPI.DIPH_BYID;
 import static net.java.games.input.windows.WinAPI.DIPH_DEVICE;
@@ -82,7 +84,7 @@ import static net.java.games.input.windows.WinAPI.DIPROP_RANGE;
  */
 final class IDirectInputDevice {
 
-    private static final Logger log = Logger.getLogger(IDirectInputDevice.class.getName());
+    private static final Logger logger = getLogger(IDirectInputDevice.class.getName());
 
     public final static int GUID_XAxis = 1;
     public final static int GUID_YAxis = 2;
@@ -263,7 +265,7 @@ final class IDirectInputDevice {
             enumEffects();
             createRumblers();
         } catch (IOException e) {
-            log.fine("Failed to create rumblers: " + e.getMessage());
+            logger.log(Level.DEBUG, "Failed to create rumblers: " + e.getMessage());
         }
         // Some DirectInput lamer-designer made the device state
         // axis mode be per-device not per-axis, so I'll just
@@ -490,7 +492,7 @@ final class IDirectInputDevice {
         PointerByReference pEffect = new PointerByReference();
         int /* HRESULT */ res = lpDevice.CreateEffect.apply(effectGuid, effect, pEffect, null);
         if (res != DI_OK) {
-            throw new IOException(String.format("Failed to create effect (0x%x)", res));
+            throw new IOException("Failed to create effect (0x%x)".formatted(res));
         }
         return pEffect.getValue();
     }
@@ -774,7 +776,7 @@ final class IDirectInputDevice {
 
         int /* HRESULT */ res = directInputDevice8.GetProperty.apply(new GUID.ByValue(DIPROP_DEADZONE), deadzone.diph);
         if (res != DI_OK && res != S_FALSE)
-            throw new NoSuchElementException(String.format("Failed to get deadzone property (%x)", res));
+            throw new NoSuchElementException("Failed to get deadzone property (%x)".formatted(res));
         return deadzone.dwData;
     }
 

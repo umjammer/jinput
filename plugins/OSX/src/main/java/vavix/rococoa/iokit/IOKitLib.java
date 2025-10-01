@@ -6,10 +6,11 @@
 
 package vavix.rococoa.iokit;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackReference;
@@ -30,6 +31,8 @@ import vavix.rococoa.corefoundation.CFRunLoop;
 import vavix.rococoa.corefoundation.CFString;
 import vavix.rococoa.corefoundation.CFType;
 
+import static java.lang.System.getLogger;
+
 
 /**
  * The IOKit framework implements nonkernel access to IOKit objects such drivers and nubs through the device-interface
@@ -40,7 +43,7 @@ import vavix.rococoa.corefoundation.CFType;
  */
 public interface IOKitLib extends Library {
 
-    Logger log = Logger.getLogger(IOKitLib.class.getName());
+    Logger logger = getLogger(IOKitLib.class.getName());
 
     IOKitLib INSTANCE = Native.load("IOKit", IOKitLib.class);
 
@@ -732,7 +735,7 @@ public interface IOKitLib extends Library {
 
         public IOHIDDeviceInterface(Pointer p) {
             super(p);
-log.finer("IOHIDDeviceInterface: " + p.dump(0, this.size()));
+logger.log(Level.TRACE, "IOHIDDeviceInterface: " + p.dump(0, this.size()));
             _reserved = getPointer().getPointer(0);
             queryInterface = (QueryInterfaceCallback) CallbackReference.getCallback(QueryInterfaceCallback.class, p.getPointer(0x08));
             addRef = (AddRefCallback) CallbackReference.getCallback(AddRefCallback.class, p.getPointer(0x10));
@@ -758,7 +761,7 @@ log.finer("IOHIDDeviceInterface: " + p.dump(0, this.size()));
 
             copyMatchingElements = (CopyMatchingElementsCallback) CallbackReference.getCallback(CopyMatchingElementsCallback.class, p.getPointer(0xa0));
             setInputReportCallback = (SetInputReportCallbackCallback) CallbackReference.getCallback(SetInputReportCallbackCallback.class, p.getPointer(0xa8));
-log.finer("IOHIDDeviceInterface:\n" + this);
+logger.log(Level.TRACE, "IOHIDDeviceInterface:\n" + this);
         }
 
         public static class ByReference extends IOHIDDeviceInterface implements Structure.ByReference {
@@ -901,7 +904,7 @@ log.finer("IOHIDDeviceInterface:\n" + this);
             getNextEvent = (GetNextEventCallback) CallbackReference.getCallback(GetNextEventCallback.class, p.getPointer(0x78));
             setEventCallout = (SetEventCalloutCallback) CallbackReference.getCallback(SetEventCalloutCallback.class, p.getPointer(0x80));
             getEventCallout = (GetEventCalloutCallback) CallbackReference.getCallback(GetEventCalloutCallback.class, p.getPointer(0x88));
-log.finer("IOHIDQueueInterface:\n" + this);
+logger.log(Level.TRACE, "IOHIDQueueInterface:\n" + this);
         }
 
         public static class ByReference extends IOHIDQueueInterface implements Structure.ByReference {

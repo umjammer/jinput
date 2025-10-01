@@ -27,10 +27,13 @@
 package net.java.games.input.linux;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import net.java.games.input.Component;
 import net.java.games.input.Rumbler;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -38,7 +41,7 @@ import net.java.games.input.Rumbler;
  */
 abstract class LinuxForceFeedbackEffect implements Rumbler {
 
-    private static final Logger log = Logger.getLogger(LinuxForceFeedbackEffect.class.getName());
+    private static final Logger logger = getLogger(LinuxForceFeedbackEffect.class.getName());
 
     enum ForceFeedbackEffectOutput implements Component.Identifier.Output {
         ForceFeedbackEffect("forceFeedbackEffect");
@@ -88,7 +91,7 @@ abstract class LinuxForceFeedbackEffect implements Rumbler {
                 writeTask.write(0);
             }
         } catch (IOException e) {
-            log.fine("Failed to rumble: " + e);
+            logger.log(Level.DEBUG, "Failed to rumble: " + e);
         }
     }
 

@@ -117,11 +117,11 @@ final class RawInputEventQueue {
             RAWINPUT[] inputData = new WinAPI.RAWINPUT[inputSize.getValue()];
             if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), WinAPI.RID_INPUT, null, inputSize, inputData[0].size()) == -1) {
                 User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
-                throw new IOException(String.format("Failed to get raw input data size (%d)", Native.getLastError()));
+                throw new IOException("Failed to get raw input data size (%d)".formatted(Native.getLastError()));
             }
             if (User32Ex.INSTANCE.GetRawInputData(msg.lParam.toPointer(), WinAPI.RID_INPUT, inputData, inputSize, inputData[0].size()) == -1) {
                 User32.INSTANCE.DefWindowProc(hwnd, msg.message, msg.wParam, msg.lParam);
-                throw new IOException(String.format("Failed to get raw input data (%d)", Native.getLastError()));
+                throw new IOException("Failed to get raw input data (%d)".formatted(Native.getLastError()));
             }
             switch (inputData[0].header.dwType) {
             case RIM_TYPEMOUSE:
@@ -178,7 +178,7 @@ final class RawInputEventQueue {
 //            devices = new RAWINPUTDEVICE[numDevices];
 //            res = GetRegisteredRawInputDevices(devices, numDevices, sizeof(RAWINPUTDEVICE));
 //            if (res == -1) {
-//                throw new IOException(String.format("Failed to get registered raw devices (%d)", Native.getLastError()));
+//                throw new IOException("Failed to get registered raw devices (%d)".formatted(Native.getLastError()));
 //            }
 //            for (i = 0; i < numDevices; i++) {
 //                System.err.printf("from windows: registered: %d %d %s (of %d)", devices[i].usUsagePage, devices[i].usUsage, devices[i].hwndTarget, numDevices);
@@ -197,7 +197,7 @@ final class RawInputEventQueue {
         }
         boolean res = User32Ex.INSTANCE.RegisterRawInputDevices(devices, numDevices, devices[0].size());
         if (!res)
-            throw new IOException(String.format("Failed to register raw devices (%d)", Native.getLastError()));
+            throw new IOException("Failed to register raw devices (%d)".formatted(Native.getLastError()));
     }
 
     private final class QueueThread extends Thread {

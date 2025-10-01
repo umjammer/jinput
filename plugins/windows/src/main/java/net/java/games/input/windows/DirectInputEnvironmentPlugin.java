@@ -33,9 +33,10 @@
 package net.java.games.input.windows;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.java.games.input.AbstractController;
 import net.java.games.input.Component;
@@ -44,6 +45,8 @@ import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.ControllerListenerSupport;
 import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -55,7 +58,7 @@ import net.java.games.input.Mouse;
  */
 final class DirectInputEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
-    private static final Logger log = Logger.getLogger(DirectInputEnvironmentPlugin.class.getName());
+    private static final Logger logger = getLogger(DirectInputEnvironmentPlugin.class.getName());
 
     private static boolean supported = false;
 
@@ -77,7 +80,7 @@ final class DirectInputEnvironmentPlugin extends ControllerListenerSupport imple
             try {
                 window = new DummyWindow();
             } catch (IOException e) {
-                log.fine("Failed to enumerate devices: " + e.getMessage());
+                logger.log(Level.DEBUG, "Failed to enumerate devices: " + e.getMessage());
             }
             this.window = window;
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
@@ -99,7 +102,7 @@ final class DirectInputEnvironmentPlugin extends ControllerListenerSupport imple
                     throw e;
                 }
             } catch (IOException e) {
-                log.fine("Failed to enumerate devices: " + e.getMessage());
+                logger.log(Level.DEBUG, "Failed to enumerate devices: " + e.getMessage());
             }
         }
 

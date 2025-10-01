@@ -18,6 +18,8 @@
 
 package vavix.rococoa.corefoundation;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -25,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -33,6 +34,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.ptr.DoubleByReference;
 import com.sun.jna.ptr.LongByReference;
 
+import static java.lang.System.getLogger;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberCFIndexType;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberCharType;
 import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberDoubleType;
@@ -57,7 +59,7 @@ import static vavix.rococoa.corefoundation.CFLib.CFNumberType.kCFNumberShortType
  */
 public class CFDictionary extends CFType {
 
-    private static final Logger log = Logger.getLogger(CFDictionary.class.getName());
+    private static final Logger logger = getLogger(CFDictionary.class.getName());
 
     public CFDictionary(Pointer address) {
         super(address);
@@ -179,11 +181,11 @@ public class CFDictionary extends CFType {
         ByteBuffer buffer = ByteBuffer.allocate(utf8Length + 1);
         boolean result = CFLib.INSTANCE.CFStringGetCString(cfstring, buffer, new NativeLong(utf8Length + 1), CFLib.kCFStringEncodingUTF8);
         if (!result) {
-log.warning("CFStringGetCString: " + result + ", " + cfstring);
+logger.log(Level.WARNING, "CFStringGetCString: " + result + ", " + cfstring);
             return null;
         }
         String string = new String(buffer.array(), 0, utf8Length, StandardCharsets.UTF_8).replace("\u0000", "");
-log.finer("string: " + string + ", utf8Length: " + utf8Length);
+logger.log(Level.TRACE, "string: " + string + ", utf8Length: " + utf8Length);
         return string;
     }
 
@@ -191,7 +193,7 @@ log.finer("string: " + string + ", utf8Length: " + utf8Length);
         DoubleByReference value = new DoubleByReference();
         boolean result = CFLib.INSTANCE.CFNumberGetValue(cfnumber, kCFNumberDoubleType, value);
         if (!result) {
-log.warning("CFNumberGetValue: " + result + ", " + cfnumber);
+logger.log(Level.WARNING, "CFNumberGetValue: " + result + ", " + cfnumber);
             return null;
         }
         return value.getValue();
@@ -201,7 +203,7 @@ log.warning("CFNumberGetValue: " + result + ", " + cfnumber);
         LongByReference value = new LongByReference();
         boolean result = CFLib.INSTANCE.CFNumberGetValue(cfnumber, kCFNumberSInt64Type, value);
         if (!result) {
-log.warning("CFNumberGetValue: " + result + ", " + cfnumber);
+logger.log(Level.WARNING, "CFNumberGetValue: " + result + ", " + cfnumber);
             return null;
         }
         return value.getValue();
@@ -216,7 +218,7 @@ log.warning("CFNumberGetValue: " + result + ", " + cfnumber);
             case kCFNumberFloat32Type, kCFNumberFloat64Type, kCFNumberFloatType, kCFNumberDoubleType ->
                     createDoubleObjectFromCFNumber(cfnumber);
             default -> {
-log.warning("unknown number type: " + numberType + ", " + cfnumber);
+logger.log(Level.WARNING, "unknown number type: " + numberType + ", " + cfnumber);
                 yield null;
             }
         };
@@ -227,10 +229,10 @@ log.warning("unknown number type: " + numberType + ", " + cfnumber);
         Object jval = createObjectFromCFObject(value);
         Object[] array = ArrayContext.arrays.get(arrayContext.arrayId);
         if (array == null) {
-log.warning("no array for id: " + arrayContext.arrayId);
+logger.log(Level.WARNING, "no array for id: " + arrayContext.arrayId);
             return;
         }
-log.finer("array(" + arrayContext.arrayId + "): [" + arrayContext.index + "] = " + jval);
+logger.log(Level.TRACE, "array(" + arrayContext.arrayId + "): [" + arrayContext.index + "] = " + jval);
         array[arrayContext.index++] = jval;
         arrayContext.write();
     }
@@ -246,7 +248,7 @@ log.finer("array(" + arrayContext.arrayId + "): [" + arrayContext.index + "] = "
         arrayContext.index = 0;
         ArrayContext.arrays.put(arrayContext.arrayId, array);
         CFLib.INSTANCE.CFArrayApplyFunction(cfarray, range, CFDictionary::createArrayEntries, arrayContext);
-log.finer("ARRAY(" + arrayContext.arrayId + "): " + array.length);
+logger.log(Level.TRACE, "ARRAY(" + arrayContext.arrayId + "): " + array.length);
         return array;
     }
 
@@ -264,36 +266,36 @@ log.finer("ARRAY(" + arrayContext.arrayId + "): " + array.length);
             return createStringFromCFString(cfobject.asString());
         } else if (typeId.equals(CFLib.INSTANCE.CFNumberGetTypeID())) { // 22
             Object n = createNumberFromCFNumber(cfobject.asNumber());
-            log.finer("number type: " + n);
+            logger.log(Level.TRACE, "number type: " + n);
             return n;
         } else if (typeId.equals(CFLib.INSTANCE.CFBooleanGetTypeID())) { // 21
             boolean b = createBooleanFromCFBoolean(cfobject.asBoolean());
-            log.finer("boolean type: " + b);
+            logger.log(Level.TRACE, "boolean type: " + b);
             return b;
         } else if (typeId.equals(CFLib.INSTANCE.CFDataGetTypeID())) { // 20
             return cfobject.asData().getBuffer().array();
         } else {
-            log.warning("unknown type: " + typeId + ", " + cfobject);
+            logger.log(Level.WARNING, "unknown type: " + typeId + ", " + cfobject);
             return null;
         }
     }
 
     static void createMapKeys(CFString key, CFType value, Pointer context) {
         DictContext dictContext = new DictContext(context);
-log.finer(dictContext.getPointer().dump(0, dictContext.size()));
+logger.log(Level.TRACE, dictContext.getPointer().dump(0, dictContext.size()));
 //if (key.getString().equals("Elements")) {
-// log.fine("Elements: value: " + value.getType());
+// logger.log(Level.DEBUG, "Elements: value: " + value.getType());
 //}
         Object jkey = createObjectFromCFObject(key);
         Object jvalue = createObjectFromCFObject(value);
-log.finer("map(" + dictContext.mapId + "): put: " + jkey + ", " + jvalue);
+logger.log(Level.TRACE, "map(" + dictContext.mapId + "): put: " + jkey + ", " + jvalue);
         if (jkey == null || jvalue == null) {
-log.warning("map: " + dictContext.mapId + ":: put: " + jkey + ", " + jvalue + "(" + (value != null ? value.getType() : "??") + ")");
+logger.log(Level.WARNING, "map: " + dictContext.mapId + ":: put: " + jkey + ", " + jvalue + "(" + (value != null ? value.getType() : "??") + ")");
             return;
         }
         Map<Object, Object> map = DictContext.maps.get(dictContext.mapId);
         if (map == null) {
-log.warning("no map for id: " + dictContext.mapId);
+logger.log(Level.WARNING, "no map for id: " + dictContext.mapId);
             return;
         }
         map.put(jkey, jvalue);
@@ -305,7 +307,7 @@ log.warning("no map for id: " + dictContext.mapId);
         dictContext.mapId = DictContext.mapIdGenerator++;
         DictContext.maps.put(dictContext.mapId, map);
         CFLib.INSTANCE.CFDictionaryApplyFunction(this, CFDictionary::createMapKeys, dictContext);
-log.finer("MAP(" + dictContext.mapId + "): " + map.size());
+logger.log(Level.TRACE, "MAP(" + dictContext.mapId + "): " + map.size());
         return map;
     }
 

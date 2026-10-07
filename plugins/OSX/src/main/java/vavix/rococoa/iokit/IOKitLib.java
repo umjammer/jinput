@@ -685,7 +685,7 @@ public interface IOKitLib extends Library {
 
         public interface GetReportCallback extends Callback {
 
-            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer reportBuffer, int reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
+            int invoke(Pointer self, int /* IOHIDReportType */ reportType, int reportID, Pointer reportBuffer, IntByReference /* UInt32* */ reportBufferSize, int timeoutMS, ReportCallbackFunction callback, Pointer callbackTarget, Pointer callbackRefcon);
         }
 
         // since 1.2.2

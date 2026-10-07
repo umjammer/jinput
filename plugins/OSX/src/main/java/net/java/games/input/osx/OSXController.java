@@ -40,6 +40,7 @@ import net.java.games.input.Event;
 import net.java.games.input.PollingController;
 import net.java.games.input.Rumbler;
 import net.java.games.input.usb.HidController;
+import net.java.games.input.usb.HidReportType;
 import net.java.games.input.usb.HidRumbler;
 
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportTypeOutput;
@@ -110,5 +111,22 @@ final class OSXController extends PollingController implements HidController {
             ((HidRumbler) rumbler).fill(data);
         }
         device.setReport(kIOHIDReportTypeOutput, reportId, data, data.length);
+    }
+
+    @Override
+    public byte[] getReportDescriptor() {
+        return device.getReportDescriptor();
+    }
+
+    @Override
+    public void writeReport(HidReportType type, int reportId, byte[] data) throws IOException {
+        if (type == HidReportType.INPUT) throw new IllegalArgumentException("an input report cannot be written");
+        device.writeReport(type.value(), reportId, data);
+    }
+
+    @Override
+    public int readReport(HidReportType type, int reportId, byte[] buffer) throws IOException {
+        if (type == HidReportType.OUTPUT) throw new IllegalArgumentException("an output report cannot be read");
+        return device.getReport(type.value(), reportId, buffer);
     }
 }

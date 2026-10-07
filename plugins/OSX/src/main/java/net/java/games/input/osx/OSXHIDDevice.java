@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 import net.java.games.input.Controller;
@@ -69,7 +70,13 @@ import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementUsagePageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsagePageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductIDKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDMaxFeatureReportSizeKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDMaxInputReportSizeKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDMaxOutputReportSizeKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportDescriptorKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportTypeFeature;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportTypeInput;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDTransportKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDVendorIDKey;
 
@@ -342,6 +349,68 @@ logger.log(Level.TRACE, "ioReturnValue: " + ioReturnValue);
         m.close();
         if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
             throw new IOException("Device '%s' setReport failed: %x".formatted(getProductName(), ioReturnValue));
+        }
+    }
+
+    /** @return the raw report descriptor, null when IOKit does not give it */
+    public byte[] getReportDescriptor() {
+        Object descriptor = properties.get(kIOHIDReportDescriptorKey);
+        return descriptor instanceof byte[] bytes ? bytes.clone() : null;
+    }
+
+    /**
+     * @param type kIOHIDReportType*
+     * @return the largest report of the type the device declares, including a report id byte, 0 when unknown
+     */
+    public int getMaxReportSize(int type) {
+        String key = switch (type) {
+            case kIOHIDReportTypeInput -> kIOHIDMaxInputReportSizeKey;
+            case kIOHIDReportTypeFeature -> kIOHIDMaxFeatureReportSizeKey;
+            default -> kIOHIDMaxOutputReportSizeKey;
+        };
+        return (int) getLongFromProperties(properties, key, 0);
+    }
+
+    /**
+     * Sends a report as is. Unlike {@link #setReport(int, int, byte[], int)} the report id is
+     * put in front only when the device numbers its reports (reportID != 0).
+     *
+     * @param data the report body without the report id
+     */
+    public synchronized void writeReport(int type, int reportID, byte[] data) throws IOException {
+        checkReleased();
+        int offset = reportID != 0 ? 1 : 0;
+        try (Memory m = new Memory(Math.max(1, data.length + offset))) {
+            if (offset != 0) m.setByte(0, (byte) reportID);
+            m.write(offset, data, 0, data.length);
+            int ioReturnValue = deviceInterface.setReport.invoke(deviceInterfaceAddress, type, reportID, m, data.length + offset, -1, null, null, null);
+            if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
+                throw new IOException("Device '%s' setReport(%d, %d) failed: %x".formatted(getProductName(), type, reportID, ioReturnValue));
+            }
+        }
+    }
+
+    /**
+     * Asks the device for a report.
+     *
+     * @param buffer filled with the report body, the report id IOKit puts in front is taken off
+     * @return bytes filled
+     */
+    public synchronized int getReport(int type, int reportID, byte[] buffer) throws IOException {
+        checkReleased();
+        int capacity = Math.max(buffer.length + 1, getMaxReportSize(type));
+        try (Memory m = new Memory(capacity)) {
+            m.clear();
+            IntByReference length = new IntByReference(capacity);
+            int ioReturnValue = deviceInterface.getReport.invoke(deviceInterfaceAddress, type, reportID, m, length, -1, null, null, null);
+            if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
+                throw new IOException("Device '%s' getReport(%d, %d) failed: %x".formatted(getProductName(), type, reportID, ioReturnValue));
+            }
+            int n = Math.min(length.getValue(), capacity);
+            int offset = reportID != 0 && n > 0 && (m.getByte(0) & 0xff) == reportID ? 1 : 0;
+            int count = Math.min(n - offset, buffer.length);
+            m.read(offset, buffer, 0, count);
+            return count;
         }
     }
 }

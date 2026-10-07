@@ -42,7 +42,20 @@ import net.java.games.input.usb.HidController;
  * feature 0xf1  63 bytes  PS4 auth: response
  * feature 0xf2  15 bytes  PS4 auth: status
  * </pre>
- * so the profile memory is most likely reached in PC mode, outside hid. How HORI Device Manager
+ * so the profile memory is most likely reached in PC mode, outside hid.
+ * <p>
+ * In PC mode the device (class ff/ff/ff, bcdDevice 1.29) is laid out as a wired Xbox 360 pad,
+ * with the endpoint numbers shuffled:
+ * <pre>
+ * if  class     Xbox 360 role                endpoints (all interrupt, 32 bytes)
+ * 0   ff/5d/01  gamepad: buttons, rumble/led  IN 0x84, OUT 0x03
+ * 1   ff/5d/03  headset / voice               IN 0x82, OUT 0x01, IN 0x83, OUT 0x04
+ * 2   ff/5d/02  expansion port                IN 0x81
+ * 3   ff/fd/13  security (console auth)       none
+ * </pre>
+ * It speaks XInput, not GIP, and has no OUT 0x02, so hori.py's commands for the Xbox model
+ * (OUT 0x02 / IN 0x82) do not apply as they are. Which interface, or which vendor control
+ * request, HORI Device Manager uses is still to be captured. How HORI Device Manager
  * does it is not known yet, so the transport refuses everything rather than send bytes nobody
  * has seen work.
  *

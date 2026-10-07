@@ -31,8 +31,20 @@ import net.java.games.input.usb.HidController;
  *  <li>0f0d:0164 in PC mode, an XInput device (class ff), not hid</li>
  * </ul>
  * and the Xbox model as 0f0d:0150, a GIP device, not hid either.
- * How HORI Device Manager talks to the PlayStation model is not known yet, so its transport
- * refuses everything rather than send bytes nobody has seen work.
+ * <p>
+ * In PS5 mode the report descriptor is that of a PS4 licensed pad and nothing more:
+ * <pre>
+ * input   0x01  63 bytes  the pad
+ * output  0x02  47 bytes
+ * feature 0x03  47 bytes  usage 0x2821, reads 21 28 03 c0 00 2c 56 .. (capabilities)
+ * feature 0xe0   2 bytes  page 0xff80, getReport fails
+ * feature 0xf0  63 bytes  PS4 auth: challenge, getReport fails
+ * feature 0xf1  63 bytes  PS4 auth: response
+ * feature 0xf2  15 bytes  PS4 auth: status
+ * </pre>
+ * so the profile memory is most likely reached in PC mode, outside hid. How HORI Device Manager
+ * does it is not known yet, so the transport refuses everything rather than send bytes nobody
+ * has seen work.
  *
  * @author <a href="mailto:umjammer@gmail.com">Naohide Sano</a> (nsano)
  * @version 0.00 2026-10-07 nsano initial version <br>

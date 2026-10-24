@@ -13,3 +13,4 @@ eclipse_bin/
 dependency-reduced-pom.xml
 tmp/
 local.properties
+AGENTS.md

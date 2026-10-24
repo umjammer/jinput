@@ -11,7 +11,7 @@
 
 this library is
 
- - using jna directly instead of jni
+ - using jna instead of jni
  - using service-loader instead of proprietary plugin mechanism
 
 and this is a fork of [original](https://github.com/jinput/jinput)
@@ -56,6 +56,8 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
   * separate jna parts as jna-platform-extended?
 * ~~at windows, i mistake dword as 2byte~~
 * component value should be generics? (currently float fixed)
+* ~~test disconnect/reconnect~~
+* check listener threadsafe, see hid4java
 
 ---
 <sub>images by <a href="https://megamodz.com/PS5-Controller-Paddles">DualSense</a>, <a href="https://wiki.openjdk.org/display/duke/Gallery">Duke</a></sub>

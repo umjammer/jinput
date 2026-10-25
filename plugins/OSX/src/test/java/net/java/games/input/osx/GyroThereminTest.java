@@ -4,7 +4,7 @@
  * Programmed by Naohide Sano
  */
 
-package net.java.games.input;
+package net.java.games.input.osx;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -14,12 +14,25 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import net.java.games.input.AbstractController;
+import net.java.games.input.Component;
+import net.java.games.input.Component.Identifier;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Event;
+import net.java.games.input.EventQueue;
+import net.java.games.input.InputEvent;
+import net.java.games.input.PollingComponent;
+import net.java.games.input.PollingController;
+import net.java.games.input.Version;
 import net.java.games.input.plugin.DualShock4PluginBase.Report5;
 import net.java.games.input.usb.HidController;
 import net.java.games.input.usb.HidInputEvent;
+import vavi.games.input.hid4java.spi.Hid4JavaEnvironmentPlugin;
 
 
 /**
@@ -50,7 +63,8 @@ import net.java.games.input.usb.HidInputEvent;
  *  <li>Options : print help</li>
  *  <li>PS : quit</li>
  * </ul>
- * the gyroscope is read from raw DualShock 4 input reports ({@link HidInputEvent}).
+ * the gyroscope is read from raw DualShock 4 input reports ({@link HidInputEvent}),
+ * so the hid4java environment is used, the osx plugin does not deliver raw reports.
  * when the environment plugin does not deliver raw reports, the left stick is used
  * instead of the gyroscope (x : pitch, y : volume).
  * <p>
@@ -63,8 +77,8 @@ public class GyroThereminTest {
 
     /** sony */
     private static final int VENDOR_ID = 0x54c;
-    /** DualShock 4 v1, v2 */
-    private static final int[] PRODUCT_IDS = {0x5c4, 0x9cc};
+    /** DualShock 4 v1, v2, usb wireless adapter */
+    private static final int[] PRODUCT_IDS = {0x5c4, 0x9cc, 0xba0};
 
     /** gyro sensitivity, about 16 LSB per degree/second */
     private static final double GYRO_DPS_PER_LSB = 1 / 16.0;
@@ -226,6 +240,12 @@ public class GyroThereminTest {
             try (SourceDataLine line = AudioSystem.getSourceDataLine(format)) {
                 line.open(format, BLOCK * 2 * 4);
                 line.start();
+
+                double gain = 0.1;
+                FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                float dB = (float) (Math.log10(gain) * 20.0);
+                gainControl.setValue(dB);
+
                 byte[] buf = new byte[BLOCK * 2];
                 while (running) {
                     for (int i = 0; i < BLOCK; i++) {
@@ -348,7 +368,7 @@ public class GyroThereminTest {
     private final Gyro gyro = new Gyro();
     private final Synth synth = new Synth();
     /** latest component values */
-    private final Map<Component.Identifier, Float> values = new ConcurrentHashMap<>();
+    private final Map<Identifier, Float> values = new ConcurrentHashMap<>();
 
     private Waveform waveform = Waveform.SINE;
     private boolean echo, crusher, mute;
@@ -373,7 +393,7 @@ public class GyroThereminTest {
     /** buttons, triggers and the left stick from the components, used when raw reports are not available */
     private EnumSet<Button> readComponents(double[] analog) {
         EnumSet<Button> buttons = EnumSet.noneOf(Button.class);
-        Component.Identifier.Button[] ids = {
+        Identifier.Button[] ids = {
                 Component.Identifier.Button._0, Component.Identifier.Button._1, Component.Identifier.Button._2,
                 Component.Identifier.Button._3, Component.Identifier.Button._4, Component.Identifier.Button._5,
                 Component.Identifier.Button._6, Component.Identifier.Button._7, Component.Identifier.Button._8,
@@ -412,6 +432,15 @@ public class GyroThereminTest {
         boolean getNextEvent(Event event);
     }
 
+    /** usb output report 0x05 */
+    private void setLightBar(int rgb) throws IOException {
+        Report5 report = new Report5();
+        report.ledRed = (rgb >> 16) & 0xff;
+        report.ledGreen = (rgb >> 8) & 0xff;
+        report.ledBlue = rgb & 0xff;
+        ((AbstractController) controller).output(report);
+    }
+
     void play() throws Exception {
         controller.addInputEventListener(event -> {
             if (event instanceof HidInputEvent hid) {
@@ -441,11 +470,15 @@ public class GyroThereminTest {
         while (true) {
             // plugins those don't fire input events
             if (controller instanceof PollingController polling) {
-                if (!polling.poll()) {
-                    System.out.println("\ncontroller disconnected");
-                    break;
-                }
+                // the osx plugin's poll() returns false even when the device is fine (kIOReturnUnderrun lacks
+                // the system bits), so ignore it and read the poll data, which comes straight off the device
+                polling.poll();
                 drain(polling.getEventQueue()::getNextEvent);
+                for (Component component : polling.getComponents()) {
+                    if (component instanceof PollingComponent pc && !pc.isRelative()) {
+                        values.put(component.getIdentifier(), pc.getPollData());
+                    }
+                }
             }
 
             long now = System.nanoTime();
@@ -508,12 +541,8 @@ public class GyroThereminTest {
             if (ledEnabled && now - lastLed > 50_000_000L) {
                 lastLed = now;
                 int rgb = Color.HSBtoRGB((float) (semitone / PITCH_RANGE) * 0.8f, 1, (float) Math.max(0.1, volume));
-                Report5 report = new Report5();
-                report.ledRed = (rgb >> 16) & 0xff;
-                report.ledGreen = (rgb >> 8) & 0xff;
-                report.ledBlue = rgb & 0xff;
                 try {
-                    ((AbstractController) controller).output(report);
+                    setLightBar(rgb);
                 } catch (Exception e) {
                     System.err.println("\nlight bar disabled: " + e);
                     ledEnabled = false;
@@ -536,7 +565,7 @@ public class GyroThereminTest {
         audio.join();
         if (ledEnabled) {
             try {
-                ((AbstractController) controller).output(new Report5());
+                setLightBar(0);
             } catch (Exception ignored) {
             }
         }
@@ -547,11 +576,24 @@ public class GyroThereminTest {
      * @param args [controller name substring]
      */
     public static void main(String[] args) throws Exception {
-        ControllerEnvironment ce = ControllerEnvironment.getDefaultEnvironment();
         System.out.println("JInput version: " + Version.getVersion());
 
+        // hid4java delivers raw input reports which have the gyro, the osx plugin does not
         Controller target = null;
-        for (Controller controller : ce.getControllers()) {
+        try {
+            for (Controller controller : new Hid4JavaEnvironmentPlugin().getControllers()) {
+                if (isDualShock4(controller) &&
+                        (args.length == 0 || controller.getName().toLowerCase().contains(args[0].toLowerCase()))) {
+                    target = controller;
+                    break;
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("hid4java unavailable, the gyro will not work: " + t);
+        }
+
+        ControllerEnvironment ce = ControllerEnvironment.getDefaultEnvironment();
+        for (Controller controller : target != null ? new Controller[0] : ce.getControllers()) {
             if (args.length > 0) {
                 if (controller.getName().toLowerCase().contains(args[0].toLowerCase())) {
                     target = controller;

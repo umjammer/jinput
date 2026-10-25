@@ -33,7 +33,10 @@
 package net.java.games.input;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -42,7 +45,7 @@ import java.util.logging.Logger;
 @Deprecated
 public abstract class PollingComponent extends AbstractComponent {
 
-    private static final Logger log = Logger.getLogger(PollingComponent.class.getName());
+    private static final Logger logger = getLogger(PollingComponent.class.getName());
 
     private boolean hasPolled;
     private float value;
@@ -70,7 +73,7 @@ public abstract class PollingComponent extends AbstractComponent {
             try {
                 setPollData(poll());
             } catch (IOException e) {
-                log.fine("Failed to poll component: " + e);
+                logger.log(Level.DEBUG, "Failed to poll component: " + e);
             }
         }
         return value;

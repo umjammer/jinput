@@ -1,13 +1,16 @@
 package net.java.games.input.linux;
 
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import net.java.games.input.Component;
+
+import static java.lang.System.getLogger;
 
 
 public class LinuxJoystickPOV extends LinuxJoystickAxis {
 
-    private static final Logger log = Logger.getLogger(LinuxJoystickPOV.class.getName());
+    private static final Logger logger = getLogger(LinuxJoystickPOV.class.getName());
 
     private final LinuxJoystickAxis hatX;
     private final LinuxJoystickAxis hatY;
@@ -51,7 +54,7 @@ public class LinuxJoystickPOV extends LinuxJoystickAxis {
         else if (lastX == 1 && lastY == 1)
             setValue(Component.POV.DOWN_RIGHT);
         else {
-            log.fine("Unknown values x = " + lastX + " | y = " + lastY);
+            logger.log(Level.DEBUG, "Unknown values x = " + lastX + " | y = " + lastY);
             setValue(Component.POV.OFF);
         }
     }

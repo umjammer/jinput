@@ -34,28 +34,29 @@
 package net.java.games.input.osx;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
+
 import net.java.games.input.Controller;
 import net.java.games.input.usb.ElementType;
 import net.java.games.input.usb.GenericDesktopUsageId;
 import net.java.games.input.usb.UsageId;
 import net.java.games.input.usb.UsagePage;
 import net.java.games.input.usb.UsagePair;
-import vavi.util.Debug;
 import vavix.rococoa.corefoundation.CFAllocator;
 import vavix.rococoa.corefoundation.CFDictionary;
 import vavix.rococoa.iokit.IOKitLib;
 import vavix.rococoa.iokit.IOKitLib.IOHIDDeviceInterface;
 import vavix.rococoa.kernel.KernelLib;
 
+import static java.lang.System.getLogger;
 import static vavix.rococoa.iokit.IOKitLib.INSTANCE;
 import static vavix.rococoa.iokit.IOKitLib.IOHIDEventStruct;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementCookieKey;
@@ -69,7 +70,13 @@ import static vavix.rococoa.iokit.IOKitLib.kIOHIDElementUsagePageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDPrimaryUsagePageKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductIDKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDMaxFeatureReportSizeKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDMaxInputReportSizeKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDMaxOutputReportSizeKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDProductKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportDescriptorKey;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportTypeFeature;
+import static vavix.rococoa.iokit.IOKitLib.kIOHIDReportTypeInput;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDTransportKey;
 import static vavix.rococoa.iokit.IOKitLib.kIOHIDVendorIDKey;
 
@@ -83,7 +90,7 @@ import static vavix.rococoa.iokit.IOKitLib.kIOHIDVendorIDKey;
  */
 public final class OSXHIDDevice {
 
-    private static final Logger log = Logger.getLogger(OSXHIDDevice.class.getName());
+    private static final Logger logger = getLogger(OSXHIDDevice.class.getName());
 
     public static final int AXIS_DEFAULT_MIN_VALUE = 0;
     public static final int AXIS_DEFAULT_MAX_VALUE = 64 * 1024;
@@ -152,9 +159,9 @@ public final class OSXHIDDevice {
         int usageId = getIntFromProperties(elementProperties, kIOHIDElementUsageKey);
         int usagePage = getIntFromProperties(elementProperties, kIOHIDElementUsagePageKey);
         UsagePair usagePair = createUsagePair(usagePage, usageId);
-log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usagePage = " + usagePage);
+logger.log(Level.TRACE, "elementType = 0x" + elementType + " | usageId = " + usageId + " | usagePage = " + usagePage);
         if (usagePair == null || (elementType != ElementType.INPUT_MISC && elementType != ElementType.INPUT_BUTTON && elementType != ElementType.INPUT_AXIS)) {
-//log.info("elementType = 0x" + elementType + " | usageId = " + usageId + " | usagePage = " + usagePage);
+//logger.log(Level.INFO, "elementType = 0x" + elementType + " | usageId = " + usageId + " | usagePage = " + usagePage);
             return null;
         } else {
             return new OSXHIDElement(this, usagePair, elementCookie, elementType, min, max, isRelative);
@@ -165,13 +172,13 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
     private void addElements(List<OSXHIDElement> elements, Map<String, ?> properties) {
         Object[] elementsProperties = (Object[]) properties.get(kIOHIDElementKey);
         if (elementsProperties == null) {
-            log.finer("no elements");
+            logger.log(Level.TRACE, "no elements");
             return;
         }
-        log.finer("elementsProperties: " + elementsProperties.length);
+        logger.log(Level.TRACE, "elementsProperties: " + elementsProperties.length);
         for (Object elementsProperty : elementsProperties) {
             Map<String, ?> elementProperties = (Map<String, ?>) elementsProperty;
-            log.finer("elementProperties: " + elementProperties);
+            logger.log(Level.TRACE, "elementProperties: " + elementProperties);
             if (elementProperties == null) continue;
             OSXHIDElement element = createElementFromElementProperties(elementProperties);
             if (element != null) {
@@ -204,7 +211,7 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
     }
 
     private static long getLongFromProperties(Map<String, ?> properties, String key) {
-        log.finer("key: " + key + ", value: " + properties.get(key));
+        logger.log(Level.TRACE, "key: " + key + ", value: " + properties.get(key));
         Object v = properties.get(key);
         return v != null ? (long) v : 0;
     }
@@ -228,17 +235,17 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
 //#region debug
 
     private void dumpProperties() {
-        log.info(toString());
+        logger.log(Level.INFO, toString());
         dumpMap("", properties);
     }
 
     private static void dumpArray(String prefix, Object[] array) {
-        log.info(prefix + "{");
+        logger.log(Level.INFO, prefix + "{");
         for (Object o : array) {
             dumpObject(prefix + "\t", o);
-            log.info(prefix + ",");
+            logger.log(Level.INFO, prefix + ",");
         }
-        log.info(prefix + "}");
+        logger.log(Level.INFO, prefix + "}");
     }
 
     private static void dumpMap(String prefix, Map<String, ?> map) {
@@ -252,13 +259,13 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
     @SuppressWarnings("unchecked")
     private static void dumpObject(String prefix, Object obj) {
         if (obj instanceof Long l) {
-            log.info(prefix + "0x" + Long.toHexString(l));
+            logger.log(Level.INFO, prefix + "0x" + Long.toHexString(l));
         } else if (obj instanceof Map)
             dumpMap(prefix, (Map<String, ?>) obj);
         else if (obj != null && obj.getClass().isArray())
             dumpArray(prefix, (Object[]) obj);
         else
-            log.info(prefix + obj);
+            logger.log(Level.INFO, prefix + obj);
     }
 
 //#endregion
@@ -277,7 +284,7 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
         CFDictionary properties = new CFDictionary(pProperties.getValue());
         @SuppressWarnings({"unchecked", "rawtypes"})
         Map<String, ?> map = (Map) properties.toMap();
-        log.finer("IORegistryEntryCreateCFProperties: " + map);
+        logger.log(Level.TRACE, "IORegistryEntryCreateCFProperties: " + map);
         return map;
     }
 
@@ -298,7 +305,7 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
 
         int ioReturnValue = deviceInterface.getElementValue.invoke(deviceInterfaceAddress, elementCookie, nativeEvent);
         if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
-            throw new IOException(String.format("Device '%s' getElementValue failed: %x", getProductName(), ioReturnValue));
+            throw new IOException("Device '%s' getElementValue failed: %x".formatted(getProductName(), ioReturnValue));
         }
         event.set(nativeEvent);
     }
@@ -315,14 +322,14 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
     private void open() throws IOException {
         int ioReturnValue = deviceInterface.open.invoke(deviceInterfaceAddress, 0);
         if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
-            throw new IOException(String.format("Device '%s' open failed: %x", getProductName(), ioReturnValue));
+            throw new IOException("Device '%s' open failed: %x".formatted(getProductName(), ioReturnValue));
         }
     }
 
     private void close() throws IOException {
         int ioReturnValue = deviceInterface.close.invoke(deviceInterfaceAddress);
         if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
-            throw new IOException(String.format("Device '%s' close failed: %x", getProductName(), ioReturnValue));
+            throw new IOException("Device '%s' close failed: %x".formatted(getProductName(), ioReturnValue));
         }
     }
 
@@ -336,12 +343,74 @@ log.finer("elementType = 0x" + elementType + " | usageId = " + usageId + " | usa
         Memory m = new Memory(len + 1);
         m.setByte(0, (byte) reportID);
         m.write(1, buf, 0, len);
-Debug.println(Level.FINER, m.dump());
+logger.log(Level.TRACE, m.dump());
         int ioReturnValue = deviceInterface.setReport.invoke(deviceInterfaceAddress, type, reportID, m, (int) m.size(), -1, null, null, null);
-Debug.println(Level.FINER, "ioReturnValue: " + ioReturnValue);
+logger.log(Level.TRACE, "ioReturnValue: " + ioReturnValue);
         m.close();
         if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
-            throw new IOException(String.format("Device '%s' setReport failed: %x", getProductName(), ioReturnValue));
+            throw new IOException("Device '%s' setReport failed: %x".formatted(getProductName(), ioReturnValue));
+        }
+    }
+
+    /** @return the raw report descriptor, null when IOKit does not give it */
+    public byte[] getReportDescriptor() {
+        Object descriptor = properties.get(kIOHIDReportDescriptorKey);
+        return descriptor instanceof byte[] bytes ? bytes.clone() : null;
+    }
+
+    /**
+     * @param type kIOHIDReportType*
+     * @return the largest report of the type the device declares, including a report id byte, 0 when unknown
+     */
+    public int getMaxReportSize(int type) {
+        String key = switch (type) {
+            case kIOHIDReportTypeInput -> kIOHIDMaxInputReportSizeKey;
+            case kIOHIDReportTypeFeature -> kIOHIDMaxFeatureReportSizeKey;
+            default -> kIOHIDMaxOutputReportSizeKey;
+        };
+        return (int) getLongFromProperties(properties, key, 0);
+    }
+
+    /**
+     * Sends a report as is. Unlike {@link #setReport(int, int, byte[], int)} the report id is
+     * put in front only when the device numbers its reports (reportID != 0).
+     *
+     * @param data the report body without the report id
+     */
+    public synchronized void writeReport(int type, int reportID, byte[] data) throws IOException {
+        checkReleased();
+        int offset = reportID != 0 ? 1 : 0;
+        try (Memory m = new Memory(Math.max(1, data.length + offset))) {
+            if (offset != 0) m.setByte(0, (byte) reportID);
+            m.write(offset, data, 0, data.length);
+            int ioReturnValue = deviceInterface.setReport.invoke(deviceInterfaceAddress, type, reportID, m, data.length + offset, -1, null, null, null);
+            if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
+                throw new IOException("Device '%s' setReport(%d, %d) failed: %x".formatted(getProductName(), type, reportID, ioReturnValue));
+            }
+        }
+    }
+
+    /**
+     * Asks the device for a report.
+     *
+     * @param buffer filled with the report body, the report id IOKit puts in front is taken off
+     * @return bytes filled
+     */
+    public synchronized int getReport(int type, int reportID, byte[] buffer) throws IOException {
+        checkReleased();
+        int capacity = Math.max(buffer.length + 1, getMaxReportSize(type));
+        try (Memory m = new Memory(capacity)) {
+            m.clear();
+            IntByReference length = new IntByReference(capacity);
+            int ioReturnValue = deviceInterface.getReport.invoke(deviceInterfaceAddress, type, reportID, m, length, -1, null, null, null);
+            if (ioReturnValue != IOKitLib.kIOReturnSuccess) {
+                throw new IOException("Device '%s' getReport(%d, %d) failed: %x".formatted(getProductName(), type, reportID, ioReturnValue));
+            }
+            int n = Math.min(length.getValue(), capacity);
+            int offset = reportID != 0 && n > 0 && (m.getByte(0) & 0xff) == reportID ? 1 : 0;
+            int count = Math.min(n - offset, buffer.length);
+            m.read(offset, buffer, 0, count);
+            return count;
         }
     }
 }

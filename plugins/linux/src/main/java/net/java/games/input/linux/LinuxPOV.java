@@ -33,9 +33,12 @@
 package net.java.games.input.linux;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import net.java.games.input.Component;
+
+import static java.lang.System.getLogger;
 
 
 /**
@@ -46,7 +49,7 @@ import net.java.games.input.Component;
  */
 final class LinuxPOV extends LinuxComponent {
 
-    private static final Logger log = Logger.getLogger(LinuxPOV.class.getName());
+    private static final Logger logger = getLogger(LinuxPOV.class.getName());
     
     private final LinuxEventComponent componentX;
     private final LinuxEventComponent componentY;
@@ -93,7 +96,7 @@ final class LinuxPOV extends LinuxComponent {
         else if (lastX == 1 && lastY == 1)
             return Component.POV.DOWN_RIGHT;
         else {
-            log.fine("Unknown values x = " + lastX + " | y = " + lastY);
+            logger.log(Level.DEBUG, "Unknown values x = " + lastX + " | y = " + lastY);
             return Component.POV.OFF;
         }
     }

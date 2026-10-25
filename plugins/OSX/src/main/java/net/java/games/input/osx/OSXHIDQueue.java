@@ -34,16 +34,18 @@
 package net.java.games.input.osx;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.sun.jna.Pointer;
+
 import vavix.rococoa.iokit.IOKitLib;
 import vavix.rococoa.iokit.IOKitLib.IOHIDEventStruct;
 import vavix.rococoa.iokit.IOKitLib.IOHIDQueueInterface;
 
+import static java.lang.System.getLogger;
 import static vavix.rococoa.iokit.IOKitLib.kIOReturnSuccess;
-import static vavix.rococoa.iokit.IOKitLib.log;
 
 
 /**
@@ -51,6 +53,8 @@ import static vavix.rococoa.iokit.IOKitLib.log;
  * @version 1.0
  */
 final class OSXHIDQueue {
+
+    private static final Logger logger = getLogger(OSXHIDQueue.class.getName());
 
     /** key: IOHIDElementCookie */
     private final Map<Integer, OSXComponent> map = new HashMap<>();
@@ -94,28 +98,28 @@ final class OSXHIDQueue {
     private void open(int queueDepth) throws IOException {
         int ioReturnValue = queue.create.invoke(queueAddress, 0, queueDepth);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue open failed: %x", ioReturnValue));
+            throw new IOException("Queue open failed: %x".formatted(ioReturnValue));
         }
     }
 
     private void close() throws IOException {
         int ioReturnValue = queue.dispose.invoke(queueAddress);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue dispose failed: %x", ioReturnValue));
+            throw new IOException("Queue dispose failed: %x".formatted(ioReturnValue));
         }
     }
 
     private void start() throws IOException {
         int ioReturnValue = queue.start.invoke(queueAddress);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue start failed: %x", ioReturnValue));
+            throw new IOException("Queue start failed: %x".formatted(ioReturnValue));
         }
     }
 
     private void stop() throws IOException {
         int ioReturnValue = queue.stop.invoke(queueAddress);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue stop failed: %x", ioReturnValue));
+            throw new IOException("Queue stop failed: %x".formatted(ioReturnValue));
         }
     }
 
@@ -128,7 +132,7 @@ final class OSXHIDQueue {
             } finally {
                 int ioReturnValue = queue.release.invoke(queueAddress).intValue();
                 if (ioReturnValue != kIOReturnSuccess) {
-                    log.warning(String.format("Queue Release failed: %x", ioReturnValue));
+                    logger.log(Level.WARNING, "Queue Release failed: %x".formatted(ioReturnValue));
                 }
             }
         }
@@ -137,7 +141,7 @@ final class OSXHIDQueue {
     public void addElement(OSXHIDElement element, OSXComponent component) throws IOException {
         int ioReturnValue = queue.addElement.invoke(queueAddress, element.getCookie(), 0);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue addElement failed: %x", ioReturnValue));
+            throw new IOException("Queue addElement failed: %x".formatted(ioReturnValue));
         }
         map.put(element.getCookie(), component);
     }
@@ -145,7 +149,7 @@ final class OSXHIDQueue {
     public void removeElement(OSXHIDElement element) throws IOException {
         int ioReturnValue = queue.removeElement.invoke(queueAddress, element.getCookie(), 0);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue removeElement failed: %x", ioReturnValue));
+            throw new IOException("Queue removeElement failed: %x".formatted(ioReturnValue));
         }
         map.remove(element.getCookie());
     }
@@ -159,7 +163,7 @@ final class OSXHIDQueue {
         if (ioReturnValue == IOKitLib.kIOReturnUnderrun) {
             return false;
         } else if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Queue getNextEvent failed: %x", ioReturnValue));
+            throw new IOException("Queue getNextEvent failed: %x".formatted(ioReturnValue));
         }
         event.set(nativeEvent);
         return true;

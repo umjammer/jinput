@@ -40,8 +40,9 @@
 package net.java.games.input.osx;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
-import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
@@ -50,6 +51,7 @@ import vavix.rococoa.corefoundation.CFLib;
 import vavix.rococoa.iokit.IOKitLib;
 import vavix.rococoa.iokit.IOKitLib.IOCFPlugInInterface;
 
+import static java.lang.System.getLogger;
 import static vavix.rococoa.iokit.IOKitLib.INSTANCE;
 import static vavix.rococoa.iokit.IOKitLib.IO_OBJECT_NULL;
 import static vavix.rococoa.iokit.IOKitLib.MACH_PORT_NULL;
@@ -69,7 +71,7 @@ import static vavix.rococoa.iokit.IOKitLib.kIOReturnSuccess;
  */
 final class OSXHIDDeviceIterator {
 
-    private static final Logger log = Logger.getLogger(OSXHIDDeviceIterator.class.getName());
+    private static final Logger logger = getLogger(OSXHIDDeviceIterator.class.getName());
 
     private final Pointer iteratorAddress;
 
@@ -91,7 +93,7 @@ final class OSXHIDDeviceIterator {
             throw new IOException("Failed to create iterator");
         }
 
-log.finer("iterator: " + hidObjectIterator.getValue());
+logger.log(Level.TRACE, "iterator: " + hidObjectIterator.getValue());
         this.iteratorAddress = hidObjectIterator.getValue();
     }
 
@@ -112,13 +114,13 @@ if (result != IOKitLib.KERN_SUCCESS) {
  IOKitLib.INSTANCE.IOObjectRelease(hidDevice);
  throw new IOException("Failed to get device path " + result);
 }
-log.finer("IORegistryEntryGetPath: " + new String(path.array()).replace("\u0000", ""));
+logger.log(Level.TRACE, "IORegistryEntryGetPath: " + new String(path.array()).replace("\u0000", ""));
 
         Pointer /* HidDeviceInterface** */ deviceInterface = createHIDDevice(hidDevice);
-log.finer("deviceInterface: " + deviceInterface.toString());
+logger.log(Level.TRACE, "deviceInterface: " + deviceInterface.toString());
         if (deviceInterface == MACH_PORT_NULL) {
             INSTANCE.IOObjectRelease(hidDevice);
-log.fine("deviceInterface is MACH_PORT_NULL");
+logger.log(Level.DEBUG, "deviceInterface is MACH_PORT_NULL");
             return null;
         }
 
@@ -140,12 +142,12 @@ log.fine("deviceInterface is MACH_PORT_NULL");
 ByteBuffer /* io_name_t */ className = ByteBuffer.allocate(512);
 int ioReturnValue0 = INSTANCE.IOObjectGetClass(hidDevice, className);
 if (ioReturnValue0 != kIOReturnSuccess) {
- log.fine("Failed to get IOObject class name.");
+ logger.log(Level.DEBUG, "Failed to get IOObject class name.");
 }
-log.finer("Found device type: " + new String(className.array()).replace("\u0000", ""));
+logger.log(Level.TRACE, "Found device type: " + new String(className.array()).replace("\u0000", ""));
 
-log.finer("kIOHIDDeviceUserClientTypeID" + kIOHIDDeviceUserClientTypeID.dump(0, 32));
-log.finer("kIOCFPlugInInterfaceID" + kIOCFPlugInInterfaceID.dump(0, 32));
+logger.log(Level.TRACE, "kIOHIDDeviceUserClientTypeID" + kIOHIDDeviceUserClientTypeID.dump(0, 32));
+logger.log(Level.TRACE, "kIOCFPlugInInterfaceID" + kIOCFPlugInInterfaceID.dump(0, 32));
 
         int ioReturnValue = INSTANCE.IOCreatePlugInInterfaceForService(hidDevice,
                 kIOHIDDeviceUserClientTypeID,
@@ -153,22 +155,22 @@ log.finer("kIOCFPlugInInterfaceID" + kIOCFPlugInInterfaceID.dump(0, 32));
                 ppPlugInInterface,
                 score);
         if (ioReturnValue != kIOReturnSuccess) {
-            throw new IOException(String.format("Couldn't create plugin for device interface %08x", ioReturnValue));
+            throw new IOException("Couldn't create plugin for device interface %08x".formatted(ioReturnValue));
         }
 
         // Call a method of the intermediate plug-in to create the device
         // interface
-log.finer(ppPlugInInterface.getValue().getPointer(0).dump(0, 64));
+logger.log(Level.TRACE, ppPlugInInterface.getValue().getPointer(0).dump(0, 64));
         IOCFPlugInInterface plugInInterface = new IOCFPlugInInterface(ppPlugInInterface.getValue().getPointer(0));
-log.finer(plugInInterface.toString());
-log.finer("CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID):" + CFLib.INSTANCE.CFUUIDGetUUIDBytes(IOKitLib.kIOHIDDeviceInterfaceID).getPointer().dump(0, 16));
+logger.log(Level.TRACE, plugInInterface.toString());
+logger.log(Level.TRACE, "CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID):" + CFLib.INSTANCE.CFUUIDGetUUIDBytes(IOKitLib.kIOHIDDeviceInterfaceID).getPointer().dump(0, 16));
         int plugInResult = plugInInterface.queryInterface.invoke(
                 ppPlugInInterface.getValue(),
                 CFLib.INSTANCE.CFUUIDGetUUIDBytes(IOKitLib.kIOHIDDeviceInterfaceID),
                 ppHidDeviceInterface);
         plugInInterface.release.invoke(ppPlugInInterface.getValue());
         if (plugInResult != CFLib.S_OK) {
-            throw new IOException(String.format("Couldn't create HID class device interface %08x", plugInResult));
+            throw new IOException("Couldn't create HID class device interface %08x".formatted(plugInResult));
         }
 
         return ppHidDeviceInterface.getValue();

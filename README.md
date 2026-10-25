@@ -11,7 +11,7 @@
 
 this library is
 
- - using jna directly instead of jni
+ - using jna instead of jni
  - using service-loader instead of proprietary plugin mechanism
 
 and this is a fork of [original](https://github.com/jinput/jinput)
@@ -29,9 +29,12 @@ and this is a fork of [original](https://github.com/jinput/jinput)
  * [purejavahidapi](https://github.com/umjammer/purejavahidapi)
  * [gamepad4j](https://github.com/umjammer/gamepad4j)
 
-### rumbler
+### samples
 
- * [sample](plugins/OSX/src/test/java/net/java/games/input/osx/OSXPluginTest.java)
+ * [rumbler](plugins/OSX/src/test/java/net/java/games/input/osx/OSXPluginTest.java)
+ * [gamepad tester](plugins/OSX/src/test/java/net/java/games/input/osx/visualizer/gamepad/GamepadTesterTest.java)
+ * [gyro paperplane](plugins/OSX/src/test/java/net/java/games/input/osx/visualizer/gyro/PaperPlaneVisualizerTest.java)
+ * [gyro theremin](plugins/OSX/src/test/java/net/java/games/input/osx/GyroThereminTest.java)
 
 ## References
 
@@ -56,6 +59,8 @@ Licensed under [BSD License](https://opensource.org/licenses/BSD-3-Clause), copy
   * separate jna parts as jna-platform-extended?
 * ~~at windows, i mistake dword as 2byte~~
 * component value should be generics? (currently float fixed)
+* ~~test disconnect/reconnect~~
+* check listener threadsafe, see hid4java
 
 ---
 <sub>images by <a href="https://megamodz.com/PS5-Controller-Paddles">DualSense</a>, <a href="https://wiki.openjdk.org/display/duke/Gallery">Duke</a></sub>

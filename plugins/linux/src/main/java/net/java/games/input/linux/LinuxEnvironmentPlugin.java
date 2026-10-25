@@ -29,11 +29,12 @@ package net.java.games.input.linux;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.java.games.input.AbstractComponent;
 import net.java.games.input.Component;
@@ -44,6 +45,8 @@ import net.java.games.input.Keyboard;
 import net.java.games.input.Mouse;
 import net.java.games.input.Rumbler;
 
+import static java.lang.System.getLogger;
+
 
 /**
  * Environment plugin for linux
@@ -53,7 +56,7 @@ import net.java.games.input.Rumbler;
  */
 public final class LinuxEnvironmentPlugin extends ControllerListenerSupport implements ControllerEnvironment {
 
-    private static final Logger log = Logger.getLogger(LinuxEnvironmentPlugin.class.getName());
+    private static final Logger logger = getLogger(LinuxEnvironmentPlugin.class.getName());
 
     private static boolean supported = false;
 
@@ -89,7 +92,7 @@ public final class LinuxEnvironmentPlugin extends ControllerListenerSupport impl
     public Controller[] getControllers() {
         if (this.controllers == null) {
             enumerateControllers();
-log.fine("Linux plugin claims to have found " + controllers.size() + " controllers");
+logger.log(Level.DEBUG, "Linux plugin claims to have found " + controllers.size() + " controllers");
         }
         return controllers.toArray(Controller[]::new);
     }
@@ -128,7 +131,7 @@ log.fine("Linux plugin claims to have found " + controllers.size() + " controlle
                     povs[3][1] = eventComponent;
                     break;
                 default:
-                    log.fine("Unknown POV instance: " + nativeCode);
+                    logger.log(Level.DEBUG, "Unknown POV instance: " + nativeCode);
                     break;
                 }
             } else if (identifier != null) {
@@ -333,7 +336,7 @@ log.fine("Linux plugin claims to have found " + controllers.size() + " controlle
                 } else
                     device.close();
             } catch (IOException e) {
-                log.fine("Failed to open device (" + eventFile + "): " + e.getMessage());
+                logger.log(Level.DEBUG, "Failed to open device (" + eventFile + "): " + e.getMessage());
             }
         }
     }
@@ -350,7 +353,7 @@ log.fine("Linux plugin claims to have found " + controllers.size() + " controlle
     private static File[] listFilesPrivileged(File dir, FilenameFilter filter) {
         File[] files = dir.listFiles(filter);
         if (files == null) {
-            log.fine("dir " + dir.getName() + " exists: " + dir.exists() + ", is writable: " + dir.isDirectory());
+            logger.log(Level.DEBUG, "dir " + dir.getName() + " exists: " + dir.exists() + ", is writable: " + dir.isDirectory());
             files = new File[] {};
         } else {
             Arrays.sort(files, Comparator.comparing(File::getName));
@@ -376,11 +379,11 @@ log.fine("Linux plugin claims to have found " + controllers.size() + " controlle
                     } else
                         device.close();
                 } catch (IOException e) {
-                    log.fine("Failed to create Controller: " + e.getMessage());
+                    logger.log(Level.DEBUG, "Failed to create Controller: " + e.getMessage());
                     device.close();
                 }
             } catch (IOException e) {
-                log.fine("Failed to open device (" + eventFile + "): " + e.getMessage());
+                logger.log(Level.DEBUG, "Failed to open device (" + eventFile + "): " + e.getMessage());
             }
         }
     }
@@ -391,7 +394,7 @@ log.fine("Linux plugin claims to have found " + controllers.size() + " controlle
                 LinuxDevice device = linuxDevice;
                 device.close();
             } catch (IOException e) {
-                log.fine("Failed to close device: " + e.getMessage());
+                logger.log(Level.DEBUG, "Failed to close device: " + e.getMessage());
             }
         }
     }

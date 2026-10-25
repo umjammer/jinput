@@ -1197,9 +1197,9 @@ public interface WinAPI {
         Kernel32Ex INSTANCE = Native.load("kernel32", Kernel32Ex.class, W32APIOptions.UNICODE_OPTIONS);
 
         // https://msdn.microsoft.com/library/windows/desktop/ms686219.aspx
-        int ABOVE_NORMAL_PRIORITY_CLASS = 0x00008000;
-        int HIGH_PRIORITY_CLASS = 0x00000080;
-        int NORMAL_PRIORITY_CLASS = 0x00000020;
+        int ABOVE_NORMAL_PRIORITY_CLASS = 0x0000_8000;
+        int HIGH_PRIORITY_CLASS = 0x0000_0080;
+        int NORMAL_PRIORITY_CLASS = 0x0000_0020;
 
         boolean SetPriorityClass(HANDLE hProcess, int dwPriorityClass);
 

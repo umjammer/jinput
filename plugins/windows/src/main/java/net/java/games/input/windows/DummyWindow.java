@@ -110,7 +110,7 @@ final class DummyWindow {
         if (!User32.INSTANCE.GetClassInfoEx(hInst, DUMMY_WINDOW_NAME, classInfo)) {
             // Register the dummy input window
             if (!RegisterDummyWindow(hInst)) {
-                throw new IOException(String.format("Failed to register window class (%d)", Native.getLastError()));
+                throw new IOException("Failed to register window class (%d)".formatted(Native.getLastError()));
             }
         }
 
@@ -119,7 +119,7 @@ final class DummyWindow {
                 WS_POPUP | WS_ICONIC,
                 0, 0, 0, 0, null, null, hInst, null);
         if (hwndDummy == null) {
-            throw new IOException(String.format("Failed to create window (%d)", Native.getLastError()));
+            throw new IOException("Failed to create window (%d)".formatted(Native.getLastError()));
         }
         return hwndDummy;
     }
@@ -131,7 +131,7 @@ final class DummyWindow {
     private static void nDestroy(HWND hwndDummy) throws IOException {
         boolean result = User32.INSTANCE.DestroyWindow(hwndDummy);
         if (!result) {
-            throw new IOException(String.format("Failed to destroy window (%d)", Native.getLastError()));
+            throw new IOException("Failed to destroy window (%d)".formatted(Native.getLastError()));
         }
     }
 

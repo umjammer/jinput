@@ -6,10 +6,11 @@
 
 package vavix.rococoa.corefoundation;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.sun.jna.Callback;
 import com.sun.jna.CallbackReference;
@@ -23,6 +24,8 @@ import com.sun.jna.Structure;
 import com.sun.jna.ptr.ByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 
+import static java.lang.System.getLogger;
+
 
 /**
  * CFLib.
@@ -32,7 +35,7 @@ import com.sun.jna.ptr.NativeLongByReference;
  */
 public interface CFLib extends Library {
 
-    Logger log = Logger.getLogger(CFLib.class.getName());
+    Logger logger = getLogger(CFLib.class.getName());
 
     CFLib INSTANCE = Native.load("CoreFoundation", CFLib.class);
 
@@ -109,7 +112,7 @@ public interface CFLib extends Library {
             copyDescription = (CopyDescriptionCallback) CallbackReference.getCallback(CopyDescriptionCallback.class, p.getPointer(0x18));
             equal = (EqualCallback) CallbackReference.getCallback(EqualCallback.class, p.getPointer(0x20));
             write();
-log.fine(this.toString());
+logger.log(Level.DEBUG, this.toString());
         }
 
         @Override

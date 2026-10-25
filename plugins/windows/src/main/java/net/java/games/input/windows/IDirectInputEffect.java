@@ -33,13 +33,15 @@
 package net.java.games.input.windows;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import com.sun.jna.Pointer;
 import net.java.games.input.Component;
 import net.java.games.input.Rumbler;
 import net.java.games.input.windows.WinAPI.DIEFFECT;
 
+import static java.lang.System.getLogger;
 import static net.java.games.input.windows.IDirectInputDevice.DIEP_GAIN;
 
 
@@ -51,7 +53,7 @@ import static net.java.games.input.windows.IDirectInputDevice.DIEP_GAIN;
  */
 final class IDirectInputEffect implements Rumbler {
 
-    private static final Logger log = Logger.getLogger(IDirectInputEffect.class.getName());
+    private static final Logger logger = getLogger(IDirectInputEffect.class.getName());
 
     enum DirectInputEffectOutput implements Component.Identifier.Output {
         DirectInputEffect("directInputEffect");
@@ -94,7 +96,7 @@ final class IDirectInputEffect implements Rumbler {
             } else
                 stop();
         } catch (IOException e) {
-            log.fine("Failed to set rumbler gain: " + e.getMessage());
+            logger.log(Level.DEBUG, "Failed to set rumbler gain: " + e.getMessage());
         }
     }
 

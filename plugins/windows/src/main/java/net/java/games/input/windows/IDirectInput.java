@@ -33,12 +33,13 @@
 package net.java.games.input.windows;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -50,6 +51,7 @@ import net.java.games.input.windows.WinAPI.DirectInput8Interface;
 import net.java.games.input.windows.WinAPI.IDirectInput8;
 import net.java.games.input.windows.WinAPI.User32Ex;
 
+import static java.lang.System.getLogger;
 import static net.java.games.input.windows.WinAPI.DI8DEVCLASS_ALL;
 import static net.java.games.input.windows.WinAPI.DIEDFL_ATTACHEDONLY;
 import static net.java.games.input.windows.WinAPI.DIENUM_CONTINUE;
@@ -67,7 +69,7 @@ import static net.java.games.input.windows.WinAPI.IID_IDirectInput8;
  */
 final class IDirectInput {
 
-    private static final Logger log = Logger.getLogger(IDirectInput.class.getName());
+    private static final Logger logger = getLogger(IDirectInput.class.getName());
 
     private final List<IDirectInputDevice> devices = new ArrayList<>();
     private final Pointer directInputAddress;
@@ -91,7 +93,7 @@ final class IDirectInput {
                 User32Ex.INSTANCE.GetModuleHandle(null), DIRECTINPUT_VERSION,
                 new Guid.GUID.ByValue(IID_IDirectInput8), pDirectInput, null);
         if (res < 0) {
-            throw new IOException(String.format("Failed to create IDirectInput8 (%d)", res));
+            throw new IOException("Failed to create IDirectInput8 (%d)".formatted(res));
         }
         return pDirectInput.getValue();
     }
@@ -131,7 +133,7 @@ final class IDirectInput {
         IDirectInput8 directInput8 = new IDirectInput8(_this.directInputAddress);
         int /* HRESULT */ res = directInput8.CreateDevice.apply(new Guid.GUID.ByValue(device.guidInstance), pDevice, null);
         if (res < 0) {
-            log.warning(String.format("Failed to create device (%d)", res));
+            logger.log(Level.WARNING, "Failed to create device (%d)".formatted(res));
             return DIENUM_STOP;
         }
 
@@ -151,7 +153,7 @@ final class IDirectInput {
         EnumContext.map.put(enumContext.id, this);
         int /* HRESULT */ res = directInput8.EnumDevices.apply(DI8DEVCLASS_ALL, IDirectInput::enumerateDevicesCallback, enumContext.getPointer(), DIEDFL_ATTACHEDONLY);
         if (res < 0) {
-            throw new IOException(String.format("Failed to enumerate devices (%d)", res));
+            throw new IOException("Failed to enumerate devices (%d)".formatted(res));
         }
     }
 
@@ -164,7 +166,7 @@ final class IDirectInput {
             IDirectInputDevice device = new IDirectInputDevice(window, address, instanceGuid, productGuid, devType, devSubtype, instanceName, productName);
             devices.add(device);
         } catch (IOException e) {
-            log.fine("Failed to initialize device " + productName + " because of: " + e);
+            logger.log(Level.DEBUG, "Failed to initialize device " + productName + " because of: " + e);
         }
     }
 

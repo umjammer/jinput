@@ -4,7 +4,7 @@
  * Programmed by Naohide Sano
  */
 
-package net.java.games.input.osx.visualizer.gylo;
+package net.java.games.input.osx.visualizer.gyro;
 
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;

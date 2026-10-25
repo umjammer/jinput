@@ -4,7 +4,7 @@
  * Programmed by Naohide Sano
  */
 
-package net.java.games.input.osx.visualizer.gylo;
+package net.java.games.input.osx.visualizer.gyro;
 
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
@@ -34,7 +34,7 @@ import static java.lang.System.getLogger;
  * <p>
  * This is a sample for the OSX plugin, not part of the library. Run it with
  * {@code mvn -pl plugins/OSX test-compile exec:java -Dexec.classpathScope=test
- * -Dexec.mainClass=net.java.games.input.osx.visualizer.gylo.PaperPlaneVisualizer}, or straight
+ * -Dexec.mainClass=net.java.games.input.osx.visualizer.gyro.PaperPlaneVisualizer}, or straight
  * from an IDE.
  * <p>
  * The pad to open is taken from {@code local.properties} in the module directory:
